@@ -4,7 +4,7 @@
 # Copyright 2019 - Wally
 # Copyright 2020 - Daniel 'dbeef' Zalega
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")
+# SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 if (DEFINED PSPDEV)
     # Custom PSPDEV passed as cmake call argument.
@@ -102,11 +102,14 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #    pspuser
 #)
 # before pspuser ${PSPSDK}/lib/prxexports.o
+# -D_REENTRANT \
+# -I${PSPDEV}/psp/include/SDL2 \
+# ${CMAKE_CXX_STANDARD_LIBRARIES} \
 
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
-    "${CMAKE_CXX_STANDARD_LIBRARIES} \
-     -lstdc++ \
+    "-lSDL2main -lSDL_mixer -lSDL2 \
+    -lstdc++ \
     -lpspirkeyb \
     -lpthread-psp \
     -lGL \
@@ -139,7 +142,7 @@ SET(
 
 # File defining macro outputting PSP-specific EBOOT.PBP out of passed executable target:
 #include("${PSPCMAKE}/CreatePBP.cmake")
-include(createpbp)
+include(CreatePBP)
 
 # Helper variable for multi-platform projects to identify current platform:
 set(PLATFORM_PSP TRUE BOOL)

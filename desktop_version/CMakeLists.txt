@@ -3,6 +3,9 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
+SET(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/PSP.cmake")
+
 # Set helper variables:
 SET(PSPDEV $ENV{PSPDEV})
 SET(PSPSDK ${PSPDEV}/psp/sdk)
@@ -199,7 +202,7 @@ IF(NOT OFFICIAL_BUILD)
 			-DGIT_EXECUTABLE=${GIT_EXECUTABLE}
 			-DINPUT_FILE=${VERSION_INPUT_FILE}
 			-DOUTPUT_FILE=${VERSION_OUTPUT_FILE}
-			-P ${CMAKE_CURRENT_SOURCE_DIR}/version.cmake
+			-P ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/version.cmake
 		)
 
 		ADD_DEPENDENCIES(VVVVVV GenerateVersion)
@@ -257,8 +260,9 @@ TARGET_LINK_LIBRARIES(VVVVVV physfs-static tinyxml2-static lodepng-static)
 # SDL2 Dependency (Detection pulled from FAudio)
 if (DEFINED SDL2_INCLUDE_DIRS AND DEFINED SDL2_LIBRARIES)
 	message(STATUS "Using pre-defined SDL2 variables SDL2_INCLUDE_DIRS and SDL2_LIBRARIES")
-	target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>")
-	target_link_libraries(VVVVVV ${SDL2_LIBRARIES})
+        target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>")
+        # target_link_libraries(VVVVVV ${SDL2_LIBRARIES})
+        # link_directories(AFTER VVVVVV ${SDL2_INCLUDE_DIRS})
 else()
 	# Only try to autodetect if both SDL2 variables aren't explicitly set
 	find_package(SDL2 CONFIG)
