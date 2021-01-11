@@ -125,8 +125,8 @@ SET(
     -D_GNU_SOURCE=1 \
     -D_REENTRANT \
     -lSDL2main \
-    -lSDL2 \
     -lSDL_mixer \
+    -lSDL2 \
     -lvorbisidec \
     -lvorbisfile \
     -lvorbisenc \
@@ -160,6 +160,7 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
+    -lpsphprm \
     -lpspkernel\
     -lpspvalloc \
     -lpspvram
