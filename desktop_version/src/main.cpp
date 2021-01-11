@@ -26,6 +26,9 @@
 #include "SoundSystem.h"
 #include "UtilityClass.h"
 
+PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
+
 scriptclass script;
 
 #if !defined(NO_CUSTOM_LEVELS)

@@ -116,17 +116,21 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # -I${PSPDEV}/psp/include/SDL2 \
 
+#     "-I${PSPDEV}/psp/include/sys \
+#     -I${PSPDEV}/psp/include/ssp \
+#     -I${PSPDEV}/psp/include/ogg \
+#     -I${PSPDEV}/psp/include/vorbis \
+#     -I${PSPDEV}/psp/include/tremor \
+#     -I${PSPDEV}/psp/include/SDL2 \
+
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
-    "-I${PSPDEV}/psp/include/ogg \
-    -I${PSPDEV}/psp/include/vorbis \
-    -I${PSPDEV}/psp/include/tremor \
-    -I${PSPDEV}/psp/include/SDL2 \
-    -D_GNU_SOURCE=1 \
+    "-D_GNU_SOURCE=1 \
     -D_REENTRANT \
     -lSDL2main \
     -lSDL_mixer \
     -lSDL2 \
+    -lGL \
     -lvorbisidec \
     -lvorbisfile \
     -lvorbisenc \
@@ -136,22 +140,27 @@ SET(
     -lstdc++ \
     -lpspirkeyb \
     -lpthread-psp \
-    -lGL \
+    -lpspgu \
+    -lpspctrl \
     -lpspaudiolib \
     -lpspaudio \
     -lm \
     -lg \
     -lc \
+    -lpsphprm \
+    -lpspdebug \
     -lpspvfpu \
     -lpspfpu \
     -lpspgum \
-    -lpspgu \
     -lpsprtc \
-    -lpspdebug \
     -lpspdisplay \
     -lpspge \
-    -lpspctrl \
     -lpspsdk \
+    -lpspkernel\
+    -lpspvalloc \
+    -lpspvram \
+    -lpspvfpu \
+    -lpspvram \
     -lc \
     -lpspnet \
     -lpspnet_inet \
@@ -160,12 +169,50 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
-    -lpsphprm \
-    -lpspkernel\
-    -lpspvalloc \
-    -lpspvram
+    -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q
     "
 )
+
+# SET(
+#     CMAKE_CXX_STANDARD_LIBRARIES
+#     "-I${PSPDEV}/psp/include/sys \
+#     -I${PSPDEV}/psp/include/ssp \
+#     -I${PSPDEV}/psp/include/ogg \
+#     -I${PSPDEV}/psp/include/vorbis \
+#     -I${PSPDEV}/psp/include/tremor \
+#     -I${PSPDEV}/psp/include/SDL2 \
+#     -D_GNU_SOURCE=1 \
+#     -D_REENTRANT \
+#     -lstdc++ \
+#     -lSDL2_mixer \
+#     -lSDL2 \
+#     -lGL \
+#     -lpspvfpu \
+#     -lpspvram \
+#     -lvorbisidec \
+#     -lpthread-psp \
+#     -lc \
+#     -lpsphprm \
+#     -lpspdebug \
+#     -lpspgu \
+#     -lpspctrl \
+#     -lpspdisplay \
+#     -lpspge \
+#     -lpspsdk \
+#     -lpsprtc \
+#     -lpspaudio \
+#     -lpspirkeyb \
+#     -lpspnet \
+#     -lpspnet_inet \
+#     -lpsppower \
+#     -lpsputility \
+#     -lpspuser \
+#     -lpspkernel \
+#     -lm \
+#     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q
+#     "
+# )
+
 
 
 # File defining macro outputting PSP-specific EBOOT.PBP out of passed executable target:
