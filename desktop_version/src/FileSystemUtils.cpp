@@ -28,6 +28,9 @@
 #define MAX_PATH PATH_MAX
 #endif
 
+// TODO
+#define MAX_PATH 256
+
 static char saveDir[MAX_PATH] = {'\0'};
 static char levelDir[MAX_PATH] = {'\0'};
 
@@ -517,7 +520,8 @@ static void PLATFORM_migrateSaveData(char* output)
 		}
 	} while (FindNextFile(hFind, &findHandle));
 #else
-#error See PLATFORM_migrateSaveData
+// TODO
+//#error See PLATFORM_migrateSaveData
 #endif
 }
 

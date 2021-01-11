@@ -3,6 +3,29 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
+# Set helper variables:
+SET(PSPDEV $ENV{PSPDEV})
+SET(PSPSDK ${PSPDEV}/psp/sdk)
+SET(PSPBIN ${PSPDEV}/bin)
+SET(PSPCMAKE ${PSPDEV}/psp/share/cmake)
+
+SET(CMAKE_TOOLCHAIN_FILE ${PSPDEV}/share/cmake/PSP.cmake)
+
+MESSAGE(STATUS ${PSPSDK})
+
+# link_directories(BEFORE
+#     ${PSPSDK}/lib
+#     ${PSPDEV}/lib
+#     ${PSPDEV}/psp/lib
+# )
+
+# Set SDL2 variables
+
+# add_definitions(-DSDL2_INCLUDE_DIRS=${PSPDEV}/psp/include/SDL2)
+# add_definitions(-DSDL2_LIBRARIES=${PSPDEV}/psp/lib/libSDL.a;${PSPDEV}/psp/lib/libSDL2main.a;${PSPDEV}/psp/lib/libSDL2_mixer.a
+
+
+
 # CMake Options
 OPTION(ENABLE_WARNINGS "Enable compilation warnings" ON)
 OPTION(ENABLE_WERROR "Treat compilation warnings as errors" OFF)

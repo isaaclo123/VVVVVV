@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <stdio.h>
+#include <SDL.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tinyxml2.h>
@@ -25,6 +26,10 @@
 #ifdef _WIN32
 #define strcasecmp stricmp
 #endif
+
+inline int strcasecmp (const char* a, const char* b) {
+    return wcscasecmp((const wchar_t*) a, (const wchar_t*) b);
+}
 
 static bool GetButtonFromString(const char *pText, SDL_GameControllerButton *button)
 {
