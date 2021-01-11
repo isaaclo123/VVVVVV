@@ -9,10 +9,6 @@ SET(PSPSDK ${PSPDEV}/psp/sdk)
 SET(PSPBIN ${PSPDEV}/bin)
 SET(PSPCMAKE ${PSPDEV}/psp/share/cmake)
 
-SET(CMAKE_TOOLCHAIN_FILE ${PSPDEV}/share/cmake/PSP.cmake)
-
-MESSAGE(STATUS ${PSPSDK})
-
 # link_directories(BEFORE
 #     ${PSPSDK}/lib
 #     ${PSPDEV}/lib
@@ -292,3 +288,5 @@ IF(HAIKU)
 	FIND_LIBRARY(ROOT_LIBRARY root)
 	TARGET_LINK_LIBRARIES(VVVVVV ${BE_LIBRARY} ${ROOT_LIBRARY})
 ENDIF()
+
+MESSAGE(STATUS "INCLUDE___________ ${include_directories}")

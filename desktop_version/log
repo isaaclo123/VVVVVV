@@ -115,7 +115,7 @@ make[2]: Leaving directory '/home/isaac/git/VVVVVV/desktop_version'
 make  -f CMakeFiles/GenerateVersion.dir/build.make CMakeFiles/GenerateVersion.dir/build
 make[2]: Entering directory '/home/isaac/git/VVVVVV/desktop_version'
 /usr/bin/cmake -DGIT_EXECUTABLE=/usr/bin/git -DINPUT_FILE=/home/isaac/git/VVVVVV/desktop_version/src/Version.h.in -DOUTPUT_FILE=/home/isaac/git/VVVVVV/desktop_version/src/Version.h.out -P /home/isaac/git/VVVVVV/desktop_version/version.cmake
--- This is interim commit c235754 (committed 2021-01-10)
+-- This is interim commit bc3f969 (committed 2021-01-10)
 make[2]: Leaving directory '/home/isaac/git/VVVVVV/desktop_version'
 [ 30%] Built target GenerateVersion
 make  -f CMakeFiles/VVVVVV.dir/build.make CMakeFiles/VVVVVV.dir/depend
