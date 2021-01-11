@@ -87,15 +87,23 @@ distribution.
 		}
 	#endif
 #else
+// TODO
 	// GCC version 3 and higher
 	//#warning( "Using sn* functions." )
-	#define TIXML_SNPRINTF	snprintf
-	#define TIXML_VSNPRINTF	vsnprintf
+	// #define TIXML_SNPRINTF	snprintf
+        static inline int TIXML_SNPRINTF ( char * s, size_t n, const char * format, ...) {
+                return 0;
+        }
+	// #define TIXML_VSNPRINTF	vsnprintf
+        static inline int TIXML_VSNPRINTF (char * s, size_t n, const char * format, va_list arg ) {
+            return 0;
+        }
 	static inline int TIXML_VSCPRINTF( const char* format, va_list va )
 	{
-		int len = vsnprintf( 0, 0, format, va );
-		TIXMLASSERT( len >= 0 );
-		return len;
+                return 0;
+		// int len = vsnprintf( 0, 0, format, va );
+		// TIXMLASSERT( len >= 0 );
+		// return len;
 	}
 	#define TIXML_SSCANF   sscanf
 #endif
@@ -1070,10 +1078,10 @@ char* XMLNode::ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr )
             // Declarations are only allowed at document level
             //
             // Multiple declarations are allowed but all declarations
-            // must occur before anything else. 
+            // must occur before anything else.
             //
-            // Optimized due to a security test case. If the first node is 
-            // a declaration, and the last node is a declaration, then only 
+            // Optimized due to a security test case. If the first node is
+            // a declaration, and the last node is a declaration, then only
             // declarations have so far been added.
             bool wellLocated = false;
 

@@ -9,7 +9,7 @@ SET(PSPSDK ${PSPDEV}/psp/sdk)
 SET(PSPBIN ${PSPDEV}/bin)
 SET(PSPCMAKE ${PSPDEV}/psp/share/cmake)
 
-# link_directories(BEFORE
+# link_directories(
 #     ${PSPSDK}/lib
 #     ${PSPDEV}/lib
 #     ${PSPDEV}/psp/lib

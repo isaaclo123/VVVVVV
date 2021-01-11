@@ -107,6 +107,7 @@ SET(
     CMAKE_CXX_STANDARD_LIBRARIES
     "${CMAKE_CXX_STANDARD_LIBRARIES} \
      -lstdc++ \
+    -lpspirkeyb \
     -lpthread-psp \
     -lGL \
     -lpspaudiolib \

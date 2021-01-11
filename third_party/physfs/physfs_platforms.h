@@ -73,7 +73,9 @@
 #  define PHYSFS_PLATFORM_UNIX 1
 #  define PHYSFS_PLATFORM_POSIX 1
 #else
-#  error Unknown platform.
+// #  error Unknown platform.
+#  define PHYSFS_PLATFORM_UNIX 1
+#  define PHYSFS_PLATFORM_POSIX 1
 #endif
 
 #endif  /* include-once blocker. */
