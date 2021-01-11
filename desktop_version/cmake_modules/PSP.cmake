@@ -114,14 +114,24 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # ${PSPDEV}/psp/lib/libvorbis.a \
 # ${PSPDEV}/psp/lib/libogg.a \
 
+# -I${PSPDEV}/psp/include/SDL2 \
+
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
     "-I${PSPDEV}/psp/include/ogg \
-    -D_REENTRANT \
+    -I${PSPDEV}/psp/include/vorbis \
+    -I${PSPDEV}/psp/include/tremor \
     -I${PSPDEV}/psp/include/SDL2 \
-    -lSDL2main -lSDL2 -lSDL_mixer \
-    -logg \
+    -D_GNU_SOURCE=1 \
+    -D_REENTRANT \
+    -lSDL2main \
+    -lSDL2 \
+    -lSDL_mixer \
+    -lvorbisidec \
+    -lvorbisfile \
+    -lvorbisenc \
     -lvorbis \
+    -logg \
     -lmikmod \
     -lstdc++ \
     -lpspirkeyb \
@@ -150,7 +160,10 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
-    -lpspkernel"
+    -lpspkernel\
+    -lpspvalloc \
+    -lpspvram
+    "
 )
 
 
