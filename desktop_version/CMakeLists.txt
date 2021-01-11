@@ -255,7 +255,17 @@ ADD_LIBRARY(physfs-static STATIC ${PFS_SRC} ${PFSP_SRC})
 ADD_LIBRARY(lodepng-static STATIC ${PNG_SRC})
 
 # Static Dependencies
-TARGET_LINK_LIBRARIES(VVVVVV physfs-static tinyxml2-static lodepng-static)
+TARGET_LINK_LIBRARIES(VVVVVV)
+
+
+TARGET_LINK_LIBRARIES(
+    VVVVVV
+    # ${PSPDEV}/psp/lib/libmikmod.a
+    # ${PSPDEV}/psp/lib/libvorbis.a
+    # ${PSPDEV}/psp/lib/libogg.a
+    physfs-static
+    tinyxml2-static
+    lodepng-static)
 
 # SDL2 Dependency (Detection pulled from FAudio)
 if (DEFINED SDL2_INCLUDE_DIRS AND DEFINED SDL2_LIBRARIES)
@@ -292,5 +302,3 @@ IF(HAIKU)
 	FIND_LIBRARY(ROOT_LIBRARY root)
 	TARGET_LINK_LIBRARIES(VVVVVV ${BE_LIBRARY} ${ROOT_LIBRARY})
 ENDIF()
-
-MESSAGE(STATUS "INCLUDE___________ ${include_directories}")

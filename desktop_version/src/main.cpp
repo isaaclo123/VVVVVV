@@ -1,3 +1,7 @@
+#include <pspkernel.h>
+#include <pspdebug.h>
+#include <pspdisplay.h>
+
 #include <SDL.h>
 #include <stdio.h>
 #include <string.h>

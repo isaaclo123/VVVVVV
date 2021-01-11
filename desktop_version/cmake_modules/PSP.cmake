@@ -106,9 +106,23 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # -I${PSPDEV}/psp/include/SDL2 \
 # ${CMAKE_CXX_STANDARD_LIBRARIES} \
 
+# -lvorbis \
+#    -logg \
+#    -lmikmod \
+
+# ${PSPDEV}/psp/lib/libmikmod.a \
+# ${PSPDEV}/psp/lib/libvorbis.a \
+# ${PSPDEV}/psp/lib/libogg.a \
+
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
-    "-lSDL2main -lSDL_mixer -lSDL2 \
+    "-I${PSPDEV}/psp/include/ogg \
+    -D_REENTRANT \
+    -I${PSPDEV}/psp/include/SDL2 \
+    -lSDL2main -lSDL2 -lSDL_mixer \
+    -logg \
+    -lvorbis \
+    -lmikmod \
     -lstdc++ \
     -lpspirkeyb \
     -lpthread-psp \
