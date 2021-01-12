@@ -17,3 +17,8 @@ cmake .. \
 cd ../
 
 cmake --build build
+
+cd build
+
+psp-fixup-imports VVVVVV
+psp-prxgen VVVVVV VVVVVV.prx
