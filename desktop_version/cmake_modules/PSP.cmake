@@ -45,7 +45,7 @@ set(ENC ${PSPBIN}/PrxEncrypter)
 set(STRIP ${PSPBIN}/psp-strip)
 
 # Include directories:
-include_directories(${include_directories} ${PSPDEV}/include ${PSPSDK}/include)
+include_directories(${INCLUDE_DIRECTORIES} ${PSPDEV}/include ${PSPSDK}/include)
 
 add_definitions("-G0")
 
@@ -116,16 +116,19 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # -I${PSPDEV}/psp/include/SDL2 \
 
-#     "-I${PSPDEV}/psp/include/sys \
+# "-I${PSPDEV}/psp/include/sys \
 #     -I${PSPDEV}/psp/include/ssp \
 #     -I${PSPDEV}/psp/include/ogg \
 #     -I${PSPDEV}/psp/include/vorbis \
 #     -I${PSPDEV}/psp/include/tremor \
 #     -I${PSPDEV}/psp/include/SDL2 \
 
+
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
-    "-D_GNU_SOURCE=1 \
+
+    "${CMAKE_CXX_STANDARD_LIBRARIES} \
+    -D_GNU_SOURCE=1 \
     -D_REENTRANT \
     -lSDL2main \
     -lSDL_mixer \
@@ -169,6 +172,7 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
+    -lpsplibc \
     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q
     "
 )

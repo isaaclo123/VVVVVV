@@ -98,6 +98,7 @@ ENDIF()
 # Include Directories
 INCLUDE_DIRECTORIES(
 	src
+	../third_party/snprintf
 	../third_party/tinyxml2
 	../third_party/physfs
 	../third_party/lodepng
@@ -153,8 +154,10 @@ IF(GOG)
 ENDIF()
 
 SET(XML2_SRC
+	../third_party/tinyxml2/snprintf.cpp
 	../third_party/tinyxml2/tinyxml2.cpp
 )
+
 SET(PFS_SRC
 	../third_party/physfs/physfs.c
 	../third_party/physfs/physfs_archiver_dir.c
@@ -251,21 +254,24 @@ SET_PROPERTY(TARGET VVVVVV PROPERTY CXX_EXTENSIONS FALSE)
 
 # Library information
 ADD_LIBRARY(tinyxml2-static STATIC ${XML2_SRC})
-ADD_LIBRARY(physfs-static STATIC ${PFS_SRC} ${PFSP_SRC})
+target_precompile_headers(tinyxml2-static
+    PRIVATE ../third_party/tinyxml2/config.h
+    PRIVATE ../third_party/tinyxml2/tinyxml2.h
+)
+# target_include_directories(VVVVVV PUBLIC ../third_party/tinyxml2)
+
+ADD_LIBRARY(physfs-static STATIC ${PFS_SRC})
 ADD_LIBRARY(lodepng-static STATIC ${PNG_SRC})
 
+# TARGET_LINK_LIBRARIES(tinyxml2-static snprintf-static )
+
 # Static Dependencies
-TARGET_LINK_LIBRARIES(VVVVVV)
-
-
 TARGET_LINK_LIBRARIES(
     VVVVVV
-    # ${PSPDEV}/psp/lib/libmikmod.a
-    # ${PSPDEV}/psp/lib/libvorbis.a
-    # ${PSPDEV}/psp/lib/libogg.a
     physfs-static
     tinyxml2-static
-    lodepng-static)
+    lodepng-static
+    )
 
 # SDL2 Dependency (Detection pulled from FAudio)
 if (DEFINED SDL2_INCLUDE_DIRS AND DEFINED SDL2_LIBRARIES)
