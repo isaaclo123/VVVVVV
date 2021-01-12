@@ -106,8 +106,13 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
     "${CMAKE_CXX_STANDARD_LIBRARIES} \
-     -lstdc++ \
-    -lpspirkeyb \
+    -lstdc++ \
+    -lpspvram \
+    -lmikmod \
+    -losl \
+    -lvorbisidec \
+    -logg \
+    -lpsphprm \
     -lpthread-psp \
     -lGL \
     -lpspaudiolib \
@@ -133,7 +138,9 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
-    -lpspkernel"
+    -lpspkernel \
+    -specs=/usr/psp/psp/sdk/lib/prxspecs -Wl,-T/usr/psp/psp/sdk/lib/linkfile.prx,-q \
+    /usr/psp/psp/sdk/lib/prxexports.o"
 )
 
 

@@ -76,7 +76,13 @@ static inline Uint32 get_framerate(const int slowdown)
 static void inline deltaloop();
 static void inline fixedloop();
 
-int main(int argc, char *argv[])
+/*#include <pspkernel.h>
+
+PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
+
+int main(int argc, char *argv[])*/
+int SDL_main(int argc, char* argv[])
 {
     char* baseDir = NULL;
     char* assetsPath = NULL;

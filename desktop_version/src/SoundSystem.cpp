@@ -34,7 +34,8 @@ SoundTrack::SoundTrack(const char* fileName)
 	size_t length = 0;
 	FILESYSTEM_loadFileToMemory(fileName, &mem, &length);
 	SDL_RWops *fileIn = SDL_RWFromMem(mem, length);
-	sound = Mix_LoadWAV_RW(fileIn, 1);
+	sound = NULL;
+	//sound = Mix_LoadWAV_RW(fileIn, 1);
 	if (length)
 	{
 		FILESYSTEM_freeMemory(&mem);

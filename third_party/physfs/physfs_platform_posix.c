@@ -60,28 +60,7 @@ static inline PHYSFS_ErrorCode errcodeFromErrno(void)
 
 static char *getUserDirByUID(void)
 {
-    uid_t uid = getuid();
-    struct passwd *pw;
-    char *retval = NULL;
-
-    pw = getpwuid(uid);
-    if ((pw != NULL) && (pw->pw_dir != NULL) && (*pw->pw_dir != '\0'))
-    {
-        const size_t dlen = strlen(pw->pw_dir);
-        const size_t add_dirsep = (pw->pw_dir[dlen-1] != '/') ? 1 : 0;
-        retval = (char *) allocator.Malloc(dlen + 1 + add_dirsep);
-        if (retval != NULL)
-        {
-            strcpy(retval, pw->pw_dir);
-            if (add_dirsep)
-            {
-                retval[dlen] = '/';
-                retval[dlen+1] = '\0';
-            } /* if */
-        } /* if */
-    } /* if */
-    
-    return retval;
+    return "./";
 } /* getUserDirByUID */
 
 
@@ -274,10 +253,10 @@ PHYSFS_sint64 __PHYSFS_platformFileLength(void *opaque)
 
 int __PHYSFS_platformFlush(void *opaque)
 {
-    const int fd = *((int *) opaque);
-    if ((fcntl(fd, F_GETFL) & O_ACCMODE) != O_RDONLY)
-        BAIL_IF(fsync(fd) == -1, errcodeFromErrno(), 0);
-    return 1;
+    /*const int fd = *((int *) opaque);*/
+    /*if ((fcntl(fd, F_GETFL) & O_ACCMODE) != O_RDONLY)*/
+        /*BAIL_IF(fsync(fd) == -1, errcodeFromErrno(), 0);*/
+    /*return 1;*/
 } /* __PHYSFS_platformFlush */
 
 
@@ -299,7 +278,7 @@ int __PHYSFS_platformDelete(const char *path)
 int __PHYSFS_platformStat(const char *fname, PHYSFS_Stat *st, const int follow)
 {
     struct stat statbuf;
-    const int rc = follow ? stat(fname, &statbuf) : lstat(fname, &statbuf);
+    const int rc = follow ? stat(fname, &statbuf) : -1;// lstat(fname, &statbuf);
     BAIL_IF(rc == -1, errcodeFromErrno(), 0);
 
     if (S_ISREG(statbuf.st_mode))
@@ -399,8 +378,8 @@ int __PHYSFS_platformGrabMutex(void *mutex)
 void __PHYSFS_platformReleaseMutex(void *mutex)
 {
     PthreadMutex *m = (PthreadMutex *) mutex;
-    assert(m->owner == pthread_self());  /* catch programming errors. */
-    assert(m->count > 0);  /* catch programming errors. */
+    //assert(m->owner == pthread_self());  /* catch programming errors. */
+    //assert(m->count > 0);  /* catch programming errors. */
     if (m->owner == pthread_self())
     {
         if (--m->count == 0)
