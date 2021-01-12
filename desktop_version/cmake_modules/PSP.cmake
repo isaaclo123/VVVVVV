@@ -141,6 +141,7 @@ SET(
     -lm \
     -lg \
     -lc \
+    -lz \
     -lpspvfpu \
     -lpspfpu \
     -lpspgum \

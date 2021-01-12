@@ -105,6 +105,7 @@ INCLUDE_DIRECTORIES(
 	../third_party/snprintf
 	../third_party/tinyxml2
 	../third_party/physfs
+	../third_party/psp-physfs
 	../third_party/lodepng
 	../third_party/utfcpp/source
 )
@@ -163,16 +164,28 @@ SET(XML2_SRC
 )
 
 SET(PFS_SRC
-	../third_party/physfs/physfs.c
-	../third_party/physfs/physfs_archiver_dir.c
-	../third_party/physfs/physfs_archiver_unpacked.c
-	../third_party/physfs/physfs_archiver_zip.c
-	../third_party/physfs/physfs_byteorder.c
-	../third_party/physfs/physfs_unicode.c
-	../third_party/physfs/physfs_platform_posix.c
-	../third_party/physfs/physfs_platform_unix.c
-	../third_party/physfs/physfs_platform_windows.c
-	../third_party/physfs/physfs_platform_haiku.cpp
+    # ../third_party/psp-physfs/physfs.c
+    # ../third_party/psp-physfs/physfs_byteorder.c
+    # ../third_party/psp-physfs/physfs_unicode.c
+    # ../third_party/psp-physfs/archivers/zip.c
+    # ../third_party/psp-physfs/archivers/dir.c
+    # # ../third_party/psp-physfs/archivers/unpacked.c
+    # ../third_party/psp-physfs/platform/vita.c
+    # ../third_party/physfs/physfs_archiver_dir.c
+    # ../third_party/physfs/physfs_archiver_unpacked.c
+    # ../third_party/physfs/physfs_archiver_zip.c
+    # ../third_party/physfs/physfs.c
+    ../third_party/physfs/physfs.c
+    ../third_party/physfs/physfs_archiver_dir.c
+    ../third_party/physfs/physfs_archiver_unpacked.c
+    ../third_party/physfs/physfs_archiver_zip.c
+    ../third_party/physfs/physfs_byteorder.c
+    ../third_party/physfs/physfs_unicode.c
+    ../third_party/physfs/physfs_platform_psp.c
+    ../third_party/physfs/physfs_platform_posix.c
+    ../third_party/physfs/physfs_platform_unix.c
+    ../third_party/physfs/physfs_platform_windows.c
+    ../third_party/physfs/physfs_platform_haiku.cpp
 )
 IF(APPLE)
 	# Are you noticing a pattern with this Apple crap yet?

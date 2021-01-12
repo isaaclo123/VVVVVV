@@ -45,7 +45,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	const char* pathSep = PHYSFS_getDirSeparator();
 
 	PHYSFS_init(argvZero);
-	PHYSFS_permitSymbolicLinks(1);
+	PHYSFS_permitSymbolicLinks(0);
 
 	/* Determine the OS user directory */
 	if (baseDir && baseDir[0] != '\0')
@@ -92,10 +92,10 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	printf("Level directory: %s\n", levelDir);
 
 	/* We didn't exist until now, migrate files! */
-	if (mkdirResult == 0)
-	{
-		PLATFORM_migrateSaveData(output);
-	}
+	// if (mkdirResult == 0)
+	// {
+	// 	PLATFORM_migrateSaveData(output);
+	// }
 
 	/* Mount the stock content last */
 	if (assetsPath)
@@ -358,6 +358,7 @@ static void PLATFORM_getOSDirectory(char* output)
 	SDL_strlcat(output, "\\VVVVVV\\", MAX_PATH);
 #else
 	SDL_strlcpy(output, PHYSFS_getPrefDir("distractionware", "VVVVVV"), MAX_PATH);
+        // TODO implement in PHYSFS
 #endif
 }
 

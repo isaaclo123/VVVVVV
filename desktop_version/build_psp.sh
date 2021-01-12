@@ -2,7 +2,7 @@
 
 # PSPDEV=$(psp-config -d)
 
-rm -r build
+rm -r build/.
 rm cmake_install.cmake
 
 mkdir -p build
@@ -20,6 +20,10 @@ cd ../
 cmake --build build
 
 cd build
+
+echo
+echo "-------REAL LINKER HERE-------"
+echo
 
 set -ex
 
