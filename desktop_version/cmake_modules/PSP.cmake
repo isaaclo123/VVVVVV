@@ -72,177 +72,46 @@ link_directories(
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # Aggregated list of all PSP-specific libraries for convenience.
-#set(PSP_LIBRARIES
-#    pthread-psp
-#    GL
-#    z
-#    stdc++
-#    stdc++
-#    pspaudiolib
-#    pspaudio
-#    m
-#    c
-#    c
-#    pspvfpu
-#    pspfpu
-#    pspgum
-#    pspgu
-#    psprtc
-#    pspdebug
-#    pspdisplay
-#    pspge
-#    pspctrl
-#    pspsdk
-#    pspnet
-#    pspnet_inet
-#    pspnet_apctl
-#    pspnet_resolver
-#    psputility
-#    psppower
-#    pspuser
-#)
-# before pspuser ${PSPSDK}/lib/prxexports.o
-# -D_REENTRANT \
-# -I${PSPDEV}/psp/include/SDL2 \
-# ${CMAKE_CXX_STANDARD_LIBRARIES} \
-
-# -lvorbis \
-#    -logg \
-#    -lmikmod \
-
-# ${PSPDEV}/psp/lib/libmikmod.a \
-# ${PSPDEV}/psp/lib/libvorbis.a \
-# ${PSPDEV}/psp/lib/libogg.a \
-
-# -I${PSPDEV}/psp/include/SDL2 \
-
-# "-I${PSPDEV}/psp/include/sys \
-#     -I${PSPDEV}/psp/include/ssp \
-#     -I${PSPDEV}/psp/include/ogg \
-#     -I${PSPDEV}/psp/include/vorbis \
-#     -I${PSPDEV}/psp/include/tremor \
-#     -I${PSPDEV}/psp/include/SDL2 \
-
-
-# SET(
-#     CMAKE_CXX_STANDARD_LIBRARIES
-#
-#     "${CMAKE_CXX_STANDARD_LIBRARIES} \
-#     -D_GNU_SOURCE=1 \
-#     -D_REENTRANT \
-#     -lSDL2main \
-#     -lSDL_mixer \
-#     -lSDL2 \
-#     -lGL \
-#     -lvorbisidec \
-#     -lvorbisfile \
-#     -lvorbisenc \
-#     -lvorbis \
-#     -logg \
-#     -lmikmod \
-#     -lstdc++ \
-#     -lpspirkeyb \
-#     -lpthread-psp \
-#     -lpspgu \
-#     -lpspctrl \
-#     -lpspaudiolib \
-#     -lpspaudio \
-#     -lm \
-#     -lg \
-#     -lc \
-#     -lpsphprm \
-#     -lpspdebug \
-#     -lpspvfpu \
-#     -lpspfpu \
-#     -lpspgum \
-#     -lpsprtc \
-#     -lpspdisplay \
-#     -lpspge \
-#     -lpspsdk \
-#     -lpspkernel\
-#     -lpspvalloc \
-#     -lpspvram \
-#     -lpspvfpu \
-#     -lpspvram \
-#     -lc \
-#     -lpspnet \
-#     -lpspnet_inet \
-#     -lpspnet_apctl \
-#     -lpspnet_resolver \
-#     -lpsputility \
-#     -lpsppower \
-#     -lpspuser \
-#     -lpsplibc
-#     "
-# )
-# -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q
-
-# SET(
-#     CMAKE_CXX_STANDARD_LIBRARIES
-#     "-I${PSPDEV}/psp/include/sys \
-#     -I${PSPDEV}/psp/include/ssp \
-#     -I${PSPDEV}/psp/include/ogg \
-#     -I${PSPDEV}/psp/include/vorbis \
-#     -I${PSPDEV}/psp/include/tremor \
-#     -I${PSPDEV}/psp/include/SDL2 \
-#     -D_GNU_SOURCE=1 \
-#     -D_REENTRANT \
-#     -lstdc++ \
-#     -lSDL2_mixer \
-#     -lSDL2 \
-#     -lGL \
-#     -lpspvfpu \
-#     -lpspvram \
-#     -lvorbisidec \
-#     -lpthread-psp \
-#     -lc \
-#     -lpsphprm \
-#     -lpspdebug \
-#     -lpspgu \
-#     -lpspctrl \
-#     -lpspdisplay \
-#     -lpspge \
-#     -lpspsdk \
-#     -lpsprtc \
-#     -lpspaudio \
-#     -lpspirkeyb \
-#     -lpspnet \
-#     -lpspnet_inet \
-#     -lpsppower \
-#     -lpsputility \
-#     -lpspuser \
-#     -lpspkernel \
-#     -lm \
-#     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q
-#     "
-# )
-
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
+
     "${CMAKE_CXX_STANDARD_LIBRARIES} \
-    -lstdc++ \
-    -lpspvram \
-    -lmikmod \
-    -lvorbisidec \
-    -logg \
-    -lpsphprm \
-    -lpthread-psp PSPDEV\
+    -D_GNU_SOURCE=1 \
+    -D_REENTRANT \
+    -lSDL2main \
+    -lSDL_mixer \
+    -lSDL2 \
     -lGL \
+    -lvorbisidec \
+    -lvorbisfile \
+    -lvorbisenc \
+    -lvorbis \
+    -logg \
+    -lmikmod \
+    -lstdc++ \
+    -lpspirkeyb \
+    -lpthread-psp \
+    -lpspgu \
+    -lpspctrl \
     -lpspaudiolib \
     -lpspaudio \
     -lm \
     -lg \
     -lc \
+    -lpsphprm \
+    -lpspdebug \
     -lpspvfpu \
     -lpspfpu \
     -lpspgum \
-    -lpspgu \
     -lpsprtc \
-    -lpspdebug \
     -lpspdisplay \
     -lpspge \
-    -lpspctrl \
     -lpspsdk \
+    -lpspkernel\
+    -lpspvalloc \
+    -lpspvram \
+    -lpspvfpu \
+    -lpspvram \
     -lc \
     -lpspnet \
     -lpspnet_inet \
@@ -251,7 +120,7 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
-    -lpspkernel \
+    -lpsplibc \
     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q \
     ${PSPDEV}/psp/sdk/lib/prxexports.o"
 )
