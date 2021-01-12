@@ -2,8 +2,8 @@
 
 # PSPDEV=$(psp-config -d)
 
-rm -r build/.
-rm cmake_install.cmake
+rm -rf build/*
+rm Makefile
 
 mkdir -p build
 

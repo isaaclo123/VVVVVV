@@ -178,23 +178,27 @@ static char *getUserDirByUID(void)
 
 char *__PHYSFS_platformCalcUserDir(void)
 {
-    char *retval = __PHYSFS_platformCopyEnvironmentVariable("HOME");
+    char *ret = allocator.Malloc(37);
+    if (ret != NULL)
+        strcpy(ret, "ms0:/PSP/GAME/");
+    return(ret);
+    // char *retval = __PHYSFS_platformCopyEnvironmentVariable("HOME");
 
-    /* if the environment variable was set, make sure it's really a dir. */
-    if (retval != NULL)
-    {
-        struct stat statbuf;
-        if ((stat(retval, &statbuf) == -1) || (S_ISDIR(statbuf.st_mode) == 0))
-        {
-            allocator.Free(retval);
-            retval = NULL;
-        } /* if */
-    } /* if */
+    // /* if the environment variable was set, make sure it's really a dir. */
+    // if (retval != NULL)
+    // {
+    //     struct stat statbuf;
+    //     if ((stat(retval, &statbuf) == -1) || (S_ISDIR(statbuf.st_mode) == 0))
+    //     {
+    //         allocator.Free(retval);
+    //         retval = NULL;
+    //     } /* if */
+    // } /* if */
 
-    if (retval == NULL)
-        retval = getUserDirByUID();
+    // if (retval == NULL)
+    //     retval = getUserDirByUID();
 
-    return(retval);
+    // return(retval);
 } /* __PHYSFS_platformGetUserDir */
 
 
