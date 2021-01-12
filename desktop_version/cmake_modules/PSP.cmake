@@ -72,46 +72,85 @@ link_directories(
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # Aggregated list of all PSP-specific libraries for convenience.
+# SET(
+#     CMAKE_CXX_STANDARD_LIBRARIES
+#
+#     "${CMAKE_CXX_STANDARD_LIBRARIES} \
+#     -D_GNU_SOURCE=1 \
+#     -D_REENTRANT \
+#     -lSDL2main \
+#     -lSDL_mixer \
+#     -lSDL2 \
+#     -lGL \
+#     -lvorbisidec \
+#     -lvorbisfile \
+#     -lvorbisenc \
+#     -lvorbis \
+#     -logg \
+#     -lmikmod \
+#     -lstdc++ \
+#     -lpspirkeyb \
+#     -lpthread-psp \
+#     -lpspgu \
+#     -lpspctrl \
+#     -lpspaudiolib \
+#     -lpspaudio \
+#     -lm \
+#     -lg \
+#     -lc \
+#     -lpsphprm \
+#     -lpspdebug \
+#     -lpspvfpu \
+#     -lpspfpu \
+#     -lpspgum \
+#     -lpsprtc \
+#     -lpspdisplay \
+#     -lpspge \
+#     -lpspsdk \
+#     -lpspkernel\
+#     -lpspvalloc \
+#     -lpspvram \
+#     -lpspvfpu \
+#     -lpspvram \
+#     -lc \
+#     -lpspnet \
+#     -lpspnet_inet \
+#     -lpspnet_apctl \
+#     -lpspnet_resolver \
+#     -lpsputility \
+#     -lpsppower \
+#     -lpspuser \
+#     -lpsplibc \
+#     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q \
+#     ${PSPDEV}/psp/sdk/lib/prxexports.o"
+# )
+
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
-
     "${CMAKE_CXX_STANDARD_LIBRARIES} \
-    -D_GNU_SOURCE=1 \
-    -D_REENTRANT \
-    -lSDL2main \
-    -lSDL_mixer \
-    -lSDL2 \
-    -lGL \
-    -lvorbisidec \
-    -lvorbisfile \
-    -lvorbisenc \
-    -lvorbis \
-    -logg \
-    -lmikmod \
     -lstdc++ \
-    -lpspirkeyb \
+    -lpspvram \
+    -lmikmod \
+    -lvorbisidec \
+    -logg \
+    -lpsphprm \
     -lpthread-psp \
-    -lpspgu \
-    -lpspctrl \
+    -lGL \
     -lpspaudiolib \
     -lpspaudio \
     -lm \
     -lg \
     -lc \
-    -lpsphprm \
-    -lpspdebug \
     -lpspvfpu \
     -lpspfpu \
     -lpspgum \
+    -lpspgu \
     -lpsprtc \
+    -lpspdebug \
     -lpspdisplay \
     -lpspge \
+    -lpspctrl \
     -lpspsdk \
-    -lpspkernel\
-    -lpspvalloc \
-    -lpspvram \
-    -lpspvfpu \
-    -lpspvram \
     -lc \
     -lpspnet \
     -lpspnet_inet \
@@ -120,7 +159,7 @@ SET(
     -lpsputility \
     -lpsppower \
     -lpspuser \
-    -lpsplibc \
+    -lpspkernel \
     -specs=${PSPDEV}/psp/sdk/lib/prxspecs -Wl,-T${PSPDEV}/psp/sdk/lib/linkfile.prx,-q \
     ${PSPDEV}/psp/sdk/lib/prxexports.o"
 )
