@@ -486,7 +486,7 @@ static PHYSFS_Io *handleIo_duplicate(PHYSFS_Io *io)
     memcpy(retval, io, sizeof (PHYSFS_Io));
     retval->opaque = newfh;
     return retval;
-    
+
 handleIo_dupe_failed:
     if (newfh)
     {
@@ -940,43 +940,44 @@ static DirHandle *openDirectory(PHYSFS_Io *io, const char *d, int forWriting)
  */
 static int sanitizePlatformIndependentPath(const char *src, char *dst)
 {
-    char *prev;
-    char ch;
-
-    while (*src == '/')  /* skip initial '/' chars... */
-        src++;
-
-    /* Make sure the entire string isn't "." or ".." */
-    if ((strcmp(src, ".") == 0) || (strcmp(src, "..") == 0))
-        BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
-
-    prev = dst;
-    do
-    {
-        ch = *(src++);
-
-        if ((ch == ':') || (ch == '\\'))  /* illegal chars in a physfs path. */
-            BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
-
-        if (ch == '/')   /* path separator. */
-        {
-            *dst = '\0';  /* "." and ".." are illegal pathnames. */
-            if ((strcmp(prev, ".") == 0) || (strcmp(prev, "..") == 0))
-                BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
-
-            while (*src == '/')   /* chop out doubles... */
-                src++;
-
-            if (*src == '\0') /* ends with a pathsep? */
-                break;  /* we're done, don't add final pathsep to dst. */
-
-            prev = dst + 1;
-        } /* if */
-
-        *(dst++) = ch;
-    } while (ch != '\0');
-
     return 1;
+    // char *prev;
+    // char ch;
+
+    // while (*src == '/')  /* skip initial '/' chars... */
+    //     src++;
+
+    // /* Make sure the entire string isn't "." or ".." */
+    // if ((strcmp(src, ".") == 0) || (strcmp(src, "..") == 0))
+    //     BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
+
+    // prev = dst;
+    // do
+    // {
+    //     ch = *(src++);
+
+    //     if ((ch == ':') || (ch == '\\'))  /* illegal chars in a physfs path. */
+    //         BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
+
+    //     if (ch == '/')   /* path separator. */
+    //     {
+    //         *dst = '\0';  /* "." and ".." are illegal pathnames. */
+    //         if ((strcmp(prev, ".") == 0) || (strcmp(prev, "..") == 0))
+    //             BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
+
+    //         while (*src == '/')   /* chop out doubles... */
+    //             src++;
+
+    //         if (*src == '\0') /* ends with a pathsep? */
+    //             break;  /* we're done, don't add final pathsep to dst. */
+
+    //         prev = dst + 1;
+    //     } /* if */
+
+    //     *(dst++) = ch;
+    // } while (ch != '\0');
+
+    // return 1;
 } /* sanitizePlatformIndependentPath */
 
 
@@ -2304,6 +2305,7 @@ static PHYSFS_EnumerateCallbackResult enumFilesCallback(void *data,
 } /* enumFilesCallback */
 
 
+// TODO
 char **PHYSFS_enumerateFiles(const char *path)
 {
     EnumStringListCallbackData ecd;

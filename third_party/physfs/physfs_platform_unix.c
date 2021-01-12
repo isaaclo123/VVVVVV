@@ -216,6 +216,7 @@ static char *findBinaryInPath(const char *bin, char *envr)
 
 static char *readSymLink(const char *path)
 {
+    return path;
     // TODO
     // ssize_t len = 64;
     // ssize_t rc = -1;
