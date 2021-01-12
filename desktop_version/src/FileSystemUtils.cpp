@@ -66,10 +66,11 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	/* Create base user directory, mount */
 	mkdirResult = PHYSFS_mkdir(output);
 
+	printf("Base directory: %s\n", output);
+
 	/* Mount our base user directory */
 	PHYSFS_mount(output, NULL, 0);
 	PHYSFS_setWriteDir(output);
-	printf("Base directory: %s\n", output);
 
 	/* Create the save/level folders */
 	mkdirResult |= PHYSFS_mkdir("saves");
@@ -105,10 +106,12 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	else
 	{
 		SDL_snprintf(output, sizeof(output), "%s%s",
-			PHYSFS_getBaseDir(),
+			// PHYSFS_getBaseDir(),
+                        baseDir,
 			"data.zip"
 		);
 	}
+	printf("output location: %s\n", output);
 	if (!PHYSFS_mount(output, NULL, 1))
 	{
 		puts("Error: data.zip missing!");
