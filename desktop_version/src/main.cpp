@@ -1,7 +1,3 @@
-#include <pspkernel.h>
-#include <pspdebug.h>
-#include <pspdisplay.h>
-
 #include <SDL.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,9 +21,6 @@
 #include "Script.h"
 #include "SoundSystem.h"
 #include "UtilityClass.h"
-
-PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
 
 scriptclass script;
 
@@ -83,7 +76,11 @@ static inline Uint32 get_framerate(const int slowdown)
 static void inline deltaloop();
 static void inline fixedloop();
 
-int main(int argc, char *argv[])
+/*#include <pspkernel.h>
+PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
+int main(int argc, char *argv[])*/
+int SDL_main(int argc, char* argv[])
 {
     char* baseDir = NULL;
     char* assetsPath = NULL;
@@ -166,11 +163,16 @@ int main(int argc, char *argv[])
         }
     }
 
+    printf("After Initial Args\n");
+
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath))
     {
-        puts("Unable to initialize filesystem!");
+        printf("Unable to initialize fs\n");
+        puts("Unable to initialize filesystem!\n");
         return 1;
     }
+
+    printf("After Filesystem Init\n");
 
     SDL_Init(
         SDL_INIT_VIDEO |
