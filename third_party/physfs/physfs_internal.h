@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pspkernel.h>
+
 #include "physfs_platforms.h"
 
 #include <assert.h>

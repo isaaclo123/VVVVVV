@@ -2009,76 +2009,77 @@ int PHYSFS_symbolicLinksPermitted(void)
  */
 static int verifyPath(DirHandle *h, char **_fname, int allowMissing)
 {
-    char *fname = *_fname;
-    int retval = 1;
-    char *start;
-    char *end;
+    return 1;
+    // char *fname = *_fname;
+    // int retval = 1;
+    // char *start;
+    // char *end;
 
-    if (*fname == '\0')  /* quick rejection. */
-        return 1;
+    // if (*fname == '\0')  /* quick rejection. */
+    //     return 1;
 
-    /* !!! FIXME: This codeblock sucks. */
-    if (h->mountPoint != NULL)  /* NULL mountpoint means "/". */
-    {
-        size_t mntpntlen = strlen(h->mountPoint);
-        size_t len = strlen(fname);
-        assert(mntpntlen > 1); /* root mount points should be NULL. */
-        /* not under the mountpoint, so skip this archive. */
-        BAIL_IF(len < mntpntlen-1, PHYSFS_ERR_NOT_FOUND, 0);
-        /* !!! FIXME: Case insensitive? */
-        retval = strncmp(h->mountPoint, fname, mntpntlen-1);
-        BAIL_IF(retval != 0, PHYSFS_ERR_NOT_FOUND, 0);
-        if (len > mntpntlen-1)  /* corner case... */
-            BAIL_IF(fname[mntpntlen-1]!='/', PHYSFS_ERR_NOT_FOUND, 0);
-        fname += mntpntlen-1;  /* move to start of actual archive path. */
-        if (*fname == '/')
-            fname++;
-        *_fname = fname;  /* skip mountpoint for later use. */
-        retval = 1;  /* may be reset, below. */
-    } /* if */
+    // /* !!! FIXME: This codeblock sucks. */
+    // if (h->mountPoint != NULL)  /* NULL mountpoint means "/". */
+    // {
+    //     size_t mntpntlen = strlen(h->mountPoint);
+    //     size_t len = strlen(fname);
+    //     assert(mntpntlen > 1); /* root mount points should be NULL. */
+    //     /* not under the mountpoint, so skip this archive. */
+    //     BAIL_IF(len < mntpntlen-1, PHYSFS_ERR_NOT_FOUND, 0);
+    //     /* !!! FIXME: Case insensitive? */
+    //     retval = strncmp(h->mountPoint, fname, mntpntlen-1);
+    //     BAIL_IF(retval != 0, PHYSFS_ERR_NOT_FOUND, 0);
+    //     if (len > mntpntlen-1)  /* corner case... */
+    //         BAIL_IF(fname[mntpntlen-1]!='/', PHYSFS_ERR_NOT_FOUND, 0);
+    //     fname += mntpntlen-1;  /* move to start of actual archive path. */
+    //     if (*fname == '/')
+    //         fname++;
+    //     *_fname = fname;  /* skip mountpoint for later use. */
+    //     retval = 1;  /* may be reset, below. */
+    // } /* if */
 
-    start = fname;
-    if (!allowSymLinks)
-    {
-        while (1)
-        {
-            PHYSFS_Stat statbuf;
-            int rc = 0;
-            end = strchr(start, '/');
+    // start = fname;
+    // if (!allowSymLinks)
+    // {
+    //     while (1)
+    //     {
+    //         PHYSFS_Stat statbuf;
+    //         int rc = 0;
+    //         end = strchr(start, '/');
 
-            if (end != NULL) *end = '\0';
-            rc = h->funcs->stat(h->opaque, fname, &statbuf);
-            if (rc)
-                rc = (statbuf.filetype == PHYSFS_FILETYPE_SYMLINK);
-            else if (currentErrorCode() == PHYSFS_ERR_NOT_FOUND)
-                retval = 0;
+    //         if (end != NULL) *end = '\0';
+    //         rc = h->funcs->stat(h->opaque, fname, &statbuf);
+    //         if (rc)
+    //             rc = (statbuf.filetype == PHYSFS_FILETYPE_SYMLINK);
+    //         else if (currentErrorCode() == PHYSFS_ERR_NOT_FOUND)
+    //             retval = 0;
 
-            if (end != NULL) *end = '/';
+    //         if (end != NULL) *end = '/';
 
-            /* insecure path (has a disallowed symlink in it)? */
-            BAIL_IF(rc, PHYSFS_ERR_SYMLINK_FORBIDDEN, 0);
+    //         /* insecure path (has a disallowed symlink in it)? */
+    //         BAIL_IF(rc, PHYSFS_ERR_SYMLINK_FORBIDDEN, 0);
 
-            /* break out early if path element is missing. */
-            if (!retval)
-            {
-                /*
-                 * We need to clear it if it's the last element of the path,
-                 *  since this might be a non-existant file we're opening
-                 *  for writing...
-                 */
-                if ((end == NULL) || (allowMissing))
-                    retval = 1;
-                break;
-            } /* if */
+    //         /* break out early if path element is missing. */
+    //         if (!retval)
+    //         {
+    //             /*
+    //              * We need to clear it if it's the last element of the path,
+    //              *  since this might be a non-existant file we're opening
+    //              *  for writing...
+    //              */
+    //             if ((end == NULL) || (allowMissing))
+    //                 retval = 1;
+    //             break;
+    //         } /* if */
 
-            if (end == NULL)
-                break;
+    //         if (end == NULL)
+    //             break;
 
-            start = end + 1;
-        } /* while */
-    } /* if */
+    //         start = end + 1;
+    //     } /* while */
+    // } /* if */
 
-    return retval;
+    // return retval;
 } /* verifyPath */
 
 

@@ -33,6 +33,7 @@
 
 static char saveDir[MAX_PATH] = {'\0'};
 static char levelDir[MAX_PATH] = {'\0'};
+static char mountDir[MAX_PATH] = {'\0'};
 
 static void PLATFORM_getOSDirectory(char* output);
 static void PLATFORM_migrateSaveData(char* output);
@@ -75,6 +76,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	/* Create the save/level folders */
 	mkdirResult |= PHYSFS_mkdir("saves");
 	mkdirResult |= PHYSFS_mkdir("levels");
+	mkdirResult |= PHYSFS_mkdir("mnt");
 
 	/* Store full save directory */
 	SDL_snprintf(saveDir, sizeof(saveDir), "%s%s%s",
@@ -91,6 +93,11 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 		PHYSFS_getDirSeparator()
 	);
 	printf("Level directory: %s\n", levelDir);
+
+        // printf("test\n");
+        // sceIoMkdir("ms0:/PSP/GAME/VVVVVV/TEST", 0777);
+        // sceIoSync("ms0:", 0);
+
 
 	/* We didn't exist until now, migrate files! */
 	// if (mkdirResult == 0)
@@ -111,7 +118,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 			"data.zip"
 		);
 	}
-	printf("output location: %s\n", output);
+	printf("zip location: %s\n", output);
 	if (!PHYSFS_mount(output, NULL, 1))
 	{
 		puts("Error: data.zip missing!");

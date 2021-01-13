@@ -65,7 +65,7 @@ PHYSFS_EnumerateCallbackResult __PHYSFS_platformEnumerate(const char *dirname,
                                const char *origdir, void *callbackdata)
 {
     SceUID dir;
-    SceIoDirent ent;
+    SceIoDirent ent = {};
     PHYSFS_EnumerateCallbackResult retval = PHYSFS_ENUM_OK;
 
     dir = sceIoDopen(dirname);
@@ -105,8 +105,8 @@ static inline PHYSFS_sint64 getEpochTime(ScePspDateTime* dt, struct tm* t) {
 int __PHYSFS_platformStat(const char *fname, PHYSFS_Stat *st, const int follow)
 {
     // TODO
-    SceIoStat statbuf;
-    struct tm t;
+    SceIoStat statbuf = {};
+    struct tm t = {};
 
     // const int rc = follow ? stat(fname, &statbuf) : lstat(fname, &statbuf);
     const int rc = sceIoGetstat(fname, &statbuf);
@@ -124,7 +124,7 @@ int __PHYSFS_platformStat(const char *fname, PHYSFS_Stat *st, const int follow)
         st->filesize = 0;
     } /* else if */
 
-    else if(FIO_S_ISDIR(statbuf.st_mode))
+    else if(FIO_S_ISLNK(statbuf.st_mode))
     {
         st->filetype = PHYSFS_FILETYPE_SYMLINK;
         st->filesize = 0;
@@ -219,7 +219,7 @@ char *__PHYSFS_platformCalcUserDir(void)
 
 int __PHYSFS_platformExists(const char *fname)
 {
-    struct SceIoStat statbuf;
+    struct SceIoStat statbuf = {};
     BAIL_IF(sceIoGetstat(fname, &statbuf) < 0, errcodeFromErrno(), 0);
     return(1);
 } /* __PHYSFS_platformExists */
@@ -227,7 +227,7 @@ int __PHYSFS_platformExists(const char *fname)
 
 int __PHYSFS_platformIsSymLink(const char *fname)
 {
-    struct SceIoStat statbuf;
+    struct SceIoStat statbuf = {};
     BAIL_IF(sceIoGetstat(fname, &statbuf) < 0, errcodeFromErrno(), 0);
     return( (FIO_S_ISLNK(statbuf.st_mode)) ? 1 : 0 );
 } /* __PHYSFS_platformIsSymlink */
@@ -235,7 +235,7 @@ int __PHYSFS_platformIsSymLink(const char *fname)
 
 int __PHYSFS_platformIsDirectory(const char *fname)
 {
-    struct SceIoStat statbuf;
+    struct SceIoStat statbuf = {};
     BAIL_IF(sceIoGetstat(fname, &statbuf) < 0, errcodeFromErrno(), 0);
     return( (FIO_S_ISDIR(statbuf.st_mode)) ? 1 : 0 );
 } /* __PHYSFS_platformIsDirectory */
@@ -276,7 +276,7 @@ void __PHYSFS_platformEnumerateFiles(const char *dirname,
                                      void *callbackdata)
 {
     SceUID dir;
-    struct SceIoDirent ent;
+    struct SceIoDirent ent = {};
     int bufsize = 0;
     char *buf = NULL;
     int dlen = 0;
@@ -348,17 +348,17 @@ int __PHYSFS_platformMkDir(const char *path)
 } /* __PHYSFS_platformMkDir */
 
 
-static void *doOpen(const char *filename, int mode)
+static void *doOpen(const char *filename, int flags, SceMode mode)
 {
     const int appending = (mode & PSP_O_APPEND);
-    SceUID fd;
+    int fd;
     int *retval;
     errno = 0;
 
     /* O_APPEND doesn't actually behave as we'd like. */
     mode &= ~PSP_O_APPEND;
 
-    fd = sceIoOpen(filename, mode, 0777);
+    fd = sceIoOpen(filename, flags, mode);
     BAIL_IF(fd < 0, errcodeFromErrno(), NULL);
 
     if (appending)
@@ -384,19 +384,19 @@ static void *doOpen(const char *filename, int mode)
 
 void *__PHYSFS_platformOpenRead(const char *filename)
 {
-    return(doOpen(filename, PSP_O_RDONLY));
+    return(doOpen(filename, PSP_O_RDONLY, S_IRUSR));
 } /* __PHYSFS_platformOpenRead */
 
 
 void *__PHYSFS_platformOpenWrite(const char *filename)
 {
-    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC));
+    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, S_IRUSR | S_IWUSR));
 } /* __PHYSFS_platformOpenWrite */
 
 
 void *__PHYSFS_platformOpenAppend(const char *filename)
 {
-    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND));
+    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND, S_IRUSR | S_IWUSR));
 } /* __PHYSFS_platformOpenAppend */
 
 
