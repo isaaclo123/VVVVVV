@@ -106,11 +106,23 @@ int __PHYSFS_platformStat(const char *fname, PHYSFS_Stat *st, const int follow)
 {
     // TODO
     SceIoStat statbuf = {};
+    SceIoDirent dirent = {};
     struct tm t = {};
+    int rc;
 
-    // const int rc = follow ? stat(fname, &statbuf) : lstat(fname, &statbuf);
-    const int rc = sceIoGetstat(fname, &statbuf);
-    BAIL_IF(rc == -1, errcodeFromErrno(), 0);
+    // try directory
+    int dfd = sceIoDopen(fname);
+
+    if (dfd >= 0) {
+        rc = sceIoDread(dfd, &dirent);
+        BAIL_IF(rc < 0, errcodeFromErrno(), 0);
+
+        statbuf = dirent.d_stat;
+        sceIoDclose(dfd);
+    } else { // if fails, try file
+        rc = sceIoGetstat(fname, &statbuf);
+        BAIL_IF(rc < 0, errcodeFromErrno(), 0);
+    }
 
     if (FIO_S_ISREG(statbuf.st_mode))
     {

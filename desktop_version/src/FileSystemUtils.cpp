@@ -33,7 +33,6 @@
 
 static char saveDir[MAX_PATH] = {'\0'};
 static char levelDir[MAX_PATH] = {'\0'};
-static char mountDir[MAX_PATH] = {'\0'};
 
 static void PLATFORM_getOSDirectory(char* output);
 static void PLATFORM_migrateSaveData(char* output);
@@ -76,7 +75,6 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	/* Create the save/level folders */
 	mkdirResult |= PHYSFS_mkdir("saves");
 	mkdirResult |= PHYSFS_mkdir("levels");
-	mkdirResult |= PHYSFS_mkdir("mnt");
 
 	/* Store full save directory */
 	SDL_snprintf(saveDir, sizeof(saveDir), "%s%s%s",
