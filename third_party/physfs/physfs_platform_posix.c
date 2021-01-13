@@ -60,7 +60,7 @@ static inline PHYSFS_ErrorCode errcodeFromErrno(void)
 
 static char *getUserDirByUID(void)
 {
-    return "./";
+    return "ms0:/PSP/GAME/";
     // uid_t uid = getuid();
     // struct passwd *pw;
     // char *retval = NULL;

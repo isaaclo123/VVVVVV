@@ -115,13 +115,13 @@ int __PHYSFS_platformStat(const char *fname, PHYSFS_Stat *st, const int follow)
 
     if (dfd >= 0) {
         rc = sceIoDread(dfd, &dirent);
-        BAIL_IF(rc < 0, errcodeFromErrno(), 0);
+        BAIL_IF(rc < 0, PHYSFS_ERR_NOT_FOUND, 0);
 
         statbuf = dirent.d_stat;
         sceIoDclose(dfd);
     } else { // if fails, try file
         rc = sceIoGetstat(fname, &statbuf);
-        BAIL_IF(rc < 0, errcodeFromErrno(), 0);
+        BAIL_IF(rc < 0, PHYSFS_ERR_NOT_FOUND, 0);
     }
 
     if (FIO_S_ISREG(statbuf.st_mode))

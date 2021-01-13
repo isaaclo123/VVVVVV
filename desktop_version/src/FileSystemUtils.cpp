@@ -45,7 +45,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	const char* pathSep = PHYSFS_getDirSeparator();
 
 	PHYSFS_init(argvZero);
-	PHYSFS_permitSymbolicLinks(0);
+	PHYSFS_permitSymbolicLinks(1);
 
 	/* Determine the OS user directory */
 	if (baseDir && baseDir[0] != '\0')
