@@ -281,73 +281,73 @@ char *__PHYSFS_platformCvtToDependent(const char *prepend,
 
 
 
-void __PHYSFS_platformEnumerateFiles(const char *dirname,
-                                     int omitSymLinks,
-                                     PHYSFS_EnumFilesCallback callback,
-                                     const char *origdir,
-                                     void *callbackdata)
-{
-    SceUID dir;
-    struct SceIoDirent ent = {};
-    int bufsize = 0;
-    char *buf = NULL;
-    int dlen = 0;
-
-    if (omitSymLinks)  /* !!! FIXME: this malloc sucks. */
-    {
-        dlen = strlen(dirname);
-        bufsize = dlen + 256;
-        buf = (char *) allocator.Malloc(bufsize);
-        if (buf == NULL)
-            return;
-        strcpy(buf, dirname);
-        if (buf[dlen - 1] != '/')
-        {
-            buf[dlen++] = '/';
-            buf[dlen] = '\0';
-        } /* if */
-    } /* if */
-
-    errno = 0;
-    dir = sceIoDopen(dirname);
-    if (dir < 0)
-    {
-        allocator.Free(buf);
-        return;
-    } /* if */
-
-    while (sceIoDread(dir, &ent))
-    {
-        if (strcmp(ent.d_name, ".") == 0)
-            continue;
-
-        if (strcmp(ent.d_name, "..") == 0)
-            continue;
-
-        if (omitSymLinks)
-        {
-            char *p;
-            int len = strlen(ent.d_name) + dlen + 1;
-            if (len > bufsize)
-            {
-                p = (char *) allocator.Realloc(buf, len);
-                if (p == NULL)
-                    continue;
-                buf = p;
-                bufsize = len;
-            } /* if */
-
-            strcpy(buf + dlen, ent.d_name);
-            if (__PHYSFS_platformIsSymLink(buf))
-                continue;
-        } /* if */
-
-        callback(callbackdata, origdir, ent.d_name);
-    } /* while */
-
-    allocator.Free(buf);
-    sceIoDclose(dir);
-} /* __PHYSFS_platformEnumerateFiles */
+// void __PHYSFS_platformEnumerateFiles(const char *dirname,
+//                                      int omitSymLinks,
+//                                      PHYSFS_EnumFilesCallback callback,
+//                                      const char *origdir,
+//                                      void *callbackdata)
+// {
+//     SceUID dir;
+//     struct SceIoDirent ent = {};
+//     int bufsize = 0;
+//     char *buf = NULL;
+//     int dlen = 0;
+//
+//     if (omitSymLinks)  /* !!! FIXME: this malloc sucks. */
+//     {
+//         dlen = strlen(dirname);
+//         bufsize = dlen + 256;
+//         buf = (char *) allocator.Malloc(bufsize);
+//         if (buf == NULL)
+//             return;
+//         strcpy(buf, dirname);
+//         if (buf[dlen - 1] != '/')
+//         {
+//             buf[dlen++] = '/';
+//             buf[dlen] = '\0';
+//         } /* if */
+//     } /* if */
+//
+//     errno = 0;
+//     dir = sceIoDopen(dirname);
+//     if (dir < 0)
+//     {
+//         allocator.Free(buf);
+//         return;
+//     } /* if */
+//
+//     while (sceIoDread(dir, &ent))
+//     {
+//         if (strcmp(ent.d_name, ".") == 0)
+//             continue;
+//
+//         if (strcmp(ent.d_name, "..") == 0)
+//             continue;
+//
+//         if (omitSymLinks)
+//         {
+//             char *p;
+//             int len = strlen(ent.d_name) + dlen + 1;
+//             if (len > bufsize)
+//             {
+//                 p = (char *) allocator.Realloc(buf, len);
+//                 if (p == NULL)
+//                     continue;
+//                 buf = p;
+//                 bufsize = len;
+//             } /* if */
+//
+//             strcpy(buf + dlen, ent.d_name);
+//             if (__PHYSFS_platformIsSymLink(buf))
+//                 continue;
+//         } /* if */
+//
+//         callback(callbackdata, origdir, ent.d_name);
+//     } /* while */
+//
+//     allocator.Free(buf);
+//     sceIoDclose(dir);
+// } /* __PHYSFS_platformEnumerateFiles */
 
 
 int __PHYSFS_platformMkDir(const char *path)
@@ -360,17 +360,17 @@ int __PHYSFS_platformMkDir(const char *path)
 } /* __PHYSFS_platformMkDir */
 
 
-static void *doOpen(const char *filename, int flags, SceMode mode)
+static void *doOpen(const char *filename, int flags)
 {
-    const int appending = (mode & PSP_O_APPEND);
+    const int appending = (flags & PSP_O_APPEND);
     int fd;
     int *retval;
     errno = 0;
 
     /* O_APPEND doesn't actually behave as we'd like. */
-    mode &= ~PSP_O_APPEND;
+    flags &= ~PSP_O_APPEND;
 
-    fd = sceIoOpen(filename, flags, mode);
+    fd = sceIoOpen(filename, flags, S_IRUSR | S_IWUSR);
     BAIL_IF(fd < 0, errcodeFromErrno(), NULL);
 
     if (appending)
@@ -396,19 +396,19 @@ static void *doOpen(const char *filename, int flags, SceMode mode)
 
 void *__PHYSFS_platformOpenRead(const char *filename)
 {
-    return(doOpen(filename, PSP_O_RDONLY, S_IRUSR));
+    return(doOpen(filename, PSP_O_RDONLY));
 } /* __PHYSFS_platformOpenRead */
 
 
 void *__PHYSFS_platformOpenWrite(const char *filename)
 {
-    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC, S_IRUSR | S_IWUSR));
+    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_TRUNC));
 } /* __PHYSFS_platformOpenWrite */
 
 
 void *__PHYSFS_platformOpenAppend(const char *filename)
 {
-    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND, S_IRUSR | S_IWUSR));
+    return(doOpen(filename, PSP_O_WRONLY | PSP_O_CREAT | PSP_O_APPEND));
 } /* __PHYSFS_platformOpenAppend */
 
 
@@ -458,7 +458,7 @@ int __PHYSFS_platformSeek(void *opaque, PHYSFS_uint64 pos)
       int rc = llseek(fd, offset_high, offset_low, &retoffset, SEEK_SET);
       BAIL_IF(rc == -1, errcodeFromErrno(), 0);
     #else
-      BAIL_IF(sceIoLseek(fd, (SceOff) pos, SEEK_SET) == -1, errcodeFromErrno(), 0);
+      BAIL_IF(sceIoLseek(fd, (int) pos, SEEK_SET) == -1, errcodeFromErrno(), 0);
     #endif
 
     return(1);
@@ -473,12 +473,12 @@ PHYSFS_sint64 __PHYSFS_platformTell(void *opaque)
     #ifdef PHYSFS_HAVE_LLSEEK
       loff_t retoffset;
       int rc = llseek(fd, 0, &retoffset, SEEK_CUR);
-      BAIL_IF(rc == -1, errcodeFromErrno(), -1);
+      BAIL_IF(rc == -1, errno, -1);
       retval = (PHYSFS_sint64) retoffset;
     #else
       retval = (PHYSFS_sint64) sceIoLseek(fd, 0, SEEK_CUR);
 
-      BAIL_IF(retval == -1, errcodeFromErrno(), -1);
+      BAIL_IF(retval == -1, errno, -1);
     #endif
 
     return(retval);
@@ -491,7 +491,7 @@ PHYSFS_sint64 __PHYSFS_platformFileLength(void *opaque)
     off_t len = -1;
     off_t cur = sceIoLseek(fd, 0, SEEK_CUR);
 
-    BAIL_IF((len=sceIoLseek(fd, 0, SEEK_END) == -1), errcodeFromErrno(), -1);
+    BAIL_IF((len=sceIoLseek(fd, 0, SEEK_END) == -1), errno, -1);
     sceIoLseek(fd, cur, SEEK_SET);
     return (PHYSFS_sint64)len;
 } /* __PHYSFS_platformFileLength */
@@ -507,7 +507,7 @@ int __PHYSFS_platformEOF(void *opaque)
 
 int __PHYSFS_platformFlush(void *opaque)
 {
-    BAIL_IF(sceIoSync("ms0:", 0) < -1, errcodeFromErrno(), 0);
+    BAIL_IF(sceIoSync("ms0:", 0) < -1, PHYSFS_ERR_IO, 0);
     return(1);
 } /* __PHYSFS_platformFlush */
 
@@ -515,14 +515,14 @@ int __PHYSFS_platformFlush(void *opaque)
 void __PHYSFS_platformClose(void *opaque)
 {
     int fd = *((int *) opaque);
-    BAIL_IF(sceIoClose(fd) == -1, errcodeFromErrno(), 0);
+    BAIL_IF(sceIoClose(fd) == -1, errno, 0);
     allocator.Free(opaque);
 } /* __PHYSFS_platformClose */
 
 
 int __PHYSFS_platformDelete(const char *path)
 {
-    BAIL_IF(sceIoRemove(path) == -1, errcodeFromErrno(), 0);
+    BAIL_IF(sceIoRemove(path) == -1, errno, 0);
     return(1);
 } /* __PHYSFS_platformDelete */
 
