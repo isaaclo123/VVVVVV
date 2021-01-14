@@ -34,6 +34,8 @@
 static char saveDir[MAX_PATH] = {'\0'};
 static char levelDir[MAX_PATH] = {'\0'};
 
+// const char* MOUNT_POINT = "ms0:/PSP/GAME/VVVVVV/";
+
 static void PLATFORM_getOSDirectory(char* output);
 static void PLATFORM_migrateSaveData(char* output);
 static void PLATFORM_copyFile(const char *oldLocation, const char *newLocation);
