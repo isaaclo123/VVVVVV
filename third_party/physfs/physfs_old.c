@@ -486,7 +486,7 @@ static PHYSFS_Io *handleIo_duplicate(PHYSFS_Io *io)
     memcpy(retval, io, sizeof (PHYSFS_Io));
     retval->opaque = newfh;
     return retval;
-    
+
 handleIo_dupe_failed:
     if (newfh)
     {
@@ -947,16 +947,16 @@ static int sanitizePlatformIndependentPath(const char *src, char *dst)
         src++;
 
     /* Make sure the entire string isn't "." or ".." */
-    if ((strcmp(src, ".") == 0) || (strcmp(src, "..") == 0))
-        BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
+    // if ((strcmp(src, ".") == 0) || (strcmp(src, "..") == 0))
+    //     BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
 
     prev = dst;
     do
     {
         ch = *(src++);
 
-        if ((ch == ':') || (ch == '\\'))  /* illegal chars in a physfs path. */
-            BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
+        // if ((ch == ':') || (ch == '\\'))  /* illegal chars in a physfs path. */
+        //     BAIL(PHYSFS_ERR_BAD_FILENAME, 0);
 
         if (ch == '/')   /* path separator. */
         {
@@ -2304,6 +2304,7 @@ static PHYSFS_EnumerateCallbackResult enumFilesCallback(void *data,
 } /* enumFilesCallback */
 
 
+// TODO
 char **PHYSFS_enumerateFiles(const char *path)
 {
     EnumStringListCallbackData ecd;

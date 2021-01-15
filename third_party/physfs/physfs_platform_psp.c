@@ -208,7 +208,7 @@ char *__PHYSFS_platformCalcUserDir(void)
 {
     char *ret = allocator.Malloc(37);
     if (ret != NULL)
-        strcpy(ret, "ms0:/PSP/GAME/");
+        strcpy(ret, "/PSP/GAME/");
     return(ret);
     // char *retval = __PHYSFS_platformCopyEnvironmentVariable("HOME");
 
@@ -390,13 +390,12 @@ static void *doOpen(const char *filename, int flags)
         BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
     } /* if */
 
-    printf("in doOpen, fd: %i\n", fd);
-    int cur = sceIoLseek(fd, 0, SEEK_CUR);
-    printf("in doOpen, cur: %i\n", cur);
-    int len = sceIoLseek(fd, 0, SEEK_END);
-    printf("in doOpen len: %i\n", len);
-
-    sceIoLseek(fd, cur, SEEK_SET);
+    // printf("in doOpen, fd: %i\n", fd);
+    // int cur = sceIoLseek(fd, 0, SEEK_CUR);
+    // printf("in doOpen, cur: %i\n", cur);
+    // int len = sceIoLseek(fd, 0, SEEK_END);
+    // printf("in doOpen len: %i\n", len);
+    // sceIoLseek(fd, cur, SEEK_SET);
 
     *retval = fd;
     return((void *) retval);
@@ -577,7 +576,7 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
 {
     char *ret = allocator.Malloc(37);
     if (ret != NULL)
-        strcpy(ret, "ms0:/PSP/GAME/");
+        strcpy(ret, "/PSP/GAME/");
     return(ret);
 }
 
@@ -585,7 +584,7 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
 {
     char *ret = allocator.Malloc(37);
     if (ret != NULL)
-        strcpy(ret, "ms0:/PSP/GAME/");
+        strcpy(ret, "/PSP/GAME/");
     return(ret);
 }
 

@@ -87,6 +87,7 @@ int SDL_main(int argc, char* argv[])
 {
     // char* baseDir = NULL;
     char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
+    // char* baseDir = "/PSP/GAME/VVVVVV/";
     char* assetsPath = NULL;
 
     for (int i = 1; i < argc; ++i)
