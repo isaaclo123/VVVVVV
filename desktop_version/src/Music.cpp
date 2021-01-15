@@ -97,7 +97,7 @@ void musicclass::init()
 		mmmmmm = false;
 		usingmmmmmm=false;
 		bool ohCrap = musicReadBlob.unPackBinary("vvvvvvmusic.vvv");
-		SDL_assert(ohCrap && "Music not found!");
+		// TODO SDL_assert(ohCrap && "Music not found!");
 	}
 	else
 	{

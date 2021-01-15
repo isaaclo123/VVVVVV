@@ -37,7 +37,7 @@
 static char saveDir[MAX_PATH] = {'\0'};
 static char levelDir[MAX_PATH] = {'\0'};
 
-// const char* MOUNT_POINT = "ms0:/PSP/GAME/VVVVVV/";
+const char* MOUNT_POINT = "ms0:/PSP/GAME/VVVVVV/";
 
 static void PLATFORM_getOSDirectory(char* output);
 static void PLATFORM_migrateSaveData(char* output);
@@ -104,7 +104,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	printf("Base directory: %s\n", output);
 
 	/* Mount our base user directory */
-	PHYSFS_mount(output, NULL, 0);
+	PHYSFS_mount(output, MOUNT_POINT, 0);
 	PHYSFS_setWriteDir(output);
 
 	/* Create the save/level folders */
@@ -152,7 +152,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 		);
 	}
 	printf("zip location: %s\n", output);
-	if (!PHYSFS_mount(output, NULL, 1))
+	if (!PHYSFS_mount(output, MOUNT_POINT, 1))
 	{
 		puts("Error: data.zip missing!");
 		puts("You do not have data.zip!");
