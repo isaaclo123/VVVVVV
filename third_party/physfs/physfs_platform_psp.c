@@ -12,17 +12,18 @@
 #ifdef PHYSFS_PLATFORM_PSP
 
 #include <pspkernel.h>
+#include <psptypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pwd.h>
-#include <dirent.h>
+// #include <unistd.h>
+// #include <ctype.h>
+#// include <sys/types.h>
+// #include <sys/stat.h>
+// #include <pwd.h>
+// #include <dirent.h>
 #include <errno.h>
-#include <fcntl.h>
+// #include <fcntl.h>
 #include <time.h>
 
 #include "physfs_internal.h"
@@ -354,7 +355,7 @@ int __PHYSFS_platformMkDir(const char *path)
 {
     int rc;
     errno = 0;
-    rc = sceIoMkdir(path, S_IRWXU);
+    rc = sceIoMkdir(path, FIO_S_IRWXU);
     BAIL_IF(rc < 0, errcodeFromErrno(), 0);
     return(1);
 } /* __PHYSFS_platformMkDir */
@@ -370,7 +371,7 @@ static void *doOpen(const char *filename, int flags)
     /* O_APPEND doesn't actually behave as we'd like. */
     flags &= ~PSP_O_APPEND;
 
-    fd = sceIoOpen(filename, flags, S_IRUSR | S_IWUSR);
+    fd = sceIoOpen(filename, flags, FIO_S_IRUSR | FIO_S_IWUSR);
     BAIL_IF(fd < 0, errcodeFromErrno(), NULL);
 
     if (appending)
@@ -388,6 +389,14 @@ static void *doOpen(const char *filename, int flags)
         sceIoClose(fd);
         BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
     } /* if */
+
+    printf("in doOpen, fd: %i\n", fd);
+    int cur = sceIoLseek(fd, 0, SEEK_CUR);
+    printf("in doOpen, cur: %i\n", cur);
+    int len = sceIoLseek(fd, 0, SEEK_END);
+    printf("in doOpen len: %i\n", len);
+
+    sceIoLseek(fd, cur, SEEK_SET);
 
     *retval = fd;
     return((void *) retval);
@@ -416,7 +425,7 @@ PHYSFS_sint64 __PHYSFS_platformRead(void *opaque, void *buffer,
                                     PHYSFS_uint64 len)
 {
     const int fd = *((int *) opaque);
-    ssize_t rc = 0;
+    int rc = 0;
 
     if (!__PHYSFS_ui64FitsAddressSpace(len))
         BAIL(PHYSFS_ERR_INVALID_ARGUMENT, -1);
@@ -433,7 +442,7 @@ PHYSFS_sint64 __PHYSFS_platformWrite(void *opaque, const void *buffer,
                                      PHYSFS_uint64 len)
 {
     const int fd = *((int *) opaque);
-    ssize_t rc = 0;
+    int rc = 0;
 
     if (!__PHYSFS_ui64FitsAddressSpace(len))
         BAIL(PHYSFS_ERR_INVALID_ARGUMENT, -1);
@@ -488,10 +497,17 @@ PHYSFS_sint64 __PHYSFS_platformTell(void *opaque)
 PHYSFS_sint64 __PHYSFS_platformFileLength(void *opaque)
 {
     int fd = *((int *) opaque);
-    off_t len = -1;
-    off_t cur = sceIoLseek(fd, 0, SEEK_CUR);
+    int cur = sceIoLseek(fd, 0, SEEK_CUR);
 
-    BAIL_IF((len=sceIoLseek(fd, 0, SEEK_END) == -1), errno, -1);
+    // printf("in fileLength, fd: %i\n", fd);
+    // printf("in fileLength, cur: %i\n", cur);
+
+    int len = sceIoLseek(fd, 0, SEEK_END);
+
+    BAIL_IF(len < 0, errno, -1);
+
+    printf("in fileLength, len: %i\n", len);
+
     sceIoLseek(fd, cur, SEEK_SET);
     return (PHYSFS_sint64)len;
 } /* __PHYSFS_platformFileLength */

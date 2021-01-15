@@ -9,6 +9,9 @@
 #include <tinyxml2.h>
 #include <vector>
 
+#include <pspkernel.h>
+#include <psptypes.h>
+
 #include "Graphics.h"
 #include "UtilityClass.h"
 
@@ -42,6 +45,36 @@ static void PLATFORM_copyFile(const char *oldLocation, const char *newLocation);
 
 int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 {
+
+
+    // int fd, cur, len;
+
+    // int flags = PSP_O_RDONLY & ~PSP_O_APPEND;
+    // fd = sceIoOpen("ms0:/PSP/GAME/VVVVVV/data.zip", flags, FIO_S_IRUSR | FIO_S_IWUSR);
+    // printf("fd: %i\n", fd);
+
+    // int* fdp = (int *) malloc(sizeof (int));
+    // *fdp = fd;
+    // void* test = (void*) fdp;
+    // printf("retval: %i\n", fdp);
+    // printf("*retval: *%i\n", *fdp);
+
+    // fd = *((int *) test);
+
+    // fd = *((int *) fdp);
+    // printf("fd after: %i\n", fd);
+
+    // cur = sceIoLseek(fd, 0, SEEK_CUR);
+    // printf("cur: %i\n", cur);
+    // len = sceIoLseek(fd, 0, SEEK_END);
+    // printf("len: %i\n", len);
+
+    // sceIoLseek(fd, cur, SEEK_SET);
+
+    // sceIoClose(fd);
+
+    // return 0;
+
 	char output[MAX_PATH];
 	int mkdirResult;
 	const char* pathSep = PHYSFS_getDirSeparator();

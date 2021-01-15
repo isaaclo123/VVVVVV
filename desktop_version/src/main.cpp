@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// #include <pspkernel.h>
+// #include <psptypes.h>
+
 #include "editor.h"
 #include "Enums.h"
 #include "Entity.h"
