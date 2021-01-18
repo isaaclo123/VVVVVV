@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 
+#include <math.h>
 #include "editor.h"
 #include "Game.h"
 #include "Graphics.h"
@@ -4389,8 +4390,8 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
     if (entities[t].vx > 6.00f) entities[t].vx = 6.0f;
     if (entities[t].vx < -6.00f) entities[t].vx = -6.0f;
 
-    if (SDL_fabsf(entities[t].vx) < xrate) entities[t].vx = 0.0f;
-    if (SDL_fabsf(entities[t].vy) < yrate) entities[t].vy = 0.0f;
+    if (fabsf(entities[t].vx) < xrate) entities[t].vx = 0.0f;
+    if (fabsf(entities[t].vy) < yrate) entities[t].vy = 0.0f;
 }
 
 void entityclass::updateentitylogic( int t )

@@ -1,6 +1,7 @@
 #define KEY_DEFINITION
 #include "KeyPoll.h"
 
+#include <pspctrl.h>
 #include <stdio.h>
 #include <string.h>
 #include <utf8/unchecked.h>
@@ -45,15 +46,15 @@ KeyPoll::KeyPoll()
 	pressedbackspace=false;
 
 	useFullscreenSpaces = false;
-	if (strcmp(SDL_GetPlatform(), "Mac OS X") == 0)
-	{
-		useFullscreenSpaces = true;
-		const char *hint = SDL_GetHint(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES);
-		if (hint != NULL)
-		{
-			useFullscreenSpaces = (strcmp(hint, "1") == 0);
-		}
-	}
+	// if (strcmp(SDL_GetPlatform(), "Mac OS X") == 0)
+	// {
+	// 	useFullscreenSpaces = true;
+	// 	const char *hint = SDL_GetHint(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES);
+	// 	if (hint != NULL)
+	// 	{
+	// 		useFullscreenSpaces = (strcmp(hint, "1") == 0);
+	// 	}
+	// }
 
 	linealreadyemptykludge = false;
 
@@ -65,17 +66,18 @@ KeyPoll::KeyPoll()
 void KeyPoll::enabletextentry()
 {
 	keybuffer="";
-	SDL_StartTextInput();
+        // TODO
+	// SDL_StartTextInput();
 }
 
 void KeyPoll::disabletextentry()
 {
-	SDL_StopTextInput();
+	// SDL_StopTextInput();
 }
 
 bool KeyPoll::textentry()
 {
-	return SDL_IsTextInputActive() == SDL_TRUE;
+	// return SDL_IsTextInputActive() == SDL_TRUE;
 }
 
 void KeyPoll::Poll()
@@ -124,7 +126,7 @@ void KeyPoll::Poll()
 				else if (	evt.key.keysym.sym == SDLK_v &&
 						keymap[SDLK_LCTRL]	)
 				{
-					keybuffer += SDL_GetClipboardText();
+					// TODO keybuffer += SDL_GetClipboardText();
 				}
 			}
 			break;
@@ -136,12 +138,14 @@ void KeyPoll::Poll()
 				pressedbackspace = false;
 			}
 			break;
+                        /*
 		case SDL_TEXTINPUT:
 			if (!altpressed)
 			{
 				keybuffer += evt.text.text;
 			}
 			break;
+                        */
 
 		/* Mouse Input */
 		case SDL_MOUSEMOTION:
@@ -190,6 +194,7 @@ void KeyPoll::Poll()
 			break;
 
 		/* Controller Input */
+                /*
 		case SDL_CONTROLLERBUTTONDOWN:
 			buttonmap[(SDL_GameControllerButton) evt.cbutton.button] = true;
 			break;
@@ -245,70 +250,71 @@ void KeyPoll::Poll()
 			SDL_GameControllerClose(toClose);
 			break;
 		}
+                */
 
 		/* Window Events */
-		case SDL_WINDOWEVENT:
-			switch (evt.window.event)
-			{
-			/* Window Resize */
-			case SDL_WINDOWEVENT_RESIZED:
-				resetWindow = true;
-				break;
+		// case SDL_WINDOWEVENT:
+		// 	switch (evt.window.event)
+		// 	{
+		// 	/* Window Resize */
+		// 	case SDL_WINDOWEVENT_RESIZED:
+		// 		resetWindow = true;
+		// 		break;
 
-			/* Window Focus */
-			case SDL_WINDOWEVENT_FOCUS_GAINED:
-				if (!game.disablepause)
-				{
-					isActive = true;
-				}
-				if (!useFullscreenSpaces)
-				{
-					if (wasFullscreen)
-					{
-						graphics.screenbuffer->isWindowed = false;
-						SDL_SetWindowFullscreen(
-							SDL_GetWindowFromID(evt.window.windowID),
-							SDL_WINDOW_FULLSCREEN_DESKTOP
-						);
-					}
-				}
-				SDL_DisableScreenSaver();
-				if (!game.disablepause && Mix_PlayingMusic())
-				{
-					// Correct songStart for how long we were paused
-					music.songStart += SDL_GetPerformanceCounter() - pauseStart;
-				}
-				break;
-			case SDL_WINDOWEVENT_FOCUS_LOST:
-				if (!game.disablepause)
-				{
-					isActive = false;
-				}
-				if (!useFullscreenSpaces)
-				{
-					wasFullscreen = !graphics.screenbuffer->isWindowed;
-					graphics.screenbuffer->isWindowed = true;
-					SDL_SetWindowFullscreen(
-						SDL_GetWindowFromID(evt.window.windowID),
-						0
-					);
-				}
-				SDL_EnableScreenSaver();
-				if (!game.disablepause)
-				{
-					pauseStart = SDL_GetPerformanceCounter();
-				}
-				break;
+		// 	/* Window Focus */
+		// 	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		// 		if (!game.disablepause)
+		// 		{
+		// 			isActive = true;
+		// 		}
+		// 		if (!useFullscreenSpaces)
+		// 		{
+		// 			if (wasFullscreen)
+		// 			{
+		// 				graphics.screenbuffer->isWindowed = false;
+		// 				SDL_SetWindowFullscreen(
+		// 					SDL_GetWindowFromID(evt.window.windowID),
+		// 					SDL_WINDOW_FULLSCREEN_DESKTOP
+		// 				);
+		// 			}
+		// 		}
+		// 		SDL_DisableScreenSaver();
+		// 		if (!game.disablepause && Mix_PlayingMusic())
+		// 		{
+		// 			// Correct songStart for how long we were paused
+		// 			music.songStart += SDL_GetPerformanceCounter() - pauseStart;
+		// 		}
+		// 		break;
+		// 	case SDL_WINDOWEVENT_FOCUS_LOST:
+		// 		if (!game.disablepause)
+		// 		{
+		// 			isActive = false;
+		// 		}
+		// 		if (!useFullscreenSpaces)
+		// 		{
+		// 			wasFullscreen = !graphics.screenbuffer->isWindowed;
+		// 			graphics.screenbuffer->isWindowed = true;
+		// 			SDL_SetWindowFullscreen(
+		// 				SDL_GetWindowFromID(evt.window.windowID),
+		// 				0
+		// 			);
+		// 		}
+		// 		SDL_EnableScreenSaver();
+		// 		if (!game.disablepause)
+		// 		{
+		// 			pauseStart = SDL_GetPerformanceCounter();
+		// 		}
+		// 		break;
 
-			/* Mouse Focus */
-			case SDL_WINDOWEVENT_ENTER:
-				SDL_DisableScreenSaver();
-				break;
-			case SDL_WINDOWEVENT_LEAVE:
-				SDL_EnableScreenSaver();
-				break;
-			}
-			break;
+		// 	/* Mouse Focus */
+		// 	case SDL_WINDOWEVENT_ENTER:
+		// 		SDL_DisableScreenSaver();
+		// 		break;
+		// 	case SDL_WINDOWEVENT_LEAVE:
+		// 		SDL_EnableScreenSaver();
+		// 		break;
+		// 	}
+		// 	break;
 
 		/* Quit Event */
 		case SDL_QUIT:
@@ -318,30 +324,31 @@ void KeyPoll::Poll()
 	}
 }
 
-bool KeyPoll::isDown(SDL_Keycode key)
+bool KeyPoll::isDown(SDLKey key)
 {
 	return keymap[key];
 }
 
-bool KeyPoll::isDown(std::vector<SDL_GameControllerButton> buttons)
-{
-	for (size_t i = 0; i < buttons.size(); i += 1)
-	{
-		if (buttonmap[buttons[i]])
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool KeyPoll::isDown(SDL_GameControllerButton button)
-{
-	return buttonmap[button];
-}
+// bool KeyPoll::isDown(std::vector<SDL_GameControllerButton> buttons)
+// {
+// 	for (size_t i = 0; i < buttons.size(); i += 1)
+// 	{
+// 		if (buttonmap[buttons[i]])
+// 		{
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
+//
+// bool KeyPoll::isDown(SDL_GameControllerButton button)
+// {
+// 	return buttonmap[button];
+// }
 
 bool KeyPoll::controllerButtonDown()
 {
+    /*
 	for (
 		SDL_GameControllerButton button = SDL_CONTROLLER_BUTTON_A;
 		button < SDL_CONTROLLER_BUTTON_DPAD_UP;
@@ -353,22 +360,30 @@ bool KeyPoll::controllerButtonDown()
 		}
 	}
 	return false;
+        */
+    return false;
 }
 
 bool KeyPoll::controllerWantsLeft(bool includeVert)
 {
+    /*
 	return (	buttonmap[SDL_CONTROLLER_BUTTON_DPAD_LEFT] ||
 			xVel < 0 ||
 			(	includeVert &&
 				(	buttonmap[SDL_CONTROLLER_BUTTON_DPAD_UP] ||
 					yVel < 0	)	)	);
+                                        */
+    return false;
 }
 
 bool KeyPoll::controllerWantsRight(bool includeVert)
 {
+    /*
 	return (	buttonmap[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] ||
 			xVel > 0 ||
 			(	includeVert &&
 				(	buttonmap[SDL_CONTROLLER_BUTTON_DPAD_DOWN] ||
 					yVel > 0	)	)	);
+                                        */
+    return false;
 }

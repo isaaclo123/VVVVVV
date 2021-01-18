@@ -88,7 +88,9 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 		/* We later append to this path and assume it ends in a slash */
 		bool trailing_pathsep = SDL_strcmp(baseDir + SDL_strlen(baseDir) - SDL_strlen(pathSep), pathSep) == 0;
 
-		SDL_snprintf(output, sizeof(output), "%s%s",
+                // TODO
+                // sizeof(output),
+		sprintf(output, "%s%s",
 			baseDir,
 			!trailing_pathsep ? pathSep : ""
 		);
@@ -112,7 +114,8 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	mkdirResult |= PHYSFS_mkdir("levels");
 
 	/* Store full save directory */
-	SDL_snprintf(saveDir, sizeof(saveDir), "%s%s%s",
+	// TODO snprintf(saveDir, sizeof(saveDir), "%s%s%s",
+	sprintf(saveDir, "%s%s%s",
 		output,
 		"saves",
 		PHYSFS_getDirSeparator()
@@ -120,7 +123,8 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	printf("Save directory: %s\n", saveDir);
 
 	/* Store full level directory */
-	SDL_snprintf(levelDir, sizeof(levelDir), "%s%s%s",
+	// TODO snprintf(levelDir, sizeof(levelDir), "%s%s%s",
+	sprintf(levelDir, "%s%s%s",
 		output,
 		"levels",
 		PHYSFS_getDirSeparator()
@@ -141,16 +145,19 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	/* Mount the stock content last */
 	if (assetsPath)
 	{
-		SDL_strlcpy(output, assetsPath, sizeof(output));
+		// FIXME SDL_strlcpy(output, assetsPath, sizeof(output));
+		strncpy(output, assetsPath, sizeof(output));
 	}
 	else
 	{
-		SDL_snprintf(output, sizeof(output), "%s%s",
+		// TODO snprintf(output, sizeof(output), "%s%s",
+		sprintf(output, "%s%s",
 			// PHYSFS_getBaseDir(),
                         baseDir,
 			"data.zip"
 		);
 	}
+        /*
 	printf("zip location: %s\n", output);
 	if (!PHYSFS_mount(output, NULL, 1))
 	{
@@ -169,12 +176,14 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 		);
 		return 0;
 	}
+        */
 
-	SDL_snprintf(output, sizeof(output), "%s%s", PHYSFS_getBaseDir(), "gamecontrollerdb.txt");
-	if (SDL_GameControllerAddMappingsFromFile(output) < 0)
-	{
-		printf("gamecontrollerdb.txt not found!\n");
-	}
+	// TODO snprintf(output, sizeof(output), "%s%s", PHYSFS_getBaseDir(), "gamecontrollerdb.txt");
+	sprintf(output, "%s%s", PHYSFS_getBaseDir(), "gamecontrollerdb.txt");
+	// TODO Game controller if (SDL_GameControllerAddMappingsFromFile(output) < 0)
+	// {
+	// 	printf("gamecontrollerdb.txt not found!\n");
+	// }
 	return 1;
 }
 
@@ -400,7 +409,9 @@ static void PLATFORM_getOSDirectory(char* output)
 	WideCharToMultiByte(CP_UTF8, 0, utf16_path, -1, output, MAX_PATH, NULL, NULL);
 	SDL_strlcat(output, "\\VVVVVV\\", MAX_PATH);
 #else
-	SDL_strlcpy(output, PHYSFS_getPrefDir("distractionware", "VVVVVV"), MAX_PATH);
+	// SDL_strlcpy(output, PHYSFS_getPrefDir("distractionware", "VVVVVV"), MAX_PATH);
+        // TODO
+	strncpy(output, PHYSFS_getPrefDir("distractionware", "VVVVVV"), MAX_PATH);
         // TODO implement in PHYSFS
 #endif
 }
@@ -620,7 +631,8 @@ bool FILESYSTEM_openDirectoryEnabled()
 	 * If you're working on a tenfoot-only build, add a def that always
 	 * returns false!
 	 */
-	return !SDL_GetHintBoolean("SteamTenfoot", SDL_FALSE);
+	// return !SDL_GetHintBoolean("SteamTenfoot", SDL_FALSE);
+        return true;
 }
 
 #ifdef _WIN32

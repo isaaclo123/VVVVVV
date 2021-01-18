@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cassert>
 
 #include "FileSystemUtils.h"
 
@@ -61,23 +62,29 @@ static SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool no
 
 	if (loadedImage != NULL)
 	{
-		optimizedImage = SDL_ConvertSurfaceFormat(
-			loadedImage,
-			SDL_PIXELFORMAT_ABGR8888, // FIXME: Format? -flibit
-			0
-		);
+		// optimizedImage = SDL_ConvertSurfaceFormat(
+		// 	loadedImage,
+		// 	SDL_PIXELFORMAT_ABGR8888, // FIXME: Format? -flibit
+		// 	0
+		// );
+                optimizedImage = SDL_DisplayFormatAlpha(
+                        loadedImage
+                );
 		SDL_FreeSurface( loadedImage );
 		free(data);
-		if (noBlend)
+		if (noBlend && optimizedImage->format != NULL)
 		{
-			SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_BLEND);
+			// SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_BLEND);
+                        SDL_SetAlpha(optimizedImage,
+                                SDL_SRCALPHA,
+                                optimizedImage->format->alpha);
 		}
 		return optimizedImage;
 	}
 	else
 	{
 		fprintf(stderr,"Image not found: %s\n", filename);
-		SDL_assert(0 && "Image not found! See stderr.");
+		assert(0 && "Image not found! See stderr.");
 		return NULL;
 	}
 }

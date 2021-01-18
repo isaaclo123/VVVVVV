@@ -430,7 +430,8 @@ void ScrollSurface( SDL_Surface* _src, int _pX, int _pY )
 
         SDL_Rect destrect1;
 
-        SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        // SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        SDL_SetAlpha(part1, 0, 128);
 
         setRect(destrect1, 0,  _pY, _pX, _src->h);
 
@@ -446,7 +447,8 @@ void ScrollSurface( SDL_Surface* _src, int _pX, int _pY )
 
         SDL_Rect destrect1;
 
-        SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        // SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        SDL_SetAlpha(part1, 0, 128);
 
         setRect(destrect1, _pX, _pY, _src->w, _src->h - _pY);
 
@@ -463,7 +465,8 @@ void ScrollSurface( SDL_Surface* _src, int _pX, int _pY )
 
         SDL_Rect destrect1;
 
-        SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        // SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        SDL_SetAlpha(part1, 0, 128);
 
         setRect(destrect1, _pX,  0, _src->w - _pX, _src->h);
 
@@ -479,7 +482,8 @@ void ScrollSurface( SDL_Surface* _src, int _pX, int _pY )
 
         SDL_Rect destrect1;
 
-        SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        // SDL_SetSurfaceBlendMode(part1, SDL_BLENDMODE_NONE);
+        SDL_SetAlpha(part1, 0, 128);
 
         setRect(destrect1, 0, 0, _src->w - _pX, _src->h);
 

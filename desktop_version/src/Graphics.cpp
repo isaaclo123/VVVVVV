@@ -202,6 +202,7 @@ void Graphics::updatetitlecolours()
     col_trinket = ct.colour;
 }
 
+/*
 #define PROCESS_TILESHEET_CHECK_ERROR(tilesheet, tile_square) \
     if (grphx.im_##tilesheet->w % tile_square != 0 \
     || grphx.im_##tilesheet->h % tile_square != 0) \
@@ -222,6 +223,28 @@ void Graphics::updatetitlecolours()
             message, \
             NULL \
         ); \
+        \
+        exit(1); \
+    }
+    FIXME
+*/
+        // sprintf(message_title, sizeof(message_title), error_title, #tilesheet); \
+
+#define PROCESS_TILESHEET_CHECK_ERROR(tilesheet, tile_square) \
+    if (grphx.im_##tilesheet->w % tile_square != 0 \
+    || grphx.im_##tilesheet->h % tile_square != 0) \
+    { \
+        const char* error = "Error: %s.png dimensions not exact multiples of %i!"; \
+        char message[128]; \
+        sprintf(message, error, #tilesheet, tile_square); \
+        \
+        const char* error_title = "Error with %s.png"; \
+        char message_title[128]; \
+        sprintf(message_title, error_title, #tilesheet); \
+        \
+        puts(message); \
+        \
+        puts(message_title); \
         \
         exit(1); \
     }
@@ -1315,7 +1338,8 @@ void Graphics::drawmenu( int cr, int cg, int cb, bool levelmenu /*= false*/ )
         }
 
         char tempstring[Game::menutextbytes];
-        SDL_strlcpy(tempstring, opt.text, sizeof(tempstring));
+        // TODO SDL_strlcpy(tempstring, opt.text, sizeof(tempstring));
+        strncpy(tempstring, opt.text, sizeof(tempstring));
 
         char buffer[Game::menutextbytes];
         if ((int) i == game.currentmenuoption)
@@ -1332,13 +1356,15 @@ void Graphics::drawmenu( int cr, int cg, int cb, bool levelmenu /*= false*/ )
             }
 
             // Add brackets
-            SDL_snprintf(buffer, sizeof(buffer), "[ %s ]", tempstring);
+            // TODO SDL_snprintf(buffer, sizeof(buffer), "[ %s ]", tempstring);
+            sprintf(buffer, "[ %s ]", tempstring);
             // Account for brackets
             x -= 16;
         }
         else
         {
-            SDL_strlcpy(buffer, tempstring, sizeof(buffer));
+            // SDL_strlcpy(buffer, tempstring, sizeof(buffer));
+            strncpy(buffer, tempstring, sizeof(buffer));
         }
 
         Print(x, y, buffer, fr, fg, fb);

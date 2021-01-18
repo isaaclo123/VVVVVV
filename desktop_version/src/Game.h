@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <string>
+#include <string.h>
 #include <vector>
 
 #include "ScreenSettings.h"
@@ -258,7 +259,11 @@ public:
     void inline option(const char* text, bool active = true)
     {
         MenuOption menuoption;
-        SDL_strlcpy(menuoption.text, text, sizeof(menuoption.text));
+        // SDL_strlcpy(menuoption.text, text, sizeof(menuoption.text));
+        int buflen = sizeof(menuoption.text);
+        strncpy(menuoption.text, text, buflen - 1);
+        menuoption.text[buflen - 1] = '\0';
+
         menuoption.active = active;
         menuoptions.push_back(menuoption);
     }
@@ -396,10 +401,12 @@ public:
     bool customlevelstatsloaded;
 
 
+    /* Fixme
     std::vector<SDL_GameControllerButton> controllerButton_map;
     std::vector<SDL_GameControllerButton> controllerButton_flip;
     std::vector<SDL_GameControllerButton> controllerButton_esc;
     std::vector<SDL_GameControllerButton> controllerButton_restart;
+    */
 
     bool skipfakeload;
     bool ghostsenabled;

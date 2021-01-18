@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tinyxml2.h>
+#include <cassert>
 
 #include "editor.h"
 #include "Entity.h"
@@ -31,6 +32,7 @@ inline int strcasecmp (const char* a, const char* b) {
     return wcscasecmp((const wchar_t*) a, (const wchar_t*) b);
 }
 
+/*
 static bool GetButtonFromString(const char *pText, SDL_GameControllerButton *button)
 {
     if (*pText == '0' ||
@@ -105,6 +107,7 @@ static bool GetButtonFromString(const char *pText, SDL_GameControllerButton *but
     }
     return false;
 }
+*/
 
 
 void Game::init(void)
@@ -4556,10 +4559,10 @@ void Game::loadstats(ScreenSettings* screen_settings)
 void Game::deserializesettings(tinyxml2::XMLElement* dataNode, ScreenSettings* screen_settings)
 {
     // Don't duplicate controller buttons!
-    controllerButton_flip.clear();
-    controllerButton_map.clear();
-    controllerButton_esc.clear();
-    controllerButton_restart.clear();
+    // controllerButton_flip.clear();
+    // controllerButton_map.clear();
+    // controllerButton_esc.clear();
+    // controllerButton_restart.clear();
 
     for (tinyxml2::XMLElement* pElem = dataNode;
     pElem != NULL;
@@ -4673,6 +4676,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, ScreenSettings* s
             graphics.showmousecursor = help.Int(pText);
         }
 
+        /* FIXME
         if (pKey == "flipButton")
         {
             SDL_GameControllerButton newButton;
@@ -4708,6 +4712,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, ScreenSettings* s
                 controllerButton_restart.push_back(newButton);
             }
         }
+        */
 
         if (pKey == "controllerSensitivity")
         {
@@ -4725,6 +4730,8 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, ScreenSettings* s
         SDL_ShowCursor(SDL_DISABLE);
     }
 
+    /*
+     * TODO
     if (controllerButton_flip.size() < 1)
     {
         controllerButton_flip.push_back(SDL_CONTROLLER_BUTTON_A);
@@ -4741,6 +4748,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, ScreenSettings* s
     {
         controllerButton_restart.push_back(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
     }
+    */
 }
 
 bool Game::savestats()
@@ -4927,6 +4935,7 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const ScreenSetting
     }
 
     // Now add them
+    /*
     for (size_t i = 0; i < controllerButton_flip.size(); i += 1)
     {
         tinyxml2::XMLElement* msg = doc.NewElement("flipButton");
@@ -4951,6 +4960,7 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const ScreenSetting
         msg->LinkEndChild(doc.NewText(help.String((int) controllerButton_restart[i]).c_str()));
         dataNode->LinkEndChild(msg);
     }
+    */
 
     xml::update_tag(dataNode, "controllerSensitivity", key.sensitivity);
 }
@@ -6383,7 +6393,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
                             break;
                         }
                         default:
-                            SDL_assert(0 && "Unhandled menu text prefix!");
+                            // SDL_assert(0 && "Unhandled menu text prefix!");
+                            assert(0 && "Unhandled menu text prefix!");
                             prefix = "";
                             break;
                         }
@@ -6394,7 +6405,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
                         prefix = tmp;
                     }
                     char text[menutextbytes];
-                    SDL_snprintf(text, sizeof(text), "%s%s", prefix, ed.ListOfMetaData[i].title.c_str());
+                    // TODO SDL_snprintf(text, sizeof(text), "%s%s", prefix, ed.ListOfMetaData[i].title.c_str());
+                    sprintf(text, "%s%s", prefix, ed.ListOfMetaData[i].title.c_str());
                     for (size_t ii = 0; ii < SDL_arraysize(text); ii++)
                     {
                         text[ii] = SDL_tolower(text[ii]);

@@ -2,6 +2,7 @@
 #include "Music.h"
 
 #include <SDL.h>
+#include <cassert>
 #include <stdio.h>
 
 #include "BinaryBlob.h"
@@ -97,7 +98,7 @@ void musicclass::init()
 		mmmmmm = false;
 		usingmmmmmm=false;
 		bool ohCrap = musicReadBlob.unPackBinary("vvvvvvmusic.vvv");
-		SDL_assert(ohCrap && "Music not found!");
+		assert(ohCrap && "Music not found!");
 	}
 	else
 	{
@@ -135,7 +136,7 @@ void musicclass::init()
 		}
 
 		bool ohCrap = musicReadBlob.unPackBinary("vvvvvvmusic.vvv");
-		SDL_assert(ohCrap && "Music not found!");
+		assert(ohCrap && "Music not found!");
 	}
 
 	int index;
@@ -161,7 +162,7 @@ void musicclass::init()
 static void songend()
 {
 	extern musicclass music;
-	music.songEnd = SDL_GetPerformanceCounter();
+	// TODO music.songEnd = SDL_GetPerformanceCounter();
 	music.currentsong = -1;
 }
 
@@ -239,15 +240,17 @@ void musicclass::play(int t, const double position_sec /*= 0.0*/, const int fade
 		}
 	}
 
-	songStart = SDL_GetPerformanceCounter();
+	// songStart = SDL_GetPerformanceCounter();
 }
 
 void musicclass::resume(const int fadein_ms /*= 0*/)
 {
-	const double offset = static_cast<double>(songEnd - songStart);
-	const double frequency = static_cast<double>(SDL_GetPerformanceFrequency());
+    // TODO
+	// const double offset = static_cast<double>(songEnd - songStart);
+	// const double frequency = static_cast<double>(SDL_GetPerformanceFrequency());
 
-	const double position_sec = offset / frequency;
+	// const double position_sec = offset / frequency;
+	const double position_sec = 0;
 
 	play(resumesong, position_sec, fadein_ms);
 }

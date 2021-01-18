@@ -19,8 +19,8 @@ extern "C"
 
 ScreenSettings::ScreenSettings()
 {
-	windowWidth = 320;
-	windowHeight = 240;
+	windowWidth = 480;
+	windowHeight = 272;
 	fullscreen = false;
 	useVsync = false;
 	stretch = 0;
@@ -30,9 +30,9 @@ ScreenSettings::ScreenSettings()
 
 void Screen::init(const ScreenSettings& settings)
 {
-	m_window = NULL;
-	m_renderer = NULL;
-	m_screenTexture = NULL;
+	// m_window = NULL;
+	// m_renderer = NULL;
+	// m_screenTexture = NULL;
 	m_screen = NULL;
 	isWindowed = !settings.fullscreen;
 	stretchMode = settings.stretch;
@@ -43,6 +43,7 @@ void Screen::init(const ScreenSettings& settings)
 	filterSubrect.w = 318;
 	filterSubrect.h = 238;
 
+        /* TODO
 	SDL_SetHintWithPriority(
 		SDL_HINT_RENDER_SCALE_QUALITY,
 		isFiltered ? "linear" : "nearest",
@@ -53,18 +54,20 @@ void Screen::init(const ScreenSettings& settings)
 		vsync ? "1" : "0",
 		SDL_HINT_OVERRIDE
 	);
+        */
 
 	// Uncomment this next line when you need to debug -flibit
 	// SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
 	// FIXME: m_renderer is also created in Graphics::processVsync()!
-	SDL_CreateWindowAndRenderer(
-		640,
-		480,
-		SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE,
-		&m_window,
-		&m_renderer
-	);
-	SDL_SetWindowTitle(m_window, "VVVVVV");
+	// SDL_CreateWindowAndRenderer(
+	// 	640,
+	// 	480,
+	// 	SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE,
+	// 	&m_window,
+	// 	&m_renderer
+	// );
+        m_screen = SDL_SetVideoMode(480, 272, 0, SDL_HWPALETTE);
+	SDL_WM_SetCaption("VVVVVV", NULL);
 
 	LoadIcon();
 
@@ -80,17 +83,17 @@ void Screen::init(const ScreenSettings& settings)
 		0xFF000000
 	);
 	// ALSO FIXME: This SDL_CreateTexture() is duplicated in Graphics::processVsync()!
-	m_screenTexture = SDL_CreateTexture(
-		m_renderer,
-		SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		320,
-		240
-	);
+	// m_screenTexture = SDL_CreateTexture(
+	// 	m_renderer,
+	// 	SDL_PIXELFORMAT_ARGB8888,
+	// 	SDL_TEXTUREACCESS_STREAMING,
+	// 	320,
+	// 	240
+	// );
 
 	badSignalEffect = settings.badSignal;
 
-	ResizeScreen(settings.windowWidth, settings.windowHeight);
+	// ResizeScreen(settings.windowWidth, settings.windowHeight);
 }
 
 void Screen::GetSettings(ScreenSettings* settings)
@@ -128,11 +131,13 @@ void Screen::LoadIcon()
 		0x00FF0000,
 		0x00000000
 	);
-	SDL_SetWindowIcon(m_window, icon);
+	// SDL_SetWindowIcon(m_window, icon);
+	SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
 	free(data);
 }
 
+/*
 void Screen::ResizeScreen(int x, int y)
 {
 	static int resX = 320;
@@ -253,10 +258,13 @@ void Screen::ResizeToNearestMultiple()
 		ResizeScreen(final_dimension * 4 / 3, final_dimension);
 	}
 }
+*/
 
 void Screen::GetWindowSize(int* x, int* y)
 {
-	SDL_GetWindowSize(m_window, x, y);
+        *x = 480;
+        *y = 272;
+	// SDL_GetWindowSize(m_window, x, y);
 }
 
 void Screen::UpdateScreen(SDL_Surface* buffer, SDL_Rect* rect )
@@ -289,60 +297,61 @@ const SDL_PixelFormat* Screen::GetFormat()
 
 void Screen::FlipScreen()
 {
-	SDL_UpdateTexture(
-		m_screenTexture,
-		NULL,
-		m_screen->pixels,
-		m_screen->pitch
-	);
-	SDL_RenderCopy(
-		m_renderer,
-		m_screenTexture,
-		isFiltered ? &filterSubrect : NULL,
-		NULL
-	);
-	SDL_RenderPresent(m_renderer);
-	SDL_RenderClear(m_renderer);
+        SDL_Flip(m_screen);
+	// SDL_UpdateTexture(
+	// 	m_screenTexture,
+	// 	NULL,
+	// 	m_screen->pixels,
+	// 	m_screen->pitch
+	// );
+	// SDL_RenderCopy(
+	// 	m_renderer,
+	// 	m_screenTexture,
+	// 	isFiltered ? &filterSubrect : NULL,
+	// 	NULL
+	// );
+	// SDL_RenderPresent(m_renderer);
+	// SDL_RenderClear(m_renderer);
 	SDL_FillRect(m_screen, NULL, 0x00000000);
 }
 
 void Screen::toggleFullScreen()
 {
 	isWindowed = !isWindowed;
-	ResizeScreen(-1, -1);
+	// ResizeScreen(-1, -1);
 }
 
 void Screen::toggleStretchMode()
 {
 	stretchMode = (stretchMode + 1) % 3;
-	ResizeScreen(-1, -1);
+	// ResizeScreen(-1, -1);
 }
 
 void Screen::toggleLinearFilter()
 {
 	isFiltered = !isFiltered;
-	SDL_SetHintWithPriority(
-		SDL_HINT_RENDER_SCALE_QUALITY,
-		isFiltered ? "linear" : "nearest",
-		SDL_HINT_OVERRIDE
-	);
-	SDL_DestroyTexture(m_screenTexture);
-	m_screenTexture = SDL_CreateTexture(
-		m_renderer,
-		SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		320,
-		240
-	);
+	// SDL_SetHintWithPriority(
+	// 	SDL_HINT_RENDER_SCALE_QUALITY,
+	// 	isFiltered ? "linear" : "nearest",
+	// 	SDL_HINT_OVERRIDE
+	// );
+	// SDL_DestroyTexture(m_screenTexture);
+	// m_screenTexture = SDL_CreateTexture(
+	// 	m_renderer,
+	// 	SDL_PIXELFORMAT_ARGB8888,
+	// 	SDL_TEXTUREACCESS_STREAMING,
+	// 	320,
+	// 	240
+	// );
 }
 
 void Screen::resetRendererWorkaround()
 {
-	SDL_SetHintWithPriority(
-		SDL_HINT_RENDER_VSYNC,
-		vsync ? "1" : "0",
-		SDL_HINT_OVERRIDE
-	);
+	// SDL_SetHintWithPriority(
+	// 	SDL_HINT_RENDER_VSYNC,
+	// 	vsync ? "1" : "0",
+	// 	SDL_HINT_OVERRIDE
+	// );
 
 	/* FIXME: This exists because SDL_HINT_RENDER_VSYNC is not dynamic!
 	 * As a result, our only workaround is to tear down the renderer
@@ -350,34 +359,34 @@ void Screen::resetRendererWorkaround()
 	 * -flibit
 	 */
 
-	if (m_renderer == NULL)
-	{
-		/* We haven't made it to init yet, don't worry about it */
-		return;
-	}
+	// if (m_renderer == NULL)
+	// {
+	// 	/* We haven't made it to init yet, don't worry about it */
+	// 	return;
+	// }
 
-	SDL_RendererInfo renderInfo;
-	SDL_GetRendererInfo(m_renderer, &renderInfo);
-	bool curVsync = (renderInfo.flags & SDL_RENDERER_PRESENTVSYNC) != 0;
-	if (vsync == curVsync)
-	{
-		return;
-	}
+	// SDL_RendererInfo renderInfo;
+	// SDL_GetRendererInfo(m_renderer, &renderInfo);
+	// bool curVsync = (renderInfo.flags & SDL_RENDERER_PRESENTVSYNC) != 0;
+	// if (vsync == curVsync)
+	// {
+	// 	return;
+	// }
 
-	SDL_DestroyTexture(m_screenTexture);
-	SDL_DestroyRenderer(m_renderer);
+	// SDL_DestroyTexture(m_screenTexture);
+	// SDL_DestroyRenderer(m_renderer);
 
-	m_renderer = SDL_CreateRenderer(m_window, -1, 0);
-	m_screenTexture = SDL_CreateTexture(
-		m_renderer,
-		SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		320,
-		240
-	);
+	// m_renderer = SDL_CreateRenderer(m_window, -1, 0);
+	// m_screenTexture = SDL_CreateTexture(
+	// 	m_renderer,
+	// 	SDL_PIXELFORMAT_ARGB8888,
+	// 	SDL_TEXTUREACCESS_STREAMING,
+	// 	320,
+	// 	240
+	// );
 
 	/* Ugh, have to make sure to re-apply graphics options after doing the
 	 * above, otherwise letterbox/integer won't be applied...
 	 */
-	ResizeScreen(-1, -1);
+// 	ResizeScreen(-1, -1);
 }

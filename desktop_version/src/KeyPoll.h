@@ -31,7 +31,7 @@ enum Kybrd
 class KeyPoll
 {
 public:
-	std::map<SDL_Keycode, bool> keymap;
+	std::map<SDLKey, bool> keymap;
 
 	bool isActive;
 
@@ -52,10 +52,10 @@ public:
 
 	void Poll();
 
-	bool isDown(SDL_Keycode key);
+	bool isDown(SDLKey key);
 
-	bool isDown(std::vector<SDL_GameControllerButton> buttons);
-	bool isDown(SDL_GameControllerButton button);
+	// bool isDown(std::vector<SDL_GameControllerButton> buttons);
+	// bool isDown(SDL_GameControllerButton button);
 	bool controllerButtonDown();
 	bool controllerWantsLeft(bool includeVert);
 	bool controllerWantsRight(bool includeVert);
@@ -72,8 +72,8 @@ public:
 	Uint64 pauseStart;
 
 private:
-	std::map<SDL_JoystickID, SDL_GameController*> controllers;
-	std::map<SDL_GameControllerButton, bool> buttonmap;
+	// std::map<SDL_JoystickID, SDL_GameController*> controllers;
+	// std::map<SDL_GameControllerButton, bool> buttonmap;
 	int xVel, yVel;
 	bool useFullscreenSpaces;
 	Uint32 wasFullscreen;

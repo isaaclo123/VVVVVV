@@ -705,7 +705,7 @@ static void inline fixedloop()
     if (key.resetWindow)
     {
         key.resetWindow = false;
-        gameScreen.ResizeScreen(-1, -1);
+        // gameScreen.ResizeScreen(-1, -1);
     }
 
     music.processmusic();

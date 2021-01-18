@@ -14,8 +14,8 @@ public:
 
 	void LoadIcon();
 
-	void ResizeScreen(int x, int y);
-	void ResizeToNearestMultiple();
+	// void ResizeScreen(int x, int y);
+	// void ResizeToNearestMultiple();
 	void GetWindowSize(int* x, int* y);
 
 	void UpdateScreen(SDL_Surface* buffer, SDL_Rect* rect);
@@ -34,9 +34,10 @@ public:
 	int stretchMode;
 	bool vsync;
 
-	SDL_Window *m_window;
-	SDL_Renderer *m_renderer;
-	SDL_Texture *m_screenTexture;
+	// SDL_Surface* m_window;
+	// SDL_Renderer *m_renderer;
+	// SDL_Surface* m_screenTexture;
+	// SDL_Texture *m_screenTexture;
 	SDL_Surface* m_screen;
 
 	SDL_Rect filterSubrect;

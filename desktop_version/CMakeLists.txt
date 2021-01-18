@@ -18,10 +18,10 @@ SET(PSPCMAKE ${PSPDEV}/psp/share/cmake)
 #     ${PSPDEV}/psp/lib
 # )
 
-# Set SDL2 variables
+# Set SDL variables
 
-# add_definitions(-DSDL2_INCLUDE_DIRS=${PSPDEV}/psp/include/SDL2)
-# add_definitions(-DSDL2_LIBRARIES=${PSPDEV}/psp/lib/libSDL.a;${PSPDEV}/psp/lib/libSDL2main.a;${PSPDEV}/psp/lib/libSDL2_mixer.a
+# add_definitions(-DSDL_INCLUDE_DIRS=${PSPDEV}/psp/include/SDL)
+# add_definitions(-DSDL_LIBRARIES=${PSPDEV}/psp/lib/libSDL.a;${PSPDEV}/psp/lib/libSDLmain.a;${PSPDEV}/psp/lib/libSDL_mixer.a
 
 
 
@@ -290,26 +290,26 @@ TARGET_LINK_LIBRARIES(
     lodepng-static
     )
 
-# SDL2 Dependency (Detection pulled from FAudio)
-if (DEFINED SDL2_INCLUDE_DIRS AND DEFINED SDL2_LIBRARIES)
-	message(STATUS "Using pre-defined SDL2 variables SDL2_INCLUDE_DIRS and SDL2_LIBRARIES")
-        target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>")
-        # target_link_libraries(VVVVVV ${SDL2_LIBRARIES})
-        # link_directories(AFTER VVVVVV ${SDL2_INCLUDE_DIRS})
+# SDL Dependency (Detection pulled from FAudio)
+if (DEFINED SDL_INCLUDE_DIRS AND DEFINED SDL_LIBRARIES)
+	message(STATUS "Using pre-defined SDL variables SDL_INCLUDE_DIRS and SDL_LIBRARIES")
+        target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL_INCLUDE_DIRS}>")
+        # target_link_libraries(VVVVVV ${SDL_LIBRARIES})
+        # link_directories(AFTER VVVVVV ${SDL_INCLUDE_DIRS})
 else()
-	# Only try to autodetect if both SDL2 variables aren't explicitly set
-	find_package(SDL2 CONFIG)
-	if (TARGET SDL2::SDL2)
-		message(STATUS "Using TARGET SDL2::SDL2")
-		target_link_libraries(VVVVVV SDL2::SDL2 SDL2_mixer)
-	elseif (TARGET SDL2)
-		message(STATUS "Using TARGET SDL2")
-		target_link_libraries(VVVVVV SDL2 SDL2_mixer)
+	# Only try to autodetect if both SDL variables aren't explicitly set
+	find_package(SDL CONFIG)
+	if (TARGET SDL::SDL)
+		message(STATUS "Using TARGET SDL::SDL")
+		target_link_libraries(VVVVVV SDL::SDL SDL_mixer)
+	elseif (TARGET SDL)
+		message(STATUS "Using TARGET SDL")
+		target_link_libraries(VVVVVV SDL SDL_mixer)
 	else()
-		message(STATUS "No TARGET SDL2::SDL2, or SDL2, using variables")
-		find_path(SDL2_MIXER_INCLUDE_DIRS NAMES SDL_mixer.h PATH_SUFFIXES SDL2)
-		target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL2_INCLUDE_DIRS}>" ${SDL2_MIXER_INCLUDE_DIRS})
-		target_link_libraries(VVVVVV ${SDL2_LIBRARIES} SDL2_mixer)
+		message(STATUS "No TARGET SDL::SDL, or SDL, using variables")
+		find_path(SDL_MIXER_INCLUDE_DIRS NAMES SDL_mixer.h PATH_SUFFIXES SDL)
+		target_include_directories(VVVVVV SYSTEM PUBLIC "$<BUILD_INTERFACE:${SDL_INCLUDE_DIRS}>" ${SDL_MIXER_INCLUDE_DIRS})
+		target_link_libraries(VVVVVV ${SDL_LIBRARIES} SDL_mixer)
 	endif()
 endif()
 
