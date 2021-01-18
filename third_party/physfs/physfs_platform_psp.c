@@ -505,7 +505,7 @@ PHYSFS_sint64 __PHYSFS_platformFileLength(void *opaque)
 
     BAIL_IF(len < 0, errno, -1);
 
-    printf("in fileLength, len: %i\n", len);
+    // printf("in fileLength, len: %i\n", len);
 
     sceIoLseek(fd, cur, SEEK_SET);
     return (PHYSFS_sint64)len;
