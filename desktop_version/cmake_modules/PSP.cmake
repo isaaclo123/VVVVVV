@@ -128,6 +128,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 SET(
     CMAKE_CXX_STANDARD_LIBRARIES
     "${CMAKE_CXX_STANDARD_LIBRARIES} \
+    -D_GNU_SOURCE \
     -lstdc++ \
     -lpspvram \
     -lmikmod \
