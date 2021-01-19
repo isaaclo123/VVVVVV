@@ -3,6 +3,8 @@
 #include "SoundSystem.h"
 #include "FileSystemUtils.h"
 
+#include "SDL2_stub.h"
+
 MusicTrack::MusicTrack(const char* fileName)
 {
 	m_music = Mix_LoadMUS(fileName);

@@ -1,29 +1,24 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <pspkernel.h>
+#include <psptypes.h>
 #include <stdio.h>
 #include "Music.h"
 #include "BinaryBlob.h"
 #include "Map.h"
 
-#include <kos.h>
-#include <dc/sound/sound.h>
-#include "memory_stats.h"
+// #include <dc/sound/sound.h>
+// #include "memory_stats.h"
+// TODO
+#define snd_stream_hnd_t int
+
 struct SFX_t {
-  //snd_stream_hnd_t shnd;
+  snd_stream_hnd_t shnd;
   SoundTrack* t;
-  kthread_t* thread;
+  SceUID* thread;
   int pos;
 };
 static SFX_t SFX[32];
-#define FS_PREFIX "/cd"
-  #if defined(FS_PREFIX_PC)
-  #define FS_PREFIX "/pc/VVVVVV/desktop_version/dc/romdisk/"
-  #elif defined(FS_PREFIX_SD)
-  #define FS_PREFIX "/sd"
-  #elif defined(FS_PREFIX_CD)
-  #define FS_PREFIX "/cd"
-  #endif
-
 
 /*
 * Struct that holds the RIFF data of the Wave file.
@@ -59,7 +54,8 @@ struct WAVE_Data {
 };
 
 // Variables for streaming music
-static file_t soundFile = NULL;
+// static file_t soundFile = NULL;
+static void* soundFile = NULL;
 
 int8_t mix_fading_out = -1;  // -1 = FadingIn , +1 = Fading Out , 0 = Nothing
 int mix_fading_ms = -1;
@@ -70,6 +66,8 @@ int mix_next = -1;
 
 int LoadWavFile(const char* filename,
     int* size, int* frequency) {
+    return 1;
+    /*
   WAVE_Format wave_format;
   RIFF_Header riff_header;
   WAVE_Data wave_data;
@@ -122,9 +120,11 @@ int LoadWavFile(const char* filename,
   *frequency = wave_format.sampleRate;
 
   return 1;
+  */
 }
 
 void *wav_callback(snd_stream_hnd_t hnd, int len, int * actual) {
+    /*
   //printf("wav_callback %d %d\n", hnd, len);
   SoundTrack* t = SFX[hnd].t;
   int off = sizeof(RIFF_Header) + sizeof(WAVE_Format) + sizeof(WAVE_Data);
@@ -147,9 +147,12 @@ void *wav_callback(snd_stream_hnd_t hnd, int len, int * actual) {
   *actual = pcm;
 
   return pcm_ptr;
+  */
 }
 
 int stream_setup(SoundTrack* t) {
+    return 1;
+    /*
   snd_stream_hnd_t shnd = snd_stream_alloc(&wav_callback, SND_STREAM_BUFFER_MAX);
   if (shnd == SND_STREAM_INVALID) {
     printf("stream_thread: SND_STREAM_INVALID %p\n", t);
@@ -168,8 +171,11 @@ int stream_setup(SoundTrack* t) {
   SFX[shnd].thread = thd_get_current();
   SFX[shnd].pos = sizeof(RIFF_Header) + sizeof(WAVE_Format) + sizeof(WAVE_Data);
   snd_stream_start(shnd, wave_format.sampleRate, wave_format.numChannels-1);
+  */
 }
 int stream_loop() {
+  return 0;
+    /*
   for (int shnd = 0; shnd < 32; ++shnd) {
     if (SFX[shnd].t != NULL) {
       int ret = snd_stream_poll(shnd);
@@ -186,11 +192,13 @@ int stream_loop() {
   }
 
   return 0;
+  */
 }
 
 void musicclass::init()
 {
-  int rc = snd_stream_init();
+  // int rc = snd_stream_init();
+  int rc = 0;
   if(rc != 0) {
     printf("musicclass: Error initializing the stream!!\n");
   }
@@ -225,7 +233,7 @@ void musicclass::init()
 	soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
 
 
-  print_ram_stats();
+  // print_ram_stats();
 
 #ifdef VVV_COMPILEMUSIC
 	binaryBlob musicWriteBlob;
@@ -251,7 +259,7 @@ void musicclass::init()
 
 	binaryBlob musicReadBlob;
 
-  print_ram_stats();
+  // print_ram_stats();
 
   for (int i = 0; i < 32; ++i) {
     SFX[i].t = NULL;
@@ -279,6 +287,7 @@ void musicclass::init()
 
 void musicclass::play(int t)
 {
+    /*
   printf("#####\nmusicclass::play %d\n#####\n", t);
 	t = (t % 16);
 
@@ -304,12 +313,12 @@ void musicclass::play(int t)
         mix_next = t;
         mix_loops = 0;
         mix_fading_ms = 0;
-        /*
-				if(Mix_FadeInMusic(musicTracks[t].m_music, 0, 0)==-1)
-				{
-					printf("Mix_PlayMusic: %s\n", Mix_GetError());
-				}
-        */
+//
+// 	      		if(Mix_FadeInMusic(musicTracks[t].m_music, 0, 0)==-1)
+// 	      		{
+// 	      			printf("Mix_PlayMusic: %s\n", Mix_GetError());
+// 	      		}
+
         mix_playing_music = 1;
         printf("Playing CD track %d\n", mix_next+1);
         if (cdrom_cdda_play(mix_next+1, mix_next+1, 15, CDDA_TRACKS) != ERR_OK)
@@ -355,47 +364,57 @@ void musicclass::play(int t)
 			currentsong = -1;
 		}
 	}
+                */
 }
 
 void musicclass::haltdasmusik()
 {
+    /*
   printf("musicclass::haltdasmusik\n");
   resumesong = currentsong;
 	//Mix_HaltMusic();
   cdrom_cdda_pause();
 	currentsong = -1;
+        */
 }
 
 void musicclass::silencedasmusik()
 {
+    /*
   printf("musicclass::silencedasmusik\n");
 	//Mix_VolumeMusic(0) ;
   mix_volume = 0;
   spu_cdda_volume(0, 0);
 	musicVolume = 0;
+        */
 }
 
 void musicclass::fadeMusicVolumeIn(int ms)
 {
+    /*
 	m_doFadeInVol = true;
 	//FadeVolAmountPerFrame =  MIX_MAX_VOLUME / (ms / 33);
 	FadeVolAmountPerFrame =  15 / (ms / 33);
   mix_volume = 15;
   spu_cdda_volume(15, 15);
+  */
 }
 
 void musicclass::fadeout()
 {
+    /*
 	//Mix_FadeOutMusic(2000);
   mix_playing_music = 0;
   cdrom_cdda_pause();
   mix_fading_out = 1;
   mix_fading_ms = 2000;
 	currentsong = -1;
+        */
 }
 
 void musicclass::processmusicfadein()
 {
+    /*
 	musicVolume += FadeVolAmountPerFrame;
 	//Mix_VolumeMusic(musicVolume);
 
@@ -407,10 +426,12 @@ void musicclass::processmusicfadein()
 	{
 		m_doFadeInVol = false;
 	}
+        */
 }
 
 void musicclass::processmusic()
 {
+    /*
 	if(!safeToProcessMusic)
 	{
 		return;
@@ -436,17 +457,16 @@ void musicclass::processmusic()
 
   // Actual processing of mix variables
   if (mix_fading_out == 1) {  // FadingOut
-	  /*
-    int fade_amount =  mix_volume / (mix_fading_ms / 33);
-    mix_volume -= fade_amount;
-    if (mix_volume < 0) mix_volume = 0;
-    spu_cdda_volume(mix_volume, mix_volume);
-    mix_fading_ms -= 33;
-    if (mix_fading_ms <= 0) {
-       mix_fading_ms = 0;
-       mix_fading_out = 0;
-    }
-    */
+    // int fade_amount =  mix_volume / (mix_fading_ms / 33);
+    // mix_volume -= fade_amount;
+    // if (mix_volume < 0) mix_volume = 0;
+    // spu_cdda_volume(mix_volume, mix_volume);
+    // mix_fading_ms -= 33;
+    // if (mix_fading_ms <= 0) {
+    //    mix_fading_ms = 0;
+    //    mix_fading_out = 0;
+    // }
+
     mix_playing_music = 0;
     cdrom_cdda_pause();
     mix_fading_out = 0;
@@ -459,28 +479,29 @@ void musicclass::processmusic()
       printf("Playing CD track %d\n", mix_next+1);
     }
   } else if (mix_fading_out == -1) {  // FadingIn
-    /*
-	  int fade_amount =  mix_volume / (mix_fading_ms / 33);
-    mix_volume += fade_amount;
-    if (mix_volume > 15) mix_volume = 15;
-    spu_cdda_volume(mix_volume, mix_volume);
-    mix_fading_ms -= 33;
-    if (mix_fading_ms <= 0) {
-       mix_fading_ms = 0;
-       mix_fading_out = 0;
-    }
-    */
+
+//	  int fade_amount =  mix_volume / (mix_fading_ms / 33);
+//    mix_volume += fade_amount;
+//    if (mix_volume > 15) mix_volume = 15;
+//    spu_cdda_volume(mix_volume, mix_volume);
+//    mix_fading_ms -= 33;
+//    if (mix_fading_ms <= 0) {
+//       mix_fading_ms = 0;
+//       mix_fading_out = 0;
+//    }
     mix_volume = 15;
     spu_cdda_volume(mix_volume, mix_volume);
     mix_fading_out = 0;
   }
 
   stream_loop();
+  */
 }
 
 
 void musicclass::niceplay(int t)
 {
+    /*
 	// important: do nothing if the correct song is playing!
 	//if((!mmmmmm && currentsong!=t) || (mmmmmm && usingmmmmmm && currentsong!=t) || (mmmmmm && !usingmmmmmm && currentsong!=t+16))
 	if(currentsong!=t)
@@ -493,10 +514,12 @@ void musicclass::niceplay(int t)
 		nicefade = 1;
 		nicechange = t;
 	}
+        */
 }
 
 void musicclass::changemusicarea(int x, int y)
 {
+    /*
 	switch(musicroom(x, y))
 	{
 	case musicroom(11, 4):
@@ -529,10 +552,13 @@ void musicclass::changemusicarea(int x, int y)
 		niceplay(1);
 		break;
 	}
+        */
 }
 
 void musicclass::playef(int t)
 {
+    /*
   //thd_create(1, (void*)stream_thread, (void*)&soundTracks[t]);
   stream_setup((void*)&soundTracks[t]);
+  */
 }

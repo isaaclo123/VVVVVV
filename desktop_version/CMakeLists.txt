@@ -102,7 +102,7 @@ ENDIF()
 # Include Directories
 INCLUDE_DIRECTORIES(
         src
-        ../third_party/snprintf
+        # ../third_party/snprintf
         ../third_party/tinyxml2
         ../third_party/tinyxml
         ../third_party/physfs
@@ -142,8 +142,9 @@ SET(VVV_SRC
         src/Screen_psp.cpp
         src/Script.cpp
         src/Scripts.cpp
-        src/snprintf.cpp
-        src/SoundSystem.cpp
+        # src/snprintf.cpp
+        # src/SoundSystem.cpp
+        src/SoundSystem_psp.cpp
         src/Spacestation2.cpp
         src/TerminalScripts.cpp
         src/Textbox.cpp

@@ -10,10 +10,10 @@
 // GUSARBA: Uncomment this #include statement if you are using Chui's SDL port
 //#include <SDL_dreamcast.h>
 
-extern "C"
-{
-#include "SDL_inprint.h"
-}
+// extern "C"
+// {
+// #include "SDL_inprint.h"
+// }
 
 static Uint32 update_time = 0;
 
@@ -56,15 +56,15 @@ Screen::Screen()
 	);
 	SDL_SetWindowTitle(m_window, "VVVVVV");
   */
-  
+
 	unsigned char *fileIn = NULL;
 	size_t length = 0;
 	unsigned char *data;
 	unsigned int width, height;
 	FILESYSTEM_loadFileToMemory("VVVVVV.png", &fileIn, &length);
-	lodepng_decode24(&data, &width, &height, fileIn, length);  
+	lodepng_decode24(&data, &width, &height, fileIn, length);
 	FILESYSTEM_freeMemory(&fileIn);
-	SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(  
+	SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(
 		data,
 		width,
 		height,
@@ -86,17 +86,17 @@ Screen::Screen()
   SDL_DC_Default60Hz(SDL_TRUE);
   SDL_DC_VerticalWait(SDL_FALSE);
   SDL_DC_SetVideoDriver(SDL_DC_DIRECT_VIDEO);
-  */  
+  */
 
   // SDL1.2 Migration
   SDL_WM_SetCaption("VVVVVV", "VVVVVV");
-  m_window = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);  
+  m_window = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
 	// FIXME: This surface should be the actual backbuffer! -flibit
 	m_screen = SDL_CreateRGBSurface(
 		0,
 		320,
-		240,	
+		240,
     16,
     0x00000F00,
     0x000000F0,
@@ -156,7 +156,7 @@ void Screen::ResizeScreen(int x, int y)
 			//SDL_SetWindowSize(m_window, resX, resY);
       //SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-      // GUSARBA: Disabled at the moment 
+      // GUSARBA: Disabled at the moment
       //m_window = SDL_SetVideoMode(resX, resY, 0, SDL_SWSURFACE | SDL_RESIZABLE);
       //m_screen = m_window;
 		}
@@ -227,7 +227,7 @@ void Screen::UpdateScreen(SDL_Surface* buffer, SDL_Rect* rect )
 
 const SDL_PixelFormat* Screen::GetFormat()
 {
-	return m_screen->format;  
+	return m_screen->format;
 }
 
 void Screen::FlipScreen()
@@ -247,22 +247,22 @@ void Screen::FlipScreen()
 	);
 	SDL_RenderPresent(m_renderer);
 	SDL_RenderClear(m_renderer);
-  */  
+  */
 
   Uint32 flip_time = 0;
   Uint32 rect_time = 0;
   static char tmpstats[256] = {0};
 
   // GUSARBA: Disabled at the moment
-  /*  
+  /*
   if (isFiltered) {
     SDL_BlitSurface(m_screen, &filterSubrect, m_window, NULL);
   } else {
-    SDL_BlitSurface(m_screen, NULL, m_window, NULL);    
-  } 
+    SDL_BlitSurface(m_screen, NULL, m_window, NULL);
+  }
   */
- 
-  // GUSARBA: Uncomment these to get debug performance stats 
+
+  // GUSARBA: Uncomment these to get debug performance stats
   /*
   prepare_inline_font();
   incolor(0xFF0000, 0x333333);
@@ -273,14 +273,14 @@ void Screen::FlipScreen()
 
   //SDL_UpdateRect(m_window, 0, 0, 0, 0);
   SDL_Flip(m_window);
- 
+
   flip_time = SDL_GetTicks() - flip_time;
-  
+
   rect_time = SDL_GetTicks();
 
   //SDL_FillRect(m_screen, NULL, 0x00000000);
   //SDL_FillRect(m_window, NULL, 0x00000000);
-  
+
   rect_time = SDL_GetTicks() - rect_time;
 
   static Uint32 frame_time = SDL_GetTicks();
@@ -293,7 +293,7 @@ void Screen::FlipScreen()
   ++t;
   if (t == 30) {
     t = 0;
-    sprintf(tmpstats, "ft u bS bC bSn bNn %d %d %d %d %d %d\0", frame_time, update_time, GraphicsStats::BSS_time, GraphicsStats::BSC_time, GraphicsStats::BSS_numcalls, GraphicsStats::BSC_numcalls);    
+    sprintf(tmpstats, "ft u bS bC bSn bNn %d %d %d %d %d %d\0", frame_time, update_time, GraphicsStats::BSS_time, GraphicsStats::BSC_time, GraphicsStats::BSS_numcalls, GraphicsStats::BSC_numcalls);
   }
   GraphicsStats::BSS_time = 0;
   GraphicsStats::BSC_time = 0;

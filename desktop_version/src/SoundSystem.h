@@ -13,29 +13,32 @@ class MusicTrack
 {
 public:
 	MusicTrack(const char* fileName);
-#ifndef PSP
-  MusicTrack(SDL_RWops *rw);
-	Mix_Music *m_music;
-#else
+// #ifndef PSP
+//   MusicTrack(SDL_RWops *rw);
+// 	Mix_Music *m_music;
+// #else
 	int m_music;
-#endif
+// #endif
 	bool m_isValid;
   static int s_num_tracks;
 };
+
+// TODO
+#define snd_stream_hnd_t int
 
 class SoundTrack
 {
 public:
 	SoundTrack(const char* fileName);
-#ifndef PSP
-	Mix_Chunk *sound;
-  int size;
-#else
-  //unsigned char *sound;
+// #ifndef PSP
+// 	Mix_Chunk *sound;
+//   int size;
+// #else
+  unsigned char *sound;
   //ALuint sound;
   //ALsizei size;
   // sfxhnd_t sound;
-#endif
+// #endif
 };
 
 class SoundSystem

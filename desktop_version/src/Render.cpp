@@ -10,11 +10,11 @@
 
 #include "MakeAndPlay.h"
 
-#ifdef PSP
-extern "C" {
-#include <SDL_inprint.h>
-}
-#endif
+// #ifdef PSP
+// extern "C" {
+// #include <SDL_inprint.h>
+// }
+// #endif
 
 extern scriptclass script;
 
@@ -1772,15 +1772,15 @@ void gamerender()
     time_render = SDL_GetTicks() - time_render;
 
     // GUSARBA: Uncomment these to get performance debug stats
-   
+
     //char tmprt[80] = {0};
-    //sprintf(tmprt, "gamerender t %d e %d b %d u %d ex %d r %d\0", 
-    //        time, time_entities, time_backbuffer, time_ui, time_extra, 
+    //sprintf(tmprt, "gamerender t %d e %d b %d u %d ex %d r %d\0",
+    //        time, time_entities, time_backbuffer, time_ui, time_extra,
     //        time_render);
     //prepare_inline_font();
     //incolor(0xFF0000, 0x333333);
     //inprint(graphics.screenbuffer->m_window, tmprt, 10, 42);
-    
+
 
 }
 
