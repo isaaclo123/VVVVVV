@@ -1,0 +1,7 @@
+#ifndef VERSION_H_OUT
+#define VERSION_H_OUT
+
+#define INTERIM_COMMIT "79668ed"
+#define COMMIT_DATE "2021-01-17"
+
+#endif /* VERSION_H_OUT */

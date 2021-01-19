@@ -1,33 +1,34 @@
 #ifndef MAPGAME_H
 #define MAPGAME_H
 
-#include <vector>
-
+#include "Tower.h"
+#include "WarpClass.h"
 #include "Finalclass.h"
 #include "Labclass.h"
-#include "Maths.h"
-#include "Otherlevel.h"
 #include "Spacestation2.h"
-#include "Tower.h"
-#include "TowerBG.h"
-#include "WarpClass.h"
+#include "Otherlevel.h"
+#include "Entity.h"
+#include "Graphics.h"
+#include <vector>
+#include "Music.h"
+#include "editor.h"
 
-struct Roomtext
-{
-    int x, y;
-    std::string text;
-};
+#if !defined(NO_CUSTOM_LEVELS)
+extern editorclass ed;
+#endif
 
 class mapclass
 {
 public:
     mapclass();
 
+    int RGB(int red,int green,int blue);
+
     int intpol(int a, int b, float c);
 
-    void setteleporter(int x, int y);
+    void setteleporter(int t, int x, int y);
 
-    void settrinket(int x, int y);
+    void settrinket(int t, int x, int y);
 
     void resetmap();
 
@@ -38,7 +39,6 @@ public:
     std::string getglitchname(int x, int y);
 
     void initmapdata();
-    void initcustommapdata();
 
     int finalat(int x, int y);
 
@@ -46,11 +46,9 @@ public:
 
     void changefinalcol(int t);
 
-    void setcol(TowerBG& bg_obj, const int r1, const int g1, const int b1 , const int r2, const  int g2, const int b2, const int c);
+    void setcol(const int r1, const int g1, const int b1 , const int r2, const  int g2, const int b2, const int c);
 
-    void updatebgobj(TowerBG& bg_obj);
-
-    void updatetowerglow(TowerBG& bg_obj);
+    void updatetowerglow();
 
     void nexttowercolour();
 
@@ -60,7 +58,11 @@ public:
 
     bool collide(int x, int y);
 
+    void fillareamap(std::vector<std::string>& tmap);
+
     void settile(int xp, int yp, int t);
+
+    void fillcontent(std::vector<std::string>& tmap);
 
 
     int area(int _rx, int _ry);
@@ -71,7 +73,6 @@ public:
 
     void showship();
 
-    void resetplayer(const bool player_died);
     void resetplayer();
 
     void warpto(int rx, int ry , int t, int tx, int ty);
@@ -82,16 +83,18 @@ public:
 
     void loadlevel(int rx, int ry);
 
-    void twoframedelayfix();
 
+    std::vector <int> roomdeaths;
+    std::vector <int> roomdeathsfinal;
+    std::vector <int> areamap;
+    std::vector <int> contents;
+    std::vector <int> explored;
+    std::vector <int> vmult;
+    std::vector <std::string> tmap;
 
-    int roomdeaths[20 * 20];
-    int roomdeathsfinal[20 * 20];
-    static const int areamap[20 * 20];
-    short contents[40 * 30];
-    bool explored[20 * 20];
-    int vmult[30];
-
+    int temp;
+    int temp2;
+    int j;
     int background;
     int rcol;
     int tileset;
@@ -100,21 +103,26 @@ public:
 
 
     std::string roomname;
-    std::string hiddenname;
 
     //Special tower stuff
     bool towermode;
     float ypos;
-    float oldypos;
+    int bypos;
     int cameramode;
     int cameraseek, cameraseekframe;
     int resumedelay;
     bool minitowermode;
+    int scrolldir;
 
-    int colstatedelay;
+    //This is the old colour cycle
+    int r, g,b;
+    int check, cmode;
+    int towercol;
+    int colstate, colstatedelay;
     int colsuperstate;
     int spikeleveltop, spikelevelbottom;
-    int oldspikeleveltop, oldspikelevelbottom;
+    bool tdrawback;
+    int bscroll;
     //final level navigation
     int finalx;
     int finaly;
@@ -126,11 +134,13 @@ public:
     bool custommodeforreal;
     int customx, customy;
     int customwidth, customheight;
+    int customtrinkets;
+    int customcrewmates;
     int custommmxoff, custommmyoff, custommmxsize, custommmysize;
     int customzoom;
     bool customshowmm;
 
-    std::string specialnames[8];
+    std::vector<std::string> specialnames;
     int glitchmode;
     int glitchdelay;
     std::string glitchname;
@@ -146,6 +156,7 @@ public:
     std::vector<point> teleporters;
     std::vector<point> shinytrinkets;
 
+    int numteleporters, numshinytrinkets;
     bool showteleporters, showtargets, showtrinkets;
 
     //Roomtext
@@ -168,8 +179,6 @@ public:
     int cursorstate, cursordelay;
 };
 
-#ifndef MAP_DEFINITION
 extern mapclass map;
-#endif
 
 #endif /* MAPGAME_H */

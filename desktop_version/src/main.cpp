@@ -1,29 +1,34 @@
 #include <SDL.h>
-#include <stdio.h>
-#include <string.h>
+#include <SDL_mixer.h>
+#include "SoundSystem.h"
 
-// #include <pspkernel.h>
-// #include <psptypes.h>
-
-#include "editor.h"
-#include "Enums.h"
-#include "Entity.h"
-#include "FileSystemUtils.h"
+#include "UtilityClass.h"
 #include "Game.h"
 #include "Graphics.h"
-#include "Input.h"
 #include "KeyPoll.h"
-#include "Logic.h"
-#include "Map.h"
-#include "Music.h"
-#include "Network.h"
-#include "preloader.h"
 #include "Render.h"
-#include "RenderFixed.h"
+
+#include "Tower.h"
+#include "WarpClass.h"
+#include "Labclass.h"
+#include "Finalclass.h"
+#include "Map.h"
+
 #include "Screen.h"
+
 #include "Script.h"
-#include "SoundSystem.h"
-#include "UtilityClass.h"
+
+#include "Logic.h"
+
+#include "Input.h"
+#include "editor.h"
+#include "preloader.h"
+
+#include "FileSystemUtils.h"
+#include "Network.h"
+
+#include <stdio.h>
+#include <string.h>
 
 scriptclass script;
 
@@ -39,154 +44,41 @@ Game game;
 KeyPoll key;
 mapclass map;
 entityclass obj;
-Screen gameScreen;
 
-static bool startinplaytest = false;
-static bool savefileplaytest = false;
-static int savex = 0;
-static int savey = 0;
-static int saverx = 0;
-static int savery = 0;
-static int savegc = 0;
-static int savemusic = 0;
-static std::string playassets;
-
-static std::string playtestname;
-
-static volatile Uint32 time_ = 0;
-static volatile Uint32 timePrev = 0;
-static volatile Uint32 accumulator = 0;
-static volatile Uint32 f_time = 0;
-static volatile Uint32 f_timePrev = 0;
-
-static inline Uint32 get_framerate(const int slowdown)
-{
-    switch (slowdown)
-    {
-    case 30:
-        return 34;
-    case 24:
-        return 41;
-    case 18:
-        return 55;
-    case 12:
-        return 83;
-    }
-
-    return 34;
-}
-
-static void inline deltaloop();
-static void inline fixedloop();
-
-/*#include <pspkernel.h>
-PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
-int main(int argc, char *argv[])*/
-int SDL_main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     // char* baseDir = NULL;
     char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
-    // char* baseDir = "/PSP/GAME/VVVVVV/";
     char* assetsPath = NULL;
 
-    for (int i = 1; i < argc; ++i)
-    {
-#define ARG(name) (strcmp(argv[i], name) == 0)
-#define ARG_INNER(code) \
-    if (i + 1 < argc) \
-    { \
-        code \
-    } \
-    else \
-    { \
-        printf("%s option requires one argument.\n", argv[i]); \
-        return 1; \
-    }
-
-        if (ARG("-renderer"))
-        {
-            ARG_INNER({
-                i++;
-                SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, argv[i], SDL_HINT_OVERRIDE);
-            })
-        }
-        else if (ARG("-basedir"))
-        {
-            ARG_INNER({
-                i++;
-                baseDir = argv[i];
-            })
-        }
-        else if (ARG("-assets"))
-        {
-            ARG_INNER({
-                i++;
-                assetsPath = argv[i];
-            })
-        }
-        else if (ARG("-playing") || ARG("-p"))
-        {
-            ARG_INNER({
-                i++;
-                startinplaytest = true;
-                playtestname = std::string("levels/");
-                playtestname.append(argv[i]);
-                playtestname.append(std::string(".vvvvvv"));
-            })
-        }
-        else if (ARG("-playx") || ARG("-playy") ||
-        ARG("-playrx") || ARG("-playry") ||
-        ARG("-playgc") || ARG("-playmusic"))
-        {
-            ARG_INNER({
-                savefileplaytest = true;
-                int v = help.Int(argv[i+1]);
-                if (ARG("-playx")) savex = v;
-                else if (ARG("-playy")) savey = v;
-                else if (ARG("-playrx")) saverx = v;
-                else if (ARG("-playry")) savery = v;
-                else if (ARG("-playgc")) savegc = v;
-                else if (ARG("-playmusic")) savemusic = v;
-                i++;
-            })
-        }
-        else if (ARG("-playassets"))
-        {
-            ARG_INNER({
-                i++;
-                // Even if this is a directory, FILESYSTEM_mountassets() expects '.vvvvvv' on the end
-                playassets = "levels/" + std::string(argv[i]) + ".vvvvvv";
-            })
-        }
-#undef ARG_INNER
-#undef ARG
-        else
-        {
-            printf("Error: invalid option: %s\n", argv[i]);
-            return 1;
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-renderer") == 0) {
+            ++i;
+            SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, argv[i], SDL_HINT_OVERRIDE);
+        } else if (strcmp(argv[i], "-basedir") == 0) {
+            ++i;
+            baseDir = argv[i];
+        } else if (strcmp(argv[i], "-assets") == 0) {
+            ++i;
+            assetsPath = argv[i];
         }
     }
-
 
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath))
     {
-        puts("Unable to initialize filesystem!\n");
         return 1;
     }
 
     SDL_Init(
         SDL_INIT_VIDEO |
         SDL_INIT_AUDIO |
-        SDL_INIT_JOYSTICK |
-        SDL_INIT_GAMECONTROLLER
+        SDL_INIT_JOYSTICK
+        // | SDL_INIT_GAMECONTROLLER
     );
-    if (SDL_IsTextInputActive() == SDL_TRUE)
-    {
-        SDL_StopTextInput();
-    }
 
     NETWORK_init();
+
+    Screen gameScreen;
 
     printf("\t\t\n");
     printf("\t\t\n");
@@ -227,488 +119,359 @@ int SDL_main(int argc, char* argv[])
 
     graphics.init();
 
-    game.init();
 
-    // This loads music too...
-    graphics.reloadresources();
+
+    music.init();
+    game.init();
+    game.infocus = true;
+
+    graphics.MakeTileArray();
+    graphics.MakeSpriteArray();
+    graphics.maketelearray();
+
+
+    graphics.images.push_back(graphics.grphx.im_image0);
+    graphics.images.push_back(graphics.grphx.im_image1);
+    graphics.images.push_back(graphics.grphx.im_image2);
+    graphics.images.push_back(graphics.grphx.im_image3);
+    graphics.images.push_back(graphics.grphx.im_image4);
+    graphics.images.push_back(graphics.grphx.im_image5);
+    graphics.images.push_back(graphics.grphx.im_image6);
+
+    graphics.images.push_back(graphics.grphx.im_image7);
+    graphics.images.push_back(graphics.grphx.im_image8);
+    graphics.images.push_back(graphics.grphx.im_image9);
+    graphics.images.push_back(graphics.grphx.im_image10);
+    graphics.images.push_back(graphics.grphx.im_image11);
+    graphics.images.push_back(graphics.grphx.im_image12);
+
+    const SDL_PixelFormat* fmt = gameScreen.GetFormat();
+    graphics.backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_SetSurfaceBlendMode(graphics.backBuffer, SDL_BLENDMODE_NONE);
+    graphics.footerbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 10, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_SetSurfaceBlendMode(graphics.footerbuffer, SDL_BLENDMODE_BLEND);
+    // SDL_SetSurfaceAlphaMode(graphics.footerbuffer, 127);
+
+    SDL_SetColorKey(graphics.footerbuffer, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(graphics.footerbuffer->format, 0, 0, 0));
+    FillRect(graphics.footerbuffer, SDL_MapRGB(fmt, 0, 0, 0));
+    graphics.Makebfont();
+
+
+    graphics.foregroundBuffer =  SDL_CreateRGBSurface(SDL_SWSURFACE ,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask  );
+    SDL_SetSurfaceBlendMode(graphics.foregroundBuffer, SDL_BLENDMODE_NONE);
+
+    graphics.screenbuffer = &gameScreen;
+
+    graphics.menubuffer = SDL_CreateRGBSurface(SDL_SWSURFACE ,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask );
+    SDL_SetSurfaceBlendMode(graphics.menubuffer, SDL_BLENDMODE_NONE);
+
+    graphics.towerbuffer =  SDL_CreateRGBSurface(SDL_SWSURFACE ,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask  );
+    SDL_SetSurfaceBlendMode(graphics.towerbuffer, SDL_BLENDMODE_NONE);
+
+    graphics.tempBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE ,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask  );
+    SDL_SetSurfaceBlendMode(graphics.tempBuffer, SDL_BLENDMODE_NONE);
 
     game.gamestate = PRELOADER;
 
     game.menustart = false;
     game.mainmenu = 0;
 
-    // Initialize title screen to cyan
-    graphics.titlebg.colstate = 10;
-    map.nexttowercolour();
-
     map.ypos = (700-29) * 8;
-    graphics.towerbg.bypos = map.ypos / 2;
-    graphics.titlebg.bypos = map.ypos / 2;
+    map.bypos = map.ypos / 2;
 
-    {
-        // Prioritize unlock.vvv first (2.2 and below),
-        // but settings have been migrated to settings.vvv (2.3 and up)
-        ScreenSettings screen_settings;
-        game.loadstats(&screen_settings);
-        game.loadsettings(&screen_settings);
-        gameScreen.init(screen_settings);
-    }
-    graphics.screenbuffer = &gameScreen;
-
-    const SDL_PixelFormat* fmt = gameScreen.GetFormat();
-    #define CREATE_SURFACE(w, h) \
-        SDL_CreateRGBSurface( \
-            SDL_SWSURFACE, \
-            w, h, \
-            fmt->BitsPerPixel, \
-            fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask \
-        )
-    graphics.backBuffer = CREATE_SURFACE(320, 240);
-    SDL_SetSurfaceBlendMode(graphics.backBuffer, SDL_BLENDMODE_NONE);
-
-    graphics.footerbuffer = CREATE_SURFACE(320, 10);
-    SDL_SetSurfaceBlendMode(graphics.footerbuffer, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(graphics.footerbuffer, 127);
-    FillRect(graphics.footerbuffer, SDL_MapRGB(fmt, 0, 0, 0));
-
-    graphics.ghostbuffer = CREATE_SURFACE(320, 240);
-    SDL_SetSurfaceBlendMode(graphics.ghostbuffer, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceAlphaMod(graphics.ghostbuffer, 127);
-
-    graphics.Makebfont();
-
-    graphics.foregroundBuffer =  CREATE_SURFACE(320, 240);
-    SDL_SetSurfaceBlendMode(graphics.foregroundBuffer, SDL_BLENDMODE_BLEND);
-
-    graphics.menubuffer = CREATE_SURFACE(320, 240);
-    SDL_SetSurfaceBlendMode(graphics.menubuffer, SDL_BLENDMODE_NONE);
-
-    graphics.warpbuffer = CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.warpbuffer, SDL_BLENDMODE_NONE);
-
-    graphics.warpbuffer_lerp = CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.warpbuffer_lerp, SDL_BLENDMODE_NONE);
-
-    graphics.towerbg.buffer =  CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.towerbg.buffer, SDL_BLENDMODE_NONE);
-
-    graphics.towerbg.buffer_lerp = CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.towerbg.buffer_lerp, SDL_BLENDMODE_NONE);
-
-    graphics.titlebg.buffer = CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.titlebg.buffer, SDL_BLENDMODE_NONE);
-
-    graphics.titlebg.buffer_lerp = CREATE_SURFACE(320 + 16, 240 + 16);
-    SDL_SetSurfaceBlendMode(graphics.titlebg.buffer_lerp, SDL_BLENDMODE_NONE);
-
-    graphics.tempBuffer = CREATE_SURFACE(320, 240);
-    SDL_SetSurfaceBlendMode(graphics.tempBuffer, SDL_BLENDMODE_NONE);
-
-    #undef CREATE_SURFACE
-
+    //Moved screensetting init here from main menu V2.1
+    game.loadstats();
     if (game.skipfakeload)
         game.gamestate = TITLEMODE;
+    if(game.usingmmmmmm==0) music.usingmmmmmm=false;
+    if(game.usingmmmmmm==1) music.usingmmmmmm=true;
     if (game.slowdown == 0) game.slowdown = 30;
+
+    switch(game.slowdown){
+        case 30: game.gameframerate=34; break;
+        case 24: game.gameframerate=41; break;
+        case 18: game.gameframerate=55; break;
+        case 12: game.gameframerate=83; break;
+        default: game.gameframerate=34; break;
+    }
 
     //Check to see if you've already unlocked some achievements here from before the update
     if (game.swnbestrank > 0){
-        if(game.swnbestrank >= 1) game.unlockAchievement("vvvvvvsupgrav5");
-        if(game.swnbestrank >= 2) game.unlockAchievement("vvvvvvsupgrav10");
-        if(game.swnbestrank >= 3) game.unlockAchievement("vvvvvvsupgrav15");
-        if(game.swnbestrank >= 4) game.unlockAchievement("vvvvvvsupgrav20");
-        if(game.swnbestrank >= 5) game.unlockAchievement("vvvvvvsupgrav30");
-        if(game.swnbestrank >= 6) game.unlockAchievement("vvvvvvsupgrav60");
+        if(game.swnbestrank >= 1) NETWORK_unlockAchievement("vvvvvvsupgrav5");
+        if(game.swnbestrank >= 2) NETWORK_unlockAchievement("vvvvvvsupgrav10");
+        if(game.swnbestrank >= 3) NETWORK_unlockAchievement("vvvvvvsupgrav15");
+        if(game.swnbestrank >= 4) NETWORK_unlockAchievement("vvvvvvsupgrav20");
+        if(game.swnbestrank >= 5) NETWORK_unlockAchievement("vvvvvvsupgrav30");
+        if(game.swnbestrank >= 6) NETWORK_unlockAchievement("vvvvvvsupgrav60");
     }
 
-    if(game.unlock[5]) game.unlockAchievement("vvvvvvgamecomplete");
-    if(game.unlock[19]) game.unlockAchievement("vvvvvvgamecompleteflip");
-    if(game.unlock[20]) game.unlockAchievement("vvvvvvmaster");
+    if(game.unlock[5]) NETWORK_unlockAchievement("vvvvvvgamecomplete");
+    if(game.unlock[19]) NETWORK_unlockAchievement("vvvvvvgamecompleteflip");
+    if(game.unlock[20]) NETWORK_unlockAchievement("vvvvvvmaster");
 
     if (game.bestgamedeaths > -1) {
         if (game.bestgamedeaths <= 500) {
-            game.unlockAchievement("vvvvvvcomplete500");
+            NETWORK_unlockAchievement("vvvvvvcomplete500");
         }
         if (game.bestgamedeaths <= 250) {
-            game.unlockAchievement("vvvvvvcomplete250");
+            NETWORK_unlockAchievement("vvvvvvcomplete250");
         }
         if (game.bestgamedeaths <= 100) {
-            game.unlockAchievement("vvvvvvcomplete100");
+            NETWORK_unlockAchievement("vvvvvvcomplete100");
         }
         if (game.bestgamedeaths <= 50) {
-            game.unlockAchievement("vvvvvvcomplete50");
+            NETWORK_unlockAchievement("vvvvvvcomplete50");
         }
     }
 
-    if(game.bestrank[0]>=3) game.unlockAchievement("vvvvvvtimetrial_station1_fixed");
-    if(game.bestrank[1]>=3) game.unlockAchievement("vvvvvvtimetrial_lab_fixed");
-    if(game.bestrank[2]>=3) game.unlockAchievement("vvvvvvtimetrial_tower_fixed");
-    if(game.bestrank[3]>=3) game.unlockAchievement("vvvvvvtimetrial_station2_fixed");
-    if(game.bestrank[4]>=3) game.unlockAchievement("vvvvvvtimetrial_warp_fixed");
-    if(game.bestrank[5]>=3) game.unlockAchievement("vvvvvvtimetrial_final_fixed");
+    if(game.bestrank[0]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_station1_fixed");
+    if(game.bestrank[1]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_lab_fixed");
+    if(game.bestrank[2]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_tower_fixed");
+    if(game.bestrank[3]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_station2_fixed");
+    if(game.bestrank[4]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_warp_fixed");
+    if(game.bestrank[5]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_final_fixed");
 
     obj.init();
 
-#if !defined(NO_CUSTOM_LEVELS)
-    if (startinplaytest) {
-        game.levelpage = 0;
-        game.playcustomlevel = 0;
-        game.playassets = playassets;
-        game.menustart = true;
-
-        ed.directoryList.clear();
-        ed.directoryList.push_back(playtestname);
-
-        LevelMetaData meta;
-        if (ed.getLevelMetaData(playtestname, meta)) {
-            ed.ListOfMetaData.clear();
-            ed.ListOfMetaData.push_back(meta);
-        } else {
-            ed.loadZips();
-            if (ed.getLevelMetaData(playtestname, meta)) {
-                ed.ListOfMetaData.clear();
-                ed.ListOfMetaData.push_back(meta);
-            } else {
-                printf("Level not found\n");
-                return 1;
-            }
-        }
-
-        game.loadcustomlevelstats();
-        game.customleveltitle=ed.ListOfMetaData[game.playcustomlevel].title;
-        game.customlevelfilename=ed.ListOfMetaData[game.playcustomlevel].filename;
-        if (savefileplaytest) {
-            game.playx = savex;
-            game.playy = savey;
-            game.playrx = saverx;
-            game.playry = savery;
-            game.playgc = savegc;
-            game.playmusic = savemusic;
-            game.cliplaytest = true;
-            script.startgamemode(23);
-        } else {
-            script.startgamemode(22);
-        }
-
-        graphics.fademode = 0;
-    }
-#endif
-
+    volatile Uint32 time, timePrev = 0;
+    game.infocus = true;
     key.isActive = true;
-    game.gametimer = 0;
 
     while(!key.quitProgram)
     {
-        f_time = SDL_GetTicks();
+        time = SDL_GetTicks();
 
-        const Uint32 f_timetaken = f_time - f_timePrev;
-        if (!game.over30mode && f_timetaken < 34)
+        // Update network per frame.
+        NETWORK_update();
+
+        //framerate limit to 30
+        Uint32 timetaken = time - timePrev;
+        if(game.gamestate==EDITORMODE)
         {
-            const volatile Uint32 f_delay = 34 - f_timetaken;
-            SDL_Delay(f_delay);
-            f_time = SDL_GetTicks();
+            if (timetaken < 24)
+            {
+                volatile Uint32 delay = 24 - timetaken;
+                SDL_Delay( delay );
+                time = SDL_GetTicks();
+            }
+            timePrev = time;
+
+        }else{
+            if (timetaken < game.gameframerate)
+            {
+                volatile Uint32 delay = game.gameframerate - timetaken;
+                SDL_Delay( delay );
+                time = SDL_GetTicks();
+            }
+            timePrev = time;
+
         }
 
-        f_timePrev = f_time;
 
-        timePrev = time_;
-        time_ = SDL_GetTicks();
 
-        deltaloop();
-    }
-
-    game.savestatsandsettings();
-    NETWORK_shutdown();
-    SDL_Quit();
-    FILESYSTEM_deinit();
-
-    return 0;
-}
-
-static void inline deltaloop()
-{
-    //timestep limit to 30
-    const float rawdeltatime = static_cast<float>(time_ - timePrev);
-    accumulator += rawdeltatime;
-
-    Uint32 timesteplimit;
-    if (game.gamestate == EDITORMODE)
-    {
-        timesteplimit = 24;
-    }
-    else if (game.gamestate == GAMEMODE)
-    {
-        timesteplimit = get_framerate(game.slowdown);
-    }
-    else
-    {
-        timesteplimit = 34;
-    }
-
-    while (accumulator >= timesteplimit)
-    {
-        accumulator = SDL_fmodf(accumulator, timesteplimit);
-
-        fixedloop();
-    }
-    const float alpha = game.over30mode ? static_cast<float>(accumulator) / timesteplimit : 1.0f;
-    graphics.alpha = alpha;
-
-    if (key.isActive)
-    {
-        switch (game.gamestate)
+        key.Poll();
+        if(key.toggleFullscreen)
         {
-        case PRELOADER:
-            preloaderrender();
-            break;
-#if !defined(NO_CUSTOM_LEVELS) && !defined(NO_EDITOR)
-        case EDITORMODE:
-            graphics.flipmode = false;
-            editorrender();
-            break;
-#endif
-        case TITLEMODE:
-            titlerender();
-            break;
-        case GAMEMODE:
-            gamerender();
-            break;
-        case MAPMODE:
-            maprender();
-            break;
-        case TELEPORTERMODE:
-            teleporterrender();
-            break;
-        case GAMECOMPLETE:
-            gamecompleterender();
-            break;
-        case GAMECOMPLETE2:
-            gamecompleterender2();
-            break;
-        case CLICKTOSTART:
-            help.updateglow();
-            break;
-        }
-        gameScreen.FlipScreen();
-    }
-}
+            if(!gameScreen.isWindowed)
+            {
+                SDL_ShowCursor(SDL_DISABLE);
+                SDL_ShowCursor(SDL_ENABLE);
+            }
+            else
+            {
+                SDL_ShowCursor(SDL_ENABLE);
+            }
 
-static void inline fixedloop()
-{
-    // Update network per frame.
-    NETWORK_update();
 
-    key.Poll();
-    if(key.toggleFullscreen)
-    {
-        gameScreen.toggleFullScreen();
-        key.toggleFullscreen = false;
+            if(game.gamestate == EDITORMODE)
+            {
+                SDL_ShowCursor(SDL_ENABLE);
+            }
 
-        key.keymap.clear(); //we lost the input due to a new window.
-        if (game.glitchrunnermode)
-        {
+            gameScreen.toggleFullScreen();
+            game.fullscreen = !game.fullscreen;
+            key.toggleFullscreen = false;
+
+            key.keymap.clear(); //we lost the input due to a new window.
             game.press_left = false;
             game.press_right = false;
             game.press_action = true;
             game.press_map = false;
         }
-    }
 
-    if(!key.isActive)
-    {
-        Mix_Pause(-1);
-        Mix_PauseMusic();
-
-        if (!game.blackout)
+        game.infocus = key.isActive;
+        if(!game.infocus)
         {
+            if(game.getGlobalSoundVol()> 0)
+            {
+                game.setGlobalSoundVol(0);
+            }
             FillRect(graphics.backBuffer, 0x00000000);
             graphics.bprint(5, 110, "Game paused", 196 - help.glow, 255 - help.glow, 196 - help.glow, true);
             graphics.bprint(5, 120, "[click to resume]", 196 - help.glow, 255 - help.glow, 196 - help.glow, true);
-            graphics.bprint(5, 220, "Press M to mute in game", 164 - help.glow, 196 - help.glow, 164 - help.glow, true);
-            graphics.bprint(5, 230, "Press N to mute music only", 164 - help.glow, 196 - help.glow, 164 - help.glow, true);
+            graphics.bprint(5, 230, "Press M to mute in game", 164 - help.glow, 196 - help.glow, 164 - help.glow, true);
+            graphics.render();
+            //We are minimised, so lets put a bit of a delay to save CPU
+            SDL_Delay(100);
         }
-        graphics.render();
-        gameScreen.FlipScreen();
-        //We are minimised, so lets put a bit of a delay to save CPU
-        SDL_Delay(100);
-    }
-    else
-    {
-        Mix_Resume(-1);
-        Mix_ResumeMusic();
-        game.gametimer++;
-        graphics.cutscenebarstimer();
-
-        switch(game.gamestate)
+        else
         {
-        case PRELOADER:
-            preloaderinput();
-            preloaderrenderfixed();
-            break;
-#if !defined(NO_CUSTOM_LEVELS) && !defined(NO_EDITOR)
-        case EDITORMODE:
-            //Input
-            editorinput();
-            ////Logic
-            editorlogic();
-
-            editorrenderfixed();
-            break;
+            switch(game.gamestate)
+            {
+            case PRELOADER:
+                //Render
+                preloaderrender();
+                break;
+#if !defined(NO_CUSTOM_LEVELS)
+            case EDITORMODE:
+                graphics.flipmode = false;
+                //Input
+                editorinput();
+                //Render
+                editorrender();
+                ////Logic
+                editorlogic();
+                break;
 #endif
-        case TITLEMODE:
-            //Input
-            titleinput();
-            ////Logic
-            titlelogic();
+            case TITLEMODE:
+                //Input
+                titleinput();
+                //Render
+                titlerender();
+                ////Logic
+                titlelogic();
+                break;
+            case GAMEMODE:
+                if (map.towermode)
+                {
+                    gameinput();
+                    towerrender();
+                    towerlogic();
 
-            titlerenderfixed();
-            break;
-        case GAMEMODE:
-            // WARNING: If updating this code, don't forget to update Map.cpp mapclass::twoframedelayfix()
+                }
+                else
+                {
 
-            // Ugh, I hate this kludge variable but it's the only way to do it
-            if (script.dontrunnextframe)
-            {
-                script.dontrunnextframe = false;
+                    if (script.running)
+                    {
+                        script.run();
+                    }
+
+                    gameinput();
+                    gamerender();
+                    gamelogic();
+
+
+                    break;
+                case MAPMODE:
+                    maprender();
+                    mapinput();
+                    maplogic();
+                    break;
+                case TELEPORTERMODE:
+                    teleporterrender();
+                    if(game.useteleporter)
+                    {
+                        teleporterinput();
+                    }
+                    else
+                    {
+                        if (script.running)
+                        {
+                            script.run();
+                        }
+                        gameinput();
+                    }
+                    maplogic();
+                    break;
+                case GAMECOMPLETE:
+                    gamecompleterender();
+                    //Input
+                    gamecompleteinput();
+                    //Logic
+                    gamecompletelogic();
+                    break;
+                case GAMECOMPLETE2:
+                    gamecompleterender2();
+                    //Input
+                    gamecompleteinput2();
+                    //Logic
+                    gamecompletelogic2();
+                    break;
+                case CLICKTOSTART:
+                    help.updateglow();
+                    break;
+                default:
+
+                break;
+                }
+
             }
-            else
-            {
-                script.run();
-            }
-
-            //Update old lerp positions of entities - has to be done BEFORE gameinput!
-            for (size_t i = 0; i < obj.entities.size(); i++)
-            {
-                obj.entities[i].lerpoldxp = obj.entities[i].xp;
-                obj.entities[i].lerpoldyp = obj.entities[i].yp;
-            }
-
-            gameinput();
-            gamerenderfixed();
-            gamelogic();
-
-
-            break;
-        case MAPMODE:
-            mapinput();
-            maplogic();
-            maprenderfixed();
-            break;
-        case TELEPORTERMODE:
-            if(game.useteleporter)
-            {
-                teleporterinput();
-            }
-            else
-            {
-                script.run();
-                gameinput();
-            }
-            maplogic();
-            maprenderfixed();
-            break;
-        case GAMECOMPLETE:
-            //Input
-            gamecompleteinput();
-            //Logic
-            gamecompletelogic();
-
-            gamecompleterenderfixed();
-            break;
-        case GAMECOMPLETE2:
-            //Input
-            gamecompleteinput2();
-            //Logic
-            gamecompletelogic2();
-            break;
-        case CLICKTOSTART:
-            break;
-        default:
-
-            break;
 
         }
 
-    }
+        //We did editorinput, now it's safe to turn this off
+        key.linealreadyemptykludge = false;
 
-    //Screen effects timers
-    if (key.isActive && game.flashlight > 0)
-    {
-        game.flashlight--;
-    }
-    if (key.isActive && game.screenshake > 0)
-    {
-        game.screenshake--;
-        graphics.updatescreenshake();
-    }
+        if (game.savemystats)
+        {
+            game.savemystats = false;
+            game.savestats();
+        }
 
-    if (graphics.screenbuffer->badSignalEffect)
-    {
-        UpdateFilter();
-    }
+        //Mute button
+#if !defined(NO_CUSTOM_LEVELS)
+        bool inEditor = ed.textentry || ed.scripthelppage == 1;
+#else
+        bool inEditor = false;
+#endif
+        if (key.isDown(KEYBOARD_m) && game.mutebutton<=0 && !inEditor)
+        {
+            game.mutebutton = 8;
+            if (game.muted)
+            {
+                game.muted = false;
+            }
+            else
+            {
+                game.muted = true;
+            }
+        }
+        if(game.mutebutton>0)
+        {
+            game.mutebutton--;
+        }
 
-    //We did editorinput, now it's safe to turn this off
-    key.linealreadyemptykludge = false;
-
-    if (game.savemystats)
-    {
-        game.savemystats = false;
-        game.savestatsandsettings();
-    }
-
-    //Mute button
-    if (key.isDown(KEYBOARD_m) && game.mutebutton<=0 && !key.textentry())
-    {
-        game.mutebutton = 8;
         if (game.muted)
         {
-            game.muted = false;
+            game.globalsound = 0;
+            Mix_VolumeMusic(0) ;
+            Mix_Volume(-1,0);
         }
-        else
+
+        if (!game.muted && game.globalsound == 0)
         {
-            game.muted = true;
+            game.globalsound = 1;
+            Mix_VolumeMusic(MIX_MAX_VOLUME) ;
+            Mix_Volume(-1,MIX_MAX_VOLUME);
         }
-    }
-    if(game.mutebutton>0)
-    {
-        game.mutebutton--;
-    }
 
-    if (key.isDown(KEYBOARD_n) && game.musicmutebutton <= 0 && !key.textentry())
-    {
-        game.musicmutebutton = 8;
-        game.musicmuted = !game.musicmuted;
-    }
-    if (game.musicmutebutton > 0)
-    {
-        game.musicmutebutton--;
-    }
-
-    if (game.muted)
-    {
-        Mix_VolumeMusic(0) ;
-        Mix_Volume(-1,0);
-    }
-    else
-    {
-        Mix_Volume(-1,MIX_MAX_VOLUME);
-
-        if (game.musicmuted)
+        if (key.resetWindow)
         {
-            Mix_VolumeMusic(0);
+            key.resetWindow = false;
+            gameScreen.ResizeScreen(-1, -1);
         }
-        else
-        {
-            Mix_VolumeMusic(music.musicVolume);
-        }
+
+        music.processmusic();
+        graphics.processfade();
+        game.gameclock();
+        gameScreen.FlipScreen();
     }
 
-    if (key.resetWindow)
-    {
-        key.resetWindow = false;
-        gameScreen.ResizeScreen(-1, -1);
-    }
+    game.savestats();
+    NETWORK_shutdown();
+    SDL_Quit();
+    FILESYSTEM_deinit();
 
-    music.processmusic();
-    graphics.processfade();
-    game.gameclock();
+    return 0;
 }

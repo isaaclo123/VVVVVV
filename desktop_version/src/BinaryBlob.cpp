@@ -1,17 +1,25 @@
 #include "BinaryBlob.h"
 
-#include <physfs.h> /* FIXME: Abstract to FileSystemUtils! */
-#include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "UtilityClass.h"
+/* FIXME: Abstract to FileSystemUtils! */
+#include <physfs.h>
 
 binaryBlob::binaryBlob()
 {
 	numberofHeaders = 0;
-	SDL_memset(m_headers, 0, sizeof(m_headers));
-	SDL_memset(m_memblocks, 0, sizeof(m_memblocks));
+	for (int i = 0; i < 128; i += 1)
+	{
+		m_headers[i].valid = false;
+
+		for (int j = 0; j < 48; j += 1)
+		{
+			m_headers[i].name[j] = '\0';
+		}
+	}
+	::memset(m_headers, 0, 128 * sizeof(resourceheader));
 }
 
 #ifdef VVV_COMPILEMUSIC
@@ -27,7 +35,7 @@ void binaryBlob::AddFileToBinaryBlob(const char* _path)
 		size = ftell(file);
 		fseek(file, 0, SEEK_SET);
 
-		memblock = (char*) SDL_malloc(size);
+		memblock = (char*) malloc(size);
 		fread(memblock, 1, size, file);
 
 		fclose(file);
@@ -55,7 +63,7 @@ void binaryBlob::writeBinaryBlob(const char* _name)
 	FILE *file = fopen(_name, "wb");
 	if (file != NULL)
 	{
-		fwrite((char*) &m_headers, 1, sizeof(m_headers), file);
+		fwrite((char*) &m_headers, 1, sizeof(resourceheader) * 128, file);
 
 		for (int i = 0; i < numberofHeaders; i += 1)
 		{
@@ -84,45 +92,25 @@ bool binaryBlob::unPackBinary(const char* name)
 
 	size = PHYSFS_fileLength(handle);
 
-	PHYSFS_readBytes(handle, &m_headers, sizeof(m_headers));
+	PHYSFS_readBytes(handle, &m_headers, sizeof(resourceheader) * 128);
 
-	int offset = 0 + (sizeof(m_headers));
+	int offset = 0 + (sizeof(resourceheader) * 128);
 
-	for (size_t i = 0; i < SDL_arraysize(m_headers); i += 1)
+	for (int i = 0; i < 128; i += 1)
 	{
-		/* Name can be stupid, just needs to be terminated */
-		m_headers[i].name[47] = '\0';
-
-		if (m_headers[i].valid & ~0x1 || !m_headers[i].valid)
+		if (m_headers[i].valid)
 		{
-			m_headers[i].valid = false;
-			continue; /* Must be EXACTLY 1 or 0 */
+			PHYSFS_seek(handle, offset);
+			m_memblocks[i] = (char*) malloc(m_headers[i].size);
+			PHYSFS_readBytes(handle, m_memblocks[i], m_headers[i].size);
+			offset += m_headers[i].size;
 		}
-		if (m_headers[i].size < 1)
-		{
-			m_headers[i].valid = false;
-			continue; /* Must be nonzero and positive */
-		}
-		if ((offset + m_headers[i].size) > size)
-		{
-			m_headers[i].valid = false;
-			continue; /* Bogus size value */
-		}
-
-		PHYSFS_seek(handle, offset);
-		m_memblocks[i] = (char*) SDL_malloc(m_headers[i].size);
-		if (m_memblocks[i] == NULL)
-		{
-			exit(1); /* Oh god we're out of memory, just bail */
-		}
-		PHYSFS_readBytes(handle, m_memblocks[i], m_headers[i].size);
-		offset += m_headers[i].size;
 	}
 	PHYSFS_close(handle);
 
 	printf("The complete reloaded file size: %lli\n", size);
 
-	for (size_t i = 0; i < SDL_arraysize(m_headers); i += 1)
+	for (int i = 0; i < 128; i += 1)
 	{
 		if (m_headers[i].valid == false)
 		{
@@ -135,23 +123,11 @@ bool binaryBlob::unPackBinary(const char* name)
 	return true;
 }
 
-void binaryBlob::clear()
-{
-	for (size_t i = 0; i < SDL_arraysize(m_headers); i += 1)
-	{
-		if (m_headers[i].valid)
-		{
-			SDL_free(m_memblocks[i]);
-			m_headers[i].valid = false;
-		}
-	}
-}
-
 int binaryBlob::getIndex(const char* _name)
 {
-	for (size_t i = 0; i < SDL_arraysize(m_headers); i += 1)
+	for (int i = 0; i < 128; i += 1)
 	{
-		if (SDL_strcmp(_name, m_headers[i].name) == 0 && m_headers[i].valid)
+		if (strcmp(_name, m_headers[i].name) == 0)
 		{
 			return i;
 		}
@@ -161,36 +137,10 @@ int binaryBlob::getIndex(const char* _name)
 
 int binaryBlob::getSize(int _index)
 {
-	if (!INBOUNDS_ARR(_index, m_headers))
-	{
-		puts("getSize() out-of-bounds!");
-		return 0;
-	}
 	return m_headers[_index].size;
 }
 
 char* binaryBlob::getAddress(int _index)
 {
-	if (!INBOUNDS_ARR(_index, m_memblocks))
-	{
-		puts("getAddress() out-of-bounds!");
-		return NULL;
-	}
 	return m_memblocks[_index];
-}
-
-std::vector<int> binaryBlob::getExtra()
-{
-	std::vector<int> result;
-	for (size_t i = 0; i < SDL_arraysize(m_headers); i += 1)
-	{
-		if (m_headers[i].valid
-#define FOREACH_TRACK(track_name) && SDL_strcmp(m_headers[i].name, track_name) != 0
-		TRACK_NAMES
-#undef FOREACH_TRACK
-		) {
-			result.push_back(i);
-		}
-	}
-	return result;
 }

@@ -1,26 +1,21 @@
-#define SCRIPT_DEFINITION
 #include "Script.h"
-
-#include "editor.h"
-#include "Entity.h"
-#include "Enums.h"
 #include "Graphics.h"
+
+#include "Entity.h"
+#include "Music.h"
 #include "KeyPoll.h"
 #include "Map.h"
-#include "Music.h"
-#include "UtilityClass.h"
-
-#include <limits.h>
 
 scriptclass::scriptclass()
 {
 	//Start SDL
 
 	//Init
+	words.resize(40);
+
 	position = 0;
 	scriptdelay = 0;
 	running = false;
-	dontrunnextframe = false;
 
 	b = 0;
 	g = 0;
@@ -35,29 +30,25 @@ scriptclass::scriptclass()
 }
 
 void scriptclass::clearcustom(){
-	customscripts.clear();
+	customscript.clear();
 }
 
-void scriptclass::tokenize( const std::string& t )
+void scriptclass::tokenize( std::string t )
 {
 	j = 0;
-	std::string tempword;
-	char currentletter;
+	tempword = "";
 
 	for (size_t i = 0; i < t.length(); i++)
 	{
-		currentletter = t[i];
-		if (currentletter == '(' || currentletter == ')' || currentletter == ',')
+		currentletter = t.substr(i, 1);
+		if (currentletter == "(" || currentletter == ")" || currentletter == ",")
 		{
 			words[j] = tempword;
-			for (size_t ii = 0; ii < words[j].length(); ii++)
-			{
-				words[j][ii] = SDL_tolower(words[j][ii]);
-			}
+			std::transform(words[j].begin(), words[j].end(), words[j].begin(), ::tolower);
 			j++;
 			tempword = "";
 		}
-		else if (currentletter == ' ')
+		else if (currentletter == " ")
 		{
 			//don't do anything - i.e. strip out spaces.
 		}
@@ -65,13 +56,9 @@ void scriptclass::tokenize( const std::string& t )
 		{
 			tempword += currentletter;
 		}
-		if (j >= (int) SDL_arraysize(words))
-		{
-			break;
-		}
 	}
 
-	if (tempword != "" && j < (int) SDL_arraysize(words))
+	if (tempword != "")
 	{
 		words[j] = tempword;
 	}
@@ -79,16 +66,9 @@ void scriptclass::tokenize( const std::string& t )
 
 void scriptclass::run()
 {
-	if (!running)
-	{
-		return;
-	}
-
-	// This counter here will stop the function when it gets too high
-	short execution_counter = 0;
 	while(running && scriptdelay<=0 && !game.pausescript)
 	{
-		if (INBOUNDS_VEC(position, commands))
+		if (position < (int) commands.size())
 		{
 			//Let's split or command in an array of words
 			tokenize(commands[position]);
@@ -104,11 +84,8 @@ void scriptclass::run()
 			{
 				//USAGE: moveplayer(x offset, y offset)
 				int player = obj.getplayer();
-				if (INBOUNDS_VEC(player, obj.entities))
-				{
-					obj.entities[player].xp += ss_toi(words[1]);
-					obj.entities[player].yp += ss_toi(words[2]);
-				}
+				obj.entities[player].xp += ss_toi(words[1]);
+				obj.entities[player].yp += ss_toi(words[2]);
 				scriptdelay = 1;
 			}
 #if !defined(NO_CUSTOM_LEVELS)
@@ -117,16 +94,12 @@ void scriptclass::run()
 				int temprx=ss_toi(words[1])-1;
 				int tempry=ss_toi(words[2])-1;
 				int curlevel=temprx+(ed.maxwidth*(tempry));
-				bool inbounds = INBOUNDS_ARR(curlevel, ed.level);
-				if (inbounds)
-				{
-					ed.level[curlevel].warpdir=ss_toi(words[3]);
-				}
+				ed.level[curlevel].warpdir=ss_toi(words[3]);
+				//If screen warping, then override all that:
+				graphics.backgrounddrawn = false;
 
 				//Do we update our own room?
-				if(inbounds && game.roomx-100==temprx && game.roomy-100==tempry){
-					//If screen warping, then override all that:
-					graphics.backgrounddrawn = false;
+				if(game.roomx-100==temprx && game.roomy-100==tempry){
 					map.warpx=false; map.warpy=false;
 					if(ed.level[curlevel].warpdir==0){
 						map.background = 1;
@@ -156,8 +129,7 @@ void scriptclass::run()
 			}
 			if (words[0] == "ifwarp")
 			{
-				int room = ss_toi(words[1])-1+(ed.maxwidth*(ss_toi(words[2])-1));
-				if (INBOUNDS_ARR(room, ed.level) && ed.level[room].warpdir == ss_toi(words[3]))
+				if (ed.level[ss_toi(words[1])-1+(ed.maxwidth*(ss_toi(words[2])-1))].warpdir == ss_toi(words[3]))
 				{
 					load("custom_"+words[4]);
 					position--;
@@ -183,7 +155,7 @@ void scriptclass::run()
 			}
 			if (words[0] == "customiftrinkets")
 			{
-				if (game.trinkets() >= ss_toi(words[1]))
+				if (game.trinkets >= ss_toi(words[1]))
 				{
 					load("custom_"+words[2]);
 					position--;
@@ -191,7 +163,7 @@ void scriptclass::run()
 			}
 			if (words[0] == "customiftrinketsless")
 			{
-				if (game.trinkets() < ss_toi(words[1]))
+				if (game.trinkets < ss_toi(words[1]))
 				{
 					load("custom_"+words[2]);
 					position--;
@@ -199,8 +171,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "customifflag")
 			{
-				int flag = ss_toi(words[1]);
-				if (INBOUNDS_ARR(flag, obj.flags) && obj.flags[flag])
+				if (obj.flags[ss_toi(words[1])]==1)
 				{
 					load("custom_"+words[2]);
 					position--;
@@ -221,16 +192,11 @@ void scriptclass::run()
 			}
 			if (words[0] == "flag")
 			{
-				int flag = ss_toi(words[1]);
-				if (INBOUNDS_ARR(flag, obj.flags))
-				{
-					if (words[2] == "on")
-					{
-						obj.flags[flag] = true;
-					}
-					else if (words[2] == "off")
-					{
-						obj.flags[flag] = false;
+				if(ss_toi(words[1])>=0 && ss_toi(words[1])<100){
+					if(words[2]=="on"){
+						obj.changeflag(ss_toi(words[1]),1);
+					}else if(words[2]=="off"){
+						obj.changeflag(ss_toi(words[1]),0);
 					}
 				}
 			}
@@ -264,8 +230,7 @@ void scriptclass::run()
 			}
 			if (words[0] == "tofloor")
 			{
-				int player = obj.getplayer();
-				if(INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onroof>0)
+				if(obj.entities[obj.getplayer()].onroof>0)
 				{
 					game.press_action = true;
 					scriptdelay = 1;
@@ -285,15 +250,17 @@ void scriptclass::run()
 			}
 			if (words[0] == "resumemusic")
 			{
-				music.resume();
+				music.play(music.resumesong);
 			}
 			if (words[0] == "musicfadeout")
 			{
-				music.fadeout(false);
+				music.fadeout();
+				music.dontquickfade = true;
 			}
 			if (words[0] == "musicfadein")
 			{
-				music.fadein();
+				music.musicfadein = 90;
+				//if(!game.muted) music.fadeMusicVolumeIn(3000);
 			}
 			if (words[0] == "trinketscriptmusic")
 			{
@@ -303,11 +270,8 @@ void scriptclass::run()
 			{
 				//USAGE: gotoposition(x position, y position, gravity position)
 				int player = obj.getplayer();
-				if (INBOUNDS_VEC(player, obj.entities))
-				{
-					obj.entities[player].xp = ss_toi(words[1]);
-					obj.entities[player].yp = ss_toi(words[2]);
-				}
+				obj.entities[player].xp = ss_toi(words[1]);
+				obj.entities[player].yp = ss_toi(words[2]);
 				game.gravitycontrol = ss_toi(words[3]);
 
 			}
@@ -389,23 +353,11 @@ void scriptclass::run()
 					g = 134;
 					b = 255;
 				}
-				else if (words[1] == "white")
-				{
-					r = 244;
-					g = 244;
-					b = 244;
-				}
 				else if (words[1] == "gray")
 				{
 					r = 174;
 					g = 174;
 					b = 174;
-				}
-				else if (words[1] == "orange")
-				{
-					r = 255;
-					g = 130;
-					b = 20;
 				}
 				else
 				{
@@ -424,10 +376,7 @@ void scriptclass::run()
 				for (int i = 0; i < ss_toi(words[4]); i++)
 				{
 					position++;
-					if (INBOUNDS_VEC(position, commands))
-					{
-						txt.push_back(commands[position]);
-					}
+					txt.push_back(commands[position]);
 				}
 			}
 			else if (words[0] == "position")
@@ -439,10 +388,7 @@ void scriptclass::run()
 				if (words[1] == "player")
 				{
 					i = obj.getplayer();
-					if (INBOUNDS_VEC(i, obj.entities))
-					{
-						j = obj.entities[i].dir;
-					}
+					j = obj.entities[i].dir;
 				}
 				else if (words[1] == "cyan")
 				{
@@ -495,7 +441,7 @@ void scriptclass::run()
 				}
 
 				//next is whether to position above or below
-				if (INBOUNDS_VEC(i, obj.entities) && words[2] == "above")
+				if (words[2] == "above")
 				{
 					if (j == 1)    //left
 					{
@@ -508,7 +454,7 @@ void scriptclass::run()
 						texty = obj.entities[i].yp - 18 - (txt.size() * 8);
 					}
 				}
-				else if (INBOUNDS_VEC(i, obj.entities))
+				else
 				{
 					if (j == 1)    //left
 					{
@@ -592,7 +538,7 @@ void scriptclass::run()
 				}
 
 				//next is whether to position above or below
-				if (INBOUNDS_VEC(i, obj.entities) && words[2] == "above")
+				if (words[2] == "above")
 				{
 					if (j == 1)    //left
 					{
@@ -605,7 +551,7 @@ void scriptclass::run()
 						texty = obj.entities[i].yp - 18 - (txt.size() * 8);
 					}
 				}
-				else if (INBOUNDS_VEC(i, obj.entities))
+				else
 				{
 					if (j == 1)    //left
 					{
@@ -627,14 +573,9 @@ void scriptclass::run()
 			{
 				if(graphics.flipmode) texty += 2*(120 - texty) - 8*(txt.size()+2);
 			}
-			else if (words[0] == "speak_active" || words[0] == "speak")
+			else if (words[0] == "speak_active")
 			{
 				//Ok, actually display the textbox we've initilised now!
-				//If using "speak", don't make the textbox active (so we can use multiple textboxes)
-				if (txt.empty())
-				{
-					txt.resize(1);
-				}
 				graphics.createtextbox(txt[0], textx, texty, r, g, b);
 				if ((int) txt.size() > 1)
 				{
@@ -665,10 +606,52 @@ void scriptclass::run()
 				}
 
 				graphics.textboxadjust();
-				if (words[0] == "speak_active")
+				graphics.textboxactive();
+
+				if (!game.backgroundtext)
 				{
-					graphics.textboxactive();
+					game.advancetext = true;
+					game.hascontrol = false;
+					game.pausescript = true;
+					if (key.isDown(90) || key.isDown(32) || key.isDown(86)
+						|| key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN)) game.jumpheld = true;
 				}
+				game.backgroundtext = false;
+			}
+			else if (words[0] == "speak")
+			{
+				//Exactly as above, except don't make the textbox active (so we can use multiple textboxes)
+				graphics.createtextbox(txt[0], textx, texty, r, g, b);
+				if ((int) txt.size() > 1)
+				{
+					for (i = 1; i < (int) txt.size(); i++)
+					{
+						graphics.addline(txt[i]);
+					}
+				}
+
+				//the textbox cannot be outside the screen. Fix if it is.
+				if (textx <= -1000)
+				{
+					//position to the left of the player
+					textx += 10000;
+					textx -= graphics.textboxwidth();
+					textx += 16;
+					graphics.textboxmoveto(textx);
+				}
+
+				if (textx == -500 || textx == -1)
+				{
+					graphics.textboxcenterx();
+				}
+
+				if (texty == -500)
+				{
+					graphics.textboxcentery();
+				}
+
+				graphics.textboxadjust();
+				//graphics.textboxactive();
 
 				if (!game.backgroundtext)
 				{
@@ -711,56 +694,28 @@ void scriptclass::run()
 			{
 				//Create the super VVVVVV combo!
 				i = obj.getplayer();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].xp = 30;
-					obj.entities[i].yp = 46;
-					obj.entities[i].size = 13;
-					obj.entities[i].colour = 23;
-					obj.entities[i].cx = 36;// 6;
-					obj.entities[i].cy = 12+80;// 2;
-					obj.entities[i].h = 126-80;// 21;
-				}
+				obj.entities[i].xp = 30;
+				obj.entities[i].yp = 46;
+				obj.entities[i].size = 13;
+				obj.entities[i].colour = 23;
+				obj.entities[i].cx = 36;// 6;
+				obj.entities[i].cy = 12+80;// 2;
+				obj.entities[i].h = 126-80;// 21;
 			}
 			else if (words[0] == "undovvvvvvman")
 			{
 				//Create the super VVVVVV combo!
 				i = obj.getplayer();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].xp = 100;
-					obj.entities[i].size = 0;
-					obj.entities[i].colour = 0;
-					obj.entities[i].cx = 6;
-					obj.entities[i].cy = 2;
-					obj.entities[i].h = 21;
-				}
+				obj.entities[i].xp = 100;
+				obj.entities[i].size = 0;
+				obj.entities[i].colour = 0;
+				obj.entities[i].cx = 6;
+				obj.entities[i].cy = 2;
+				obj.entities[i].h = 21;
 			}
 			else if (words[0] == "createentity")
 			{
-				std::string word6 = words[6];
-				std::string word7 = words[7];
-				std::string word8 = words[8];
-				std::string word9 = words[9];
-				if (words[6] == "") words[6] = "0";
-				if (words[7] == "") words[7] = "0";
-				if (words[8] == "") words[8] = "320";
-				if (words[9] == "") words[9] = "240";
-				obj.createentity(
-					ss_toi(words[1]),
-					ss_toi(words[2]),
-					ss_toi(words[3]),
-					ss_toi(words[4]),
-					ss_toi(words[5]),
-					ss_toi(words[6]),
-					ss_toi(words[7]),
-					ss_toi(words[8]),
-					ss_toi(words[9])
-				);
-				words[6] = word6;
-				words[7] = word7;
-				words[8] = word8;
-				words[9] = word9;
+				obj.createentity(ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), ss_toi(words[5]));
 			}
 			else if (words[0] == "createcrewman")
 			{
@@ -875,11 +830,11 @@ void scriptclass::run()
 					i=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities) && ss_toi(words[2]) == 0)
+				if (ss_toi(words[2]) == 0)
 				{
 					obj.entities[i].tile = 0;
 				}
-				else if (INBOUNDS_VEC(i, obj.entities))
+				else
 				{
 					obj.entities[i].tile = 144;
 				}
@@ -932,11 +887,11 @@ void scriptclass::run()
 					obj.customcrewmoods[1]=ss_toi(words[2]);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities) && ss_toi(words[2]) == 0)
+				if (ss_toi(words[2]) == 0)
 				{
 					obj.entities[i].tile = 0;
 				}
-				else if (INBOUNDS_VEC(i, obj.entities))
+				else
 				{
 					obj.entities[i].tile = 144;
 				}
@@ -972,10 +927,7 @@ void scriptclass::run()
 					i=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].tile = ss_toi(words[2]);
-				}
+				obj.entities[i].tile = ss_toi(words[2]);
 			}
 			else if (words[0] == "flipgravity")
 			{
@@ -1011,15 +963,15 @@ void scriptclass::run()
 						i=obj.getcrewman(1);
 					}
 
-					if (INBOUNDS_VEC(i, obj.entities) && obj.entities[i].rule == 7)
-					{
-						obj.entities[i].rule = 6;
-						obj.entities[i].tile = 0;
-					}
-					else if (INBOUNDS_VEC(i, obj.entities) && obj.getplayer() != i) // Don't destroy player entity
+					if (obj.entities[i].rule == 6)
 					{
 						obj.entities[i].rule = 7;
 						obj.entities[i].tile = 6;
+					}
+					else if (obj.entities[i].rule == 7)
+					{
+						obj.entities[i].rule = 6;
+						obj.entities[i].tile = 0;
 					}
 				}
 			}
@@ -1055,10 +1007,7 @@ void scriptclass::run()
 					i=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].tile +=12;
-				}
+				obj.entities[i].tile +=12;
 			}
 			else if (words[0] == "changedir")
 			{
@@ -1091,11 +1040,11 @@ void scriptclass::run()
 					i=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities) && ss_toi(words[2]) == 0)
+				if (ss_toi(words[2]) == 0)
 				{
 					obj.entities[i].dir = 0;
 				}
-				else if (INBOUNDS_VEC(i, obj.entities))
+				else
 				{
 					obj.entities[i].dir = 1;
 				}
@@ -1160,27 +1109,30 @@ void scriptclass::run()
 				}
 
 
-				if (INBOUNDS_VEC(i, obj.entities))
+				obj.entities[i].state = ss_toi(words[2]);
+				if (obj.entities[i].state == 16)
 				{
-					obj.entities[i].state = ss_toi(words[2]);
-					if (obj.entities[i].state == 16)
-					{
-						obj.entities[i].para=ss_toi(words[3]);
-					}
-					else if (obj.entities[i].state == 17)
-					{
-						obj.entities[i].dir=ss_toi(words[3]);
-					}
+					obj.entities[i].para=ss_toi(words[3]);
 				}
+				else if (obj.entities[i].state == 17)
+				{
+					obj.entities[i].dir=ss_toi(words[3]);
+				}
+			}
+			else if (words[0] == "alarmon")
+			{
+				game.alarmon = true;
+				game.alarmdelay = 0;
+			}
+			else if (words[0] == "alarmoff")
+			{
+				game.alarmon = false;
 			}
 			else if (words[0] == "activateteleporter")
 			{
 				i = obj.getteleporter();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].tile = 6;
-					obj.entities[i].colour = 102;
-				}
+				obj.entities[i].tile = 6;
+				obj.entities[i].colour = 102;
 			}
 			else if (words[0] == "changecolour")
 			{
@@ -1213,36 +1165,33 @@ void scriptclass::run()
 					i=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities))
+				if (words[2] == "cyan")
 				{
-					if (words[2] == "cyan")
-					{
-						obj.entities[i].colour = 0;
-					}
-					else if (words[2] == "red")
-					{
-						obj.entities[i].colour = 15;
-					}
-					else if (words[2] == "green")
-					{
-						obj.entities[i].colour = 13;
-					}
-					else if (words[2] == "yellow")
-					{
-						obj.entities[i].colour = 14;
-					}
-					else if (words[2] == "blue")
-					{
-						obj.entities[i].colour = 16;
-					}
-					else if (words[2] == "purple")
-					{
-						obj.entities[i].colour = 20;
-					}
-					else if (words[2] == "teleporter")
-					{
-						obj.entities[i].colour = 102;
-					}
+					obj.entities[i].colour = 0;
+				}
+				else if (words[2] == "red")
+				{
+					obj.entities[i].colour = 15;
+				}
+				else if (words[2] == "green")
+				{
+					obj.entities[i].colour = 13;
+				}
+				else if (words[2] == "yellow")
+				{
+					obj.entities[i].colour = 14;
+				}
+				else if (words[2] == "blue")
+				{
+					obj.entities[i].colour = 16;
+				}
+				else if (words[2] == "purple")
+				{
+					obj.entities[i].colour = 20;
+				}
+				else if (words[2] == "teleporter")
+				{
+					obj.entities[i].colour = 102;
 				}
 			}
 			else if (words[0] == "squeak")
@@ -1296,18 +1245,12 @@ void scriptclass::run()
 			{
 				i = obj.getplayer();
 				game.savepoint = 0;
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					game.savex = obj.entities[i].xp ;
-					game.savey = obj.entities[i].yp;
-				}
+				game.savex = obj.entities[i].xp ;
+				game.savey = obj.entities[i].yp;
 				game.savegc = game.gravitycontrol;
 				game.saverx = game.roomx;
 				game.savery = game.roomy;
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					game.savedir = obj.entities[i].dir;
-				}
+				game.savedir = obj.entities[i].dir;
 			}
 			else if (words[0] == "gamestate")
 			{
@@ -1322,20 +1265,23 @@ void scriptclass::run()
 			{
 				if (words[1] == "teleporter")
 				{
-					game.mapmenuchange(TELEPORTERMODE);
+					//TODO this draw the teleporter screen. This is a problem. :(
+					game.gamestate = 5;
+					graphics.menuoffset = 240; //actually this should count the roomname
+					if (map.extrarow) graphics.menuoffset -= 10;
+
+					graphics.resumegamemode = false;
 
 					game.useteleporter = false; //good heavens don't actually use it
 				}
 				else if (words[1] == "game")
 				{
 					graphics.resumegamemode = true;
-					game.prevgamestate = GAMEMODE;
 				}
 			}
 			else if (words[0] == "ifexplored")
 			{
-				int room = ss_toi(words[1]) + (20 * ss_toi(words[2]));
-				if (INBOUNDS_ARR(room, map.explored) && map.explored[room] == 1)
+				if (map.explored[ss_toi(words[1]) + (20 * ss_toi(words[2]))] == 1)
 				{
 					load(words[3]);
 					position--;
@@ -1359,8 +1305,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "ifflag")
 			{
-				int flag = ss_toi(words[1]);
-				if (INBOUNDS_ARR(flag, obj.flags) && obj.flags[flag])
+				if (obj.flags[ss_toi(words[1])]==1)
 				{
 					load(words[2]);
 					position--;
@@ -1368,8 +1313,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "ifcrewlost")
 			{
-				int crewmate = ss_toi(words[1]);
-				if (INBOUNDS_ARR(crewmate, game.crewstats) && !game.crewstats[crewmate])
+				if (game.crewstats[ss_toi(words[1])]==false)
 				{
 					load(words[2]);
 					position--;
@@ -1377,7 +1321,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "iftrinkets")
 			{
-				if (game.trinkets() >= ss_toi(words[1]))
+				if (game.trinkets >= ss_toi(words[1]))
 				{
 					load(words[2]);
 					position--;
@@ -1393,19 +1337,11 @@ void scriptclass::run()
 			}
 			else if (words[0] == "hidecoordinates")
 			{
-				int room = ss_toi(words[1]) + (20 * ss_toi(words[2]));
-				if (INBOUNDS_ARR(room, map.explored))
-				{
-					map.explored[room] = false;
-				}
+				map.explored[ss_toi(words[1]) + (20 * ss_toi(words[2]))] = 0;
 			}
 			else if (words[0] == "showcoordinates")
 			{
-				int room = ss_toi(words[1]) + (20 * ss_toi(words[2]));
-				if (INBOUNDS_ARR(room, map.explored))
-				{
-					map.explored[room] = true;
-				}
+				map.explored[ss_toi(words[1]) + (20 * ss_toi(words[2]))] = 1;
 			}
 			else if (words[0] == "hideship")
 			{
@@ -1463,19 +1399,11 @@ void scriptclass::run()
 			}
 			else if (words[0] == "hideplayer")
 			{
-				int player = obj.getplayer();
-				if (INBOUNDS_VEC(player, obj.entities))
-				{
-					obj.entities[player].invis = true;
-				}
+				obj.entities[obj.getplayer()].invis = true;
 			}
 			else if (words[0] == "showplayer")
 			{
-				int player = obj.getplayer();
-				if (INBOUNDS_VEC(player, obj.entities))
-				{
-					obj.entities[player].invis = false;
-				}
+				obj.entities[obj.getplayer()].invis = false;
 			}
 			else if (words[0] == "teleportscript")
 			{
@@ -1520,7 +1448,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "entersecretlab")
 			{
-				game.unlocknum(8);
+				game.unlock[8] = true;
 				game.insecretlab = true;
 			}
 			else if (words[0] == "leavesecretlab")
@@ -1532,19 +1460,18 @@ void scriptclass::run()
 				map.resetnames();
 				map.resetmap();
 				map.resetplayer();
-				graphics.towerbg.tdrawback = true;
+				map.tdrawback = true;
 
 				obj.resetallflags();
 				i = obj.getplayer();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].tile = 0;
-				}
+				obj.entities[i].tile = 0;
 
+				game.trinkets = 0;
+				game.crewmates=0;
 				for (i = 0; i < 100; i++)
 				{
-					obj.collect[i] = false;
-					obj.customcollect[i] = false;
+					obj.collect[i] = 0;
+					obj.customcollect[i] = 0;
 				}
 				game.deathcounts = 0;
 				game.advancetext = false;
@@ -1577,7 +1504,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "rollcredits")
 			{
-				game.gamestate = GAMECOMPLETE;
+				game.gamestate = 6;
 				graphics.fademode = 4;
 				game.creditposition = 0;
 			}
@@ -1712,11 +1639,11 @@ void scriptclass::run()
 					j=obj.getcrewman(1);
 				}
 
-				if (INBOUNDS_VEC(i, obj.entities) && INBOUNDS_VEC(j, obj.entities) && obj.entities[j].xp > obj.entities[i].xp + 5)
+				if (obj.entities[j].xp > obj.entities[i].xp + 5)
 				{
 					obj.entities[i].dir = 1;
 				}
-				else if (INBOUNDS_VEC(i, obj.entities) && INBOUNDS_VEC(j, obj.entities) && obj.entities[j].xp < obj.entities[i].xp - 5)
+				else if (obj.entities[j].xp < obj.entities[i].xp - 5)
 				{
 					obj.entities[i].dir = 0;
 				}
@@ -1864,14 +1791,13 @@ void scriptclass::run()
 					i=1;
 				}
 
-				int crewman = obj.getcrewman(i);
-				if (INBOUNDS_VEC(crewman, obj.entities) && i == 4)
+				if (i == 4)
 				{
-					obj.createblock(5, obj.entities[crewman].xp - 32, obj.entities[crewman].yp-20, 96, 60, i);
+					obj.createblock(5, obj.entities[obj.getcrewman(i)].xp - 32, obj.entities[obj.getcrewman(i)].yp-20, 96, 60, i);
 				}
-				else if (INBOUNDS_VEC(crewman, obj.entities))
+				else
 				{
-					obj.createblock(5, obj.entities[crewman].xp - 32, 0, 96, 240, i);
+					obj.createblock(5, obj.entities[obj.getcrewman(i)].xp - 32, 0, 96, 240, i);
 				}
 			}
 			else if (words[0] == "createrescuedcrew")
@@ -1903,45 +1829,39 @@ void scriptclass::run()
 			else if (words[0] == "restoreplayercolour")
 			{
 				i = obj.getplayer();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].colour = 0;
-				}
+				obj.entities[i].colour = 0;
 			}
 			else if (words[0] == "changeplayercolour")
 			{
 				i = obj.getplayer();
 
-				if (INBOUNDS_VEC(i, obj.entities))
+				if (words[1] == "cyan")
 				{
-					if (words[1] == "cyan")
-					{
-						obj.entities[i].colour = 0;
-					}
-					else if (words[1] == "red")
-					{
-						obj.entities[i].colour = 15;
-					}
-					else if (words[1] == "green")
-					{
-						obj.entities[i].colour = 13;
-					}
-					else if (words[1] == "yellow")
-					{
-						obj.entities[i].colour = 14;
-					}
-					else if (words[1] == "blue")
-					{
-						obj.entities[i].colour = 16;
-					}
-					else if (words[1] == "purple")
-					{
-						obj.entities[i].colour = 20;
-					}
-					else if (words[1] == "teleporter")
-					{
-						obj.entities[i].colour = 102;
-					}
+					obj.entities[i].colour = 0;
+				}
+				else if (words[1] == "red")
+				{
+					obj.entities[i].colour = 15;
+				}
+				else if (words[1] == "green")
+				{
+					obj.entities[i].colour = 13;
+				}
+				else if (words[1] == "yellow")
+				{
+					obj.entities[i].colour = 14;
+				}
+				else if (words[1] == "blue")
+				{
+					obj.entities[i].colour = 16;
+				}
+				else if (words[1] == "purple")
+				{
+					obj.entities[i].colour = 20;
+				}
+				else if (words[1] == "teleporter")
+				{
+					obj.entities[i].colour = 102;
 				}
 			}
 			else if (words[0] == "altstates")
@@ -1951,10 +1871,7 @@ void scriptclass::run()
 			else if (words[0] == "activeteleporter")
 			{
 				i = obj.getteleporter();
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].colour = 101;
-				}
+				obj.entities[i].colour = 101;
 			}
 			else if (words[0] == "foundtrinket")
 			{
@@ -1962,11 +1879,8 @@ void scriptclass::run()
 				music.haltdasmusik();
 				music.playef(3);
 
-				size_t trinket = ss_toi(words[1]);
-				if (trinket < SDL_arraysize(obj.collect))
-				{
-					obj.collect[trinket] = true;
-				}
+				game.trinkets++;
+				obj.collect[ss_toi(words[1])] = 1;
 
 				graphics.textboxremovefast();
 
@@ -1976,17 +1890,15 @@ void scriptclass::run()
 				graphics.textboxcenterx();
 
 				std::string usethisnum;
-#if !defined(NO_CUSTOM_LEVELS)
 				if (map.custommode)
 				{
-					usethisnum = help.number(ed.numtrinkets());
+					usethisnum = help.number(map.customtrinkets);
 				}
 				else
-#endif
 				{
 					usethisnum = "Twenty";
 				}
-				graphics.createtextbox(" " + help.number(game.trinkets()) + " out of " + usethisnum + " ", 50, 135, 174, 174, 174);
+				graphics.createtextbox(" " + help.number(game.trinkets) + " out of " + usethisnum + " ", 50, 135, 174, 174, 174);
 				graphics.textboxcenterx();
 
 				if (!game.backgroundtext)
@@ -2099,10 +2011,7 @@ void scriptclass::run()
 
 				obj.createentity(200, 153, 18, r, 0, 19, 30);
 				i = obj.getcrewman(game.lastsaved);
-				if (INBOUNDS_VEC(i, obj.entities))
-				{
-					obj.entities[i].dir = 1;
-				}
+				obj.entities[i].dir = 1;
 			}
 			else if (words[0] == "specialline")
 			{
@@ -2131,12 +2040,12 @@ void scriptclass::run()
 			}
 			else if (words[0] == "trinketbluecontrol")
 			{
-				if (game.trinkets() == 20 && obj.flags[67])
+				if (game.trinkets == 20 && obj.flags[67] == 1)
 				{
 					load("talkblue_trinket6");
 					position--;
 				}
-				else if (game.trinkets() >= 19 && !obj.flags[67])
+				else if (game.trinkets >= 19 && obj.flags[67] == 0)
 				{
 					load("talkblue_trinket5");
 					position--;
@@ -2149,7 +2058,7 @@ void scriptclass::run()
 			}
 			else if (words[0] == "trinketyellowcontrol")
 			{
-				if (game.trinkets() >= 19)
+				if (game.trinkets >= 19)
 				{
 					load("talkyellow_trinket3");
 					position--;
@@ -2185,70 +2094,70 @@ void scriptclass::run()
 						position--;
 					}
 				}
-				else if (obj.flags[67])
+				else if (obj.flags[67] == 1)
 				{
 					//game complete
 					load("talkred_13");
 					position--;
 				}
-				else if (obj.flags[35] && !obj.flags[52])
+				else if (obj.flags[35] == 1 && obj.flags[52] == 0)
 				{
 					//Intermission level
-					obj.flags[52] = true;
+					obj.flags[52] = 1;
 					load("talkred_9");
 					position--;
 				}
-				else if (!obj.flags[51])
+				else if (obj.flags[51] == 0)
 				{
 					//We're back home!
-					obj.flags[51] = true;
+					obj.flags[51] = 1;
 					load("talkred_5");
 					position--;
 				}
-				else if (!obj.flags[48] && game.crewstats[5])
+				else if (obj.flags[48] == 0 && game.crewstats[5])
 				{
 					//Victoria's back
-					obj.flags[48] = true;
+					obj.flags[48] = 1;
 					load("talkred_6");
 					position--;
 				}
-				else if (!obj.flags[49] && game.crewstats[4])
+				else if (obj.flags[49] == 0 && game.crewstats[4])
 				{
 					//Verdigris' back
-					obj.flags[49] = true;
+					obj.flags[49] = 1;
 					load("talkred_7");
 					position--;
 				}
-				else if (!obj.flags[50] && game.crewstats[2])
+				else if (obj.flags[50] == 0 && game.crewstats[2])
 				{
 					//Vitellary's back
-					obj.flags[50] = true;
+					obj.flags[50] = 1;
 					load("talkred_8");
 					position--;
 				}
-				else if (!obj.flags[45] && !game.crewstats[5])
+				else if (obj.flags[45] == 0 && !game.crewstats[5])
 				{
-					obj.flags[45] = true;
+					obj.flags[45] = 1;
 					load("talkred_2");
 					position--;
 				}
-				else if (!obj.flags[46] && !game.crewstats[4])
+				else if (obj.flags[46] == 0 && !game.crewstats[4])
 				{
-					obj.flags[46] = true;
+					obj.flags[46] = 1;
 					load("talkred_3");
 					position--;
 				}
-				else if (!obj.flags[47] && !game.crewstats[2])
+				else if (obj.flags[47] == 0 && !game.crewstats[2])
 				{
-					obj.flags[47] = true;
+					obj.flags[47] = 1;
 					load("talkred_4");
 					position--;
 				}
 				else
 				{
-					obj.flags[45] = false;
-					obj.flags[46] = false;
-					obj.flags[47] = false;
+					obj.flags[45] = 0;
+					obj.flags[46] = 0;
+					obj.flags[47] = 0;
 					load("talkred_1");
 					position--;
 				}
@@ -2271,47 +2180,47 @@ void scriptclass::run()
 					load("talkgreen_9");
 					position--;
 				}
-				else if (obj.flags[67])
+				else if (obj.flags[67] == 1)
 				{
 					//game complete
 					load("talkgreen_10");
 					position--;
 				}
-				else if (obj.flags[34] && !obj.flags[57])
+				else if (obj.flags[34] == 1 && obj.flags[57] == 0)
 				{
 					//Intermission level
-					obj.flags[57] = true;
+					obj.flags[57] = 1;
 					load("talkgreen_7");
 					position--;
 				}
-				else if (!obj.flags[53])
+				else if (obj.flags[53] == 0)
 				{
 					//Home!
-					obj.flags[53] = true;
+					obj.flags[53] = 1;
 					load("talkgreen_6");
 					position--;
 				}
-				else if (!obj.flags[54] && game.crewstats[2])
+				else if (obj.flags[54] == 0 && game.crewstats[2])
 				{
-					obj.flags[54] = true;
+					obj.flags[54] = 1;
 					load("talkgreen_5");
 					position--;
 				}
-				else if (!obj.flags[55] && game.crewstats[3])
+				else if (obj.flags[55] == 0 && game.crewstats[3])
 				{
-					obj.flags[55] = true;
+					obj.flags[55] = 1;
 					load("talkgreen_4");
 					position--;
 				}
-				else if (!obj.flags[56] && game.crewstats[5])
+				else if (obj.flags[56] == 0 && game.crewstats[5])
 				{
-					obj.flags[56] = true;
+					obj.flags[56] = 1;
 					load("talkgreen_3");
 					position--;
 				}
-				else if (!obj.flags[58])
+				else if (obj.flags[58] == 0)
 				{
-					obj.flags[58] = true;
+					obj.flags[58] = 1;
 					load("talkgreen_2");
 					position--;
 				}
@@ -2328,27 +2237,27 @@ void scriptclass::run()
 					load("talkblue_9");
 					position--;
 				}
-				else	if (obj.flags[67])
+				else	if (obj.flags[67] == 1)
 				{
 					//game complete, everything changes for victoria
-					if (obj.flags[41] && !obj.flags[42])
+					if (obj.flags[41] == 1 && obj.flags[42] == 0)
 					{
 						//second trinket conversation
-						obj.flags[42] = true;
+						obj.flags[42] = 1;
 						load("talkblue_trinket2");
 						position--;
 					}
-					else if (!obj.flags[41] && !obj.flags[42])
+					else if (obj.flags[41] == 0 && obj.flags[42] == 0)
 					{
 						//Third trinket conversation
-						obj.flags[42] = true;
+						obj.flags[42] = 1;
 						load("talkblue_trinket3");
 						position--;
 					}
 					else
 					{
 						//Ok, we've already dealt with the trinket thing; so either you have them all, or you don't. If you do:
-						if (game.trinkets() >= 20)
+						if (game.trinkets >= 20)
 						{
 							load("startepilogue");
 							position--;
@@ -2360,56 +2269,56 @@ void scriptclass::run()
 						}
 					}
 				}
-				else if (obj.flags[33] && !obj.flags[40])
+				else if (obj.flags[33] == 1 && obj.flags[40] == 0)
 				{
 					//Intermission level
-					obj.flags[40] = true;
+					obj.flags[40] = 1;
 					load("talkblue_7");
 					position--;
 				}
-				else if (!obj.flags[36] && game.crewstats[5])
+				else if (obj.flags[36] == 0 && game.crewstats[5])
 				{
 					//Back on the ship!
-					obj.flags[36] = true;
+					obj.flags[36] = 1;
 					load("talkblue_3");
 					position--;
 				}
-				else if (!obj.flags[41] && game.crewrescued() <= 4)
+				else if (obj.flags[41] == 0 && game.crewrescued() <= 4)
 				{
 					//First trinket conversation
-					obj.flags[41] = true;
+					obj.flags[41] = 1;
 					load("talkblue_trinket1");
 					position--;
 				}
-				else if (obj.flags[41] && !obj.flags[42] && game.crewrescued() == 5)
+				else if (obj.flags[41] == 1 && obj.flags[42] == 0 && game.crewrescued() == 5)
 				{
 					//second trinket conversation
-					obj.flags[42] = true;
+					obj.flags[42] = 1;
 					load("talkblue_trinket2");
 					position--;
 				}
-				else if (!obj.flags[41] && !obj.flags[42] && game.crewrescued() == 5)
+				else if (obj.flags[41] == 0 && obj.flags[42] == 0 && game.crewrescued() == 5)
 				{
 					//Third trinket conversation
-					obj.flags[42] = true;
+					obj.flags[42] = 1;
 					load("talkblue_trinket3");
 					position--;
 				}
-				else if (!obj.flags[37] && game.crewstats[2])
+				else if (obj.flags[37] == 0 && game.crewstats[2])
 				{
-					obj.flags[37] = true;
+					obj.flags[37] = 1;
 					load("talkblue_4");
 					position--;
 				}
-				else if (!obj.flags[38] && game.crewstats[3])
+				else if (obj.flags[38] == 0 && game.crewstats[3])
 				{
-					obj.flags[38] = true;
+					obj.flags[38] = 1;
 					load("talkblue_5");
 					position--;
 				}
-				else if (!obj.flags[39] && game.crewstats[4])
+				else if (obj.flags[39] == 0 && game.crewstats[4])
 				{
-					obj.flags[39] = true;
+					obj.flags[39] = 1;
 					load("talkblue_6");
 					position--;
 				}
@@ -2436,75 +2345,75 @@ void scriptclass::run()
 					load("talkyellow_12");
 					position--;
 				}
-				else	if (obj.flags[67])
+				else	if (obj.flags[67] == 1)
 				{
 					//game complete
 					load("talkyellow_11");
 					position--;
 				}
-				else if (obj.flags[32] && !obj.flags[31])
+				else if (obj.flags[32] == 1 && obj.flags[31] == 0)
 				{
 					//Intermission level
-					obj.flags[31] = true;
+					obj.flags[31] = 1;
 					load("talkyellow_6");
 					position--;
 				}
-				else if (!obj.flags[27] && game.crewstats[2])
+				else if (obj.flags[27] == 0 && game.crewstats[2])
 				{
 					//Back on the ship!
-					obj.flags[27] = true;
+					obj.flags[27] = 1;
 					load("talkyellow_10");
 					position--;
 				}
-				else if (!obj.flags[43] && game.crewrescued() == 5 && !game.crewstats[5])
+				else if (obj.flags[43] == 0 && game.crewrescued() == 5 && !game.crewstats[5])
 				{
 					//If by chance we've rescued everyone except Victoria by the end, Vitellary provides you with
 					//the trinket information instead.
-					obj.flags[43] = true;
-					obj.flags[42] = true;
-					obj.flags[41] = true;
+					obj.flags[43] = 1;
+					obj.flags[42] = 1;
+					obj.flags[41] = 1;
 					load("talkyellow_trinket1");
 					position--;
 				}
-				else if (!obj.flags[24] && game.crewstats[5])
+				else if (obj.flags[24] == 0 && game.crewstats[5])
 				{
-					obj.flags[24] = true;
+					obj.flags[24] = 1;
 					load("talkyellow_8");
 					position--;
 				}
-				else if (!obj.flags[26] && game.crewstats[4])
+				else if (obj.flags[26] == 0 && game.crewstats[4])
 				{
-					obj.flags[26] = true;
+					obj.flags[26] = 1;
 					load("talkyellow_7");
 					position--;
 				}
-				else if (!obj.flags[25] && game.crewstats[3])
+				else if (obj.flags[25] == 0 && game.crewstats[3])
 				{
-					obj.flags[25] = true;
+					obj.flags[25] = 1;
 					load("talkyellow_9");
 					position--;
 				}
-				else if (!obj.flags[28])
+				else if (obj.flags[28] == 0)
 				{
-					obj.flags[28] = true;
+					obj.flags[28] = 1;
 					load("talkyellow_3");
 					position--;
 				}
-				else if (!obj.flags[29])
+				else if (obj.flags[29] == 0)
 				{
-					obj.flags[29] = true;
+					obj.flags[29] = 1;
 					load("talkyellow_4");
 					position--;
 				}
-				else if (!obj.flags[30])
+				else if (obj.flags[30] == 0)
 				{
-					obj.flags[30] = true;
+					obj.flags[30] = 1;
 					load("talkyellow_5");
 					position--;
 				}
-				else if (!obj.flags[23])
+				else if (obj.flags[23] == 0)
 				{
-					obj.flags[23] = true;
+					obj.flags[23] = 1;
 					load("talkyellow_2");
 					position--;
 				}
@@ -2512,7 +2421,7 @@ void scriptclass::run()
 				{
 					load("talkyellow_1");
 					position--;
-					obj.flags[23] = false;
+					obj.flags[23] = 0;
 				}
 			}
 			else if (words[0] == "purplecontrol")
@@ -2524,68 +2433,68 @@ void scriptclass::run()
 					load("talkpurple_9");
 					position--;
 				}
-				else	if (obj.flags[67])
+				else	if (obj.flags[67] == 1)
 				{
 					//game complete
 					load("talkpurple_8");
 					position--;
 				}
-				else if (!obj.flags[17] && game.crewstats[4])
+				else if (obj.flags[17] == 0 && game.crewstats[4])
 				{
-					obj.flags[17] = true;
+					obj.flags[17] = 1;
 					load("talkpurple_6");
 					position--;
 				}
-				else if (!obj.flags[15] && game.crewstats[5])
+				else if (obj.flags[15] == 0 && game.crewstats[5])
 				{
-					obj.flags[15] = true;
+					obj.flags[15] = 1;
 					load("talkpurple_4");
 					position--;
 				}
-				else if (!obj.flags[16] && game.crewstats[3])
+				else if (obj.flags[16] == 0 && game.crewstats[3])
 				{
-					obj.flags[16] = true;
+					obj.flags[16] = 1;
 					load("talkpurple_5");
 					position--;
 				}
-				else if (!obj.flags[18] && game.crewstats[2])
+				else if (obj.flags[18] == 0 && game.crewstats[2])
 				{
-					obj.flags[18] = true;
+					obj.flags[18] = 1;
 					load("talkpurple_7");
 					position--;
 				}
-				else if (obj.flags[19] && !obj.flags[20] && !obj.flags[21])
+				else if (obj.flags[19] == 1 && obj.flags[20] == 0 && obj.flags[21] == 0)
 				{
 					//intermission one: if played one / not had first conversation / not played two [conversation one]
-					obj.flags[21] = true;
+					obj.flags[21] = 1;
 					load("talkpurple_intermission1");
 					position--;
 				}
-				else if (obj.flags[20] && obj.flags[21] && !obj.flags[22])
+				else if (obj.flags[20] == 1 && obj.flags[21] == 1 && obj.flags[22] == 0)
 				{
 					//intermission two: if played two / had first conversation / not had second conversation [conversation two]
-					obj.flags[22] = true;
+					obj.flags[22] = 1;
 					load("talkpurple_intermission2");
 					position--;
 				}
-				else if (obj.flags[20] && !obj.flags[21] && !obj.flags[22])
+				else if (obj.flags[20] == 1 && obj.flags[21] == 0 && obj.flags[22] == 0)
 				{
 					//intermission two: if played two / not had first conversation / not had second conversation [conversation three]
-					obj.flags[22] = true;
+					obj.flags[22] = 1;
 					load("talkpurple_intermission3");
 					position--;
 				}
-				else if (!obj.flags[12])
+				else if (obj.flags[12] == 0)
 				{
 					//Intro conversation
-					obj.flags[12] = true;
+					obj.flags[12] = 1;
 					load("talkpurple_intro");
 					position--;
 				}
-				else if (!obj.flags[14])
+				else if (obj.flags[14] == 0)
 				{
 					//Shorter intro conversation
-					obj.flags[14] = true;
+					obj.flags[14] = 1;
 					load("talkpurple_3");
 					position--;
 				}
@@ -2612,17 +2521,6 @@ void scriptclass::run()
 		{
 			running = false;
 		}
-		// Don't increment if we're at the max, signed int overflow is UB
-		if (execution_counter == SHRT_MAX)
-		{
-			// We must be in an infinite loop
-			printf("Warning: execution counter got to %i, stopping script\n", SHRT_MAX);
-			running = false;
-		}
-		else
-		{
-			execution_counter++;
-		}
 	}
 
 	if(scriptdelay>0)
@@ -2637,8 +2535,7 @@ void scriptclass::resetgametomenu()
 	graphics.flipmode = false;
 	obj.entities.clear();
 	graphics.fademode = 4;
-	graphics.titlebg.tdrawback = true;
-	game.createmenu(Menu::gameover);
+	game.createmenu("gameover");
 }
 
 void scriptclass::startgamemode( int t )
@@ -2652,11 +2549,9 @@ void scriptclass::startgamemode( int t )
 		game.jumpheld = true;
 		graphics.showcutscenebars = true;
 		graphics.cutscenebarspos = 320;
-		graphics.oldcutscenebarspos = 320;
 
 		//set flipmode
 		if (graphics.setflipmode) graphics.flipmode = true;
-		else obj.flags[73] = true;
 
 		if(obj.entities.empty())
 		{
@@ -2667,7 +2562,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intro");
 		break;
@@ -2681,7 +2575,6 @@ void scriptclass::startgamemode( int t )
 
 		//set flipmode
 		if (graphics.setflipmode) graphics.flipmode = true;
-		else obj.flags[73] = true;
 
 		if(obj.entities.empty())
 		{
@@ -2692,7 +2585,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 2: //Load Quicksave
@@ -2705,7 +2597,6 @@ void scriptclass::startgamemode( int t )
 
 		//set flipmode
 		if (graphics.setflipmode) graphics.flipmode = true;
-		else obj.flags[73] = true;
 
 		if(obj.entities.empty())
 		{
@@ -2716,18 +2607,14 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		//a very special case for here needs to ensure that the tower is set correctly
 		if (map.towermode)
 		{
 			map.resetplayer();
 
 			i = obj.getplayer();
-			if (INBOUNDS_VEC(i, obj.entities))
-			{
-				map.ypos = obj.entities[i].yp - 120;
-			}
-			graphics.towerbg.bypos = map.ypos / 2;
+			map.ypos = obj.entities[i].yp - 120;
+			map.bypos = map.ypos / 2;
 			map.cameramode = 0;
 			map.colsuperstate = 0;
 		}
@@ -2759,7 +2646,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 4:
@@ -2788,7 +2674,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 5:
@@ -2817,7 +2702,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 6:
@@ -2846,7 +2730,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 7:
@@ -2875,7 +2758,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 8:
@@ -2910,7 +2792,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 9:
@@ -2921,7 +2802,6 @@ void scriptclass::startgamemode( int t )
 		game.jumpheld = true;
 		graphics.showcutscenebars = true;
 		graphics.cutscenebarspos = 320;
-		graphics.oldcutscenebarspos = 320;
 
 		//set flipmode
 		if (graphics.setflipmode) graphics.flipmode = true;
@@ -2935,7 +2815,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 
 		load("intro");
@@ -2950,7 +2829,6 @@ void scriptclass::startgamemode( int t )
 		game.jumpheld = true;
 		graphics.showcutscenebars = true;
 		graphics.cutscenebarspos = 320;
-		graphics.oldcutscenebarspos = 320;
 
 		//set flipmode
 		if (graphics.setflipmode) graphics.flipmode = true;
@@ -2964,7 +2842,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 
 		load("intro");
@@ -2985,6 +2862,7 @@ void scriptclass::startgamemode( int t )
 				map.explored[i + (j * 20)] = 1;
 			}
 		}
+		game.trinkets = 20;
 		game.insecretlab = true;
 		map.showteleporters = true;
 
@@ -3000,7 +2878,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		music.play(11);
 		graphics.fademode = 4;
 		break;
@@ -3036,7 +2913,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_1");
 		break;
@@ -3072,7 +2948,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_1");
 		break;
@@ -3108,7 +2983,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_1");
 		break;
@@ -3144,7 +3018,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_1");
 		break;
@@ -3177,7 +3050,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_2");
 		break;
@@ -3210,7 +3082,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_2");
 		break;
@@ -3243,7 +3114,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_2");
 		break;
@@ -3276,7 +3146,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		load("intermission_2");
 		break;
@@ -3300,7 +3169,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		graphics.fademode = 4;
 		break;
 	case 21:  //play custom level (in editor)
@@ -3318,7 +3186,6 @@ void scriptclass::startgamemode( int t )
 		game.customstart();
 		game.jumpheld = true;
 
-		ed.ghosts.clear();
 
 		map.custommode = true;
 		map.customx = 100;
@@ -3336,7 +3203,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		if(ed.levmusic>0){
 			music.play(ed.levmusic);
 		}else{
@@ -3374,7 +3240,6 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 
 		ed.generatecustomminimap();
 		map.customshowmm=true;
@@ -3420,14 +3285,13 @@ void scriptclass::startgamemode( int t )
 			map.resetplayer();
 		}
 		map.gotoroom(game.saverx, game.savery);
-		map.initmapdata();
 		ed.generatecustomminimap();
 		graphics.fademode = 4;
 		break;
 	}
 #endif
 	case 100:
-		game.savestatsandsettings();
+		game.savestats();
 
 		SDL_Quit();
 		exit(0);
@@ -3442,14 +3306,9 @@ void scriptclass::teleport()
 	game.companion = 0;
 
 	i = obj.getplayer(); //less likely to have a serious collision error if the player is centered
-	if (INBOUNDS_VEC(i, obj.entities))
-	{
-		obj.entities[i].xp = 150;
-		obj.entities[i].yp = 110;
-		if(game.teleport_to_x==17 && game.teleport_to_y==17) obj.entities[i].xp = 88; //prevent falling!
-		obj.entities[i].lerpoldxp = obj.entities[i].xp;
-		obj.entities[i].lerpoldyp = obj.entities[i].yp;
-	}
+	obj.entities[i].xp = 150;
+	obj.entities[i].yp = 110;
+	if(game.teleport_to_x==17 && game.teleport_to_y==17) obj.entities[i].xp = 88; //prevent falling!
 
 	if (game.teleportscript == "levelonecomplete")
 	{
@@ -3465,27 +3324,17 @@ void scriptclass::teleport()
 	game.gravitycontrol = 0;
 	map.gotoroom(100+game.teleport_to_x, 100+game.teleport_to_y);
 	j = obj.getteleporter();
-	if (INBOUNDS_VEC(j, obj.entities))
-	{
-		obj.entities[j].state = 2;
-	}
+	obj.entities[j].state = 2;
 	game.teleport_to_new_area = false;
 
-	if (INBOUNDS_VEC(j, obj.entities))
-	{
-		game.savepoint = obj.entities[j].para;
-		game.savex = obj.entities[j].xp + 44;
-		game.savey = obj.entities[j].yp + 44;
-	}
+	game.savepoint = obj.entities[j].para;
+	game.savex = obj.entities[j].xp + 44;
+	game.savey = obj.entities[j].yp + 44;
 	game.savegc = 0;
 
 	game.saverx = game.roomx;
 	game.savery = game.roomy;
-	int player = obj.getplayer();
-	if (INBOUNDS_VEC(player, obj.entities))
-	{
-		game.savedir = obj.entities[player].dir;
-	}
+	game.savedir = obj.entities[obj.getplayer()].dir;
 
 	if(game.teleport_to_x==0 && game.teleport_to_y==0)
 	{
@@ -3529,10 +3378,6 @@ void scriptclass::teleport()
 		game.state = 0;
 		load(game.teleportscript);
 		game.teleportscript = "";
-
-		// FIXME: Remove this once game loop order is fixed in 2.4!
-		run();
-		dontrunnextframe = true;
 	}
 	else
 	{
@@ -3547,16 +3392,17 @@ void scriptclass::teleport()
 		}
 		if (!game.intimetrial && !game.nodeathmode && !game.inintermission)
 		{
-			if (game.savetele())
+			if (graphics.flipmode)
 			{
-				graphics.createtextbox("    Game Saved    ", -1, graphics.flipmode ? 202 : 12, 174, 174, 174);
+				graphics.createtextbox("    Game Saved    ", -1, 202, 174, 174, 174);
 				graphics.textboxtimer(25);
 			}
 			else
 			{
-				graphics.createtextbox("  ERROR: Could not save game!  ", -1, graphics.flipmode ? 202 : 12, 255, 60, 60);
-				graphics.textboxtimer(50);
+				graphics.createtextbox("    Game Saved    ", -1, 12, 174, 174, 174);
+				graphics.textboxtimer(25);
 			}
+			game.savetele();
 		}
 	}
 }
@@ -3569,12 +3415,8 @@ void scriptclass::hardreset()
 	game.teleport = false;
 	game.companion = 0;
 	game.roomchange = false;
-	if (!game.glitchrunnermode)
-	{
-		// Ironically, resetting more variables makes the janky fadeout system in glitchrunnermode even more glitchy
-		game.roomx = 0;
-		game.roomy = 0;
-	}
+	game.roomx = 0;
+	game.roomy = 0;
 	game.prevroomx = 0;
 	game.prevroomy = 0;
 	game.teleport_to_new_area = false;
@@ -3595,7 +3437,7 @@ void scriptclass::hardreset()
 	game.nodeathmode = false;
 	game.nocutscenes = false;
 
-	for (i = 0; i < (int) SDL_arraysize(game.crewstats); i++)
+	for (i = 0; i < 6; i++)
 	{
 		game.crewstats[i] = false;
 	}
@@ -3609,16 +3451,11 @@ void scriptclass::hardreset()
 	game.minutes = 0;
 	game.hours = 0;
 	game.gamesaved = false;
-	game.gamesavefailed = false;
 	game.savetime = "00:00";
 	game.savearea = "nowhere";
 	game.savetrinkets = 0;
-	if (!game.glitchrunnermode)
-	{
-		// Ironically, resetting more variables makes the janky fadeout system in glitchrunnermode even more glitchy
-		game.saverx = 0;
-		game.savery = 0;
-	}
+	game.saverx = 0;
+	game.savery = 0;
 
 	game.intimetrial = false;
 	game.timetrialcountdown = 0;
@@ -3656,28 +3493,19 @@ void scriptclass::hardreset()
 	game.inintermission = false;
 	game.insecretlab = false;
 
+	game.crewmates=0;
+
 	game.state = 0;
 	game.statedelay = 0;
 
 	game.hascontrol = true;
-	if (!game.glitchrunnermode)
-	{
-		// Keep the "- Press ACTION to advance text -" prompt around,
-		// apparently the speedrunners call it the "text storage" glitch
-		game.advancetext = false;
-	}
+	game.advancetext = false;
 
 	game.pausescript = false;
 
-	game.flashlight = 0;
-	game.screenshake = 0;
-
-	game.activeactivity = -1;
-	game.act_fade = 5;
-
 	//dwgraphicsclass
 	graphics.backgrounddrawn = false;
-	graphics.textbox.clear();
+	graphics.textboxremovefast();
 	graphics.flipmode = false; //This will be reset if needs be elsewhere
 	graphics.showcutscenebars = false;
 	graphics.cutscenebarspos = 0;
@@ -3702,19 +3530,20 @@ void scriptclass::hardreset()
 	map.resetnames();
 	map.custommode=false;
 	map.custommodeforreal=false;
-	if (!game.glitchrunnermode)
-	{
-		// Ironically, resetting more variables makes the janky fadeout system even more glitchy
-		map.towermode=false;
-	}
+	map.towermode=false;
 	map.cameraseekframe = 0;
 	map.resumedelay = 0;
-	graphics.towerbg.scrolldir = 0;
 	map.customshowmm=true;
 
-	SDL_memset(map.roomdeaths, 0, sizeof(map.roomdeaths));
-	SDL_memset(map.roomdeathsfinal, 0, sizeof(map.roomdeathsfinal));
-	map.resetmap();
+	for (j = 0; j < 20; j++)
+	{
+		for (i = 0; i < 20; i++)
+		{
+			map.roomdeaths[i + (j * 20)] = 0;
+			map.roomdeathsfinal[i + (j * 20)] = 0;
+			map.explored[i + (j * 20)] = 0;
+		}
+	}
 	//entityclass
 	obj.nearelephant = false;
 	obj.upsetmode = false;
@@ -3724,29 +3553,23 @@ void scriptclass::hardreset()
 	obj.trophytype = 0;
 	obj.altstates = 0;
 
-	obj.resetallflags();
-
-	for (i = 0; i < (int) SDL_arraysize(obj.customcrewmoods); i++){
-		obj.customcrewmoods[i]=true;
-	}
-
-	SDL_memset(obj.collect, false, sizeof(obj.collect));
-	SDL_memset(obj.customcollect, false, sizeof(obj.customcollect));
-	i = 100; //previously a for-loop iterating over collect/customcollect set this to 100
-
-	int theplayer = obj.getplayer();
-	if (INBOUNDS_VEC(theplayer, obj.entities)){
-		obj.entities[theplayer].tile = 0;
-	}
-
-	// Remove duplicate player entities
-	for (int i = 0; i < (int) obj.entities.size(); i++)
+	for (i = 0; i < 100; i++)
 	{
-		if (obj.entities[i].rule == 0 && i != theplayer)
-		{
-			removeentity_iter(i);
-			theplayer--; // just in case indice of player is not 0
-		}
+		obj.flags[i] = false;
+	}
+
+	for (i = 0; i < 6; i++){
+		obj.customcrewmoods[i]=1;
+	}
+
+	for (i = 0; i < 100; i++)
+	{
+		obj.collect[i] = 0;
+		obj.customcollect[i] = 0;
+	}
+
+	if (obj.getplayer() > -1){
+		obj.entities[obj.getplayer()].tile = 0;
 	}
 
 	//Script Stuff
@@ -3755,291 +3578,4 @@ void scriptclass::hardreset()
 	scriptdelay = 0;
 	scriptname = "null";
 	running = false;
-}
-
-void scriptclass::loadcustom(const std::string& t)
-{
-	//this magic function breaks down the custom script and turns into real scripting!
-	std::string cscriptname="";
-	for(size_t i=0; i<t.length(); i++){
-		if(i>=7) cscriptname+=t[i];
-	}
-
-	std::string tstring;
-
-	std::vector<std::string>* contents = NULL;
-	for(size_t i = 0; i < customscripts.size(); i++){
-		Script& script_ = customscripts[i];
-
-		if(script_.name == cscriptname){
-			contents = &script_.contents;
-			break;
-		}
-	}
-	if(contents == NULL){
-		return;
-	}
-
-	std::vector<std::string>& lines = *contents;
-
-	//Ok, we've got the relavent script segment, we do a pass to assess it, then run it!
-	int customcutscenemode=0;
-	for(size_t i=0; i<lines.size(); i++){
-		tokenize(lines[i]);
-		if(words[0] == "say"){
-			customcutscenemode=1;
-		}else if(words[0] == "reply"){
-			customcutscenemode=1;
-		}
-	}
-
-	if(customcutscenemode==1){
-		add("cutscene()");
-		add("untilbars()");
-	}
-	int customtextmode=0;
-	int speakermode=0; //0, terminal, numbers for crew
-	int squeakmode=0;//default on
-	//Now run the script
-	for(size_t i=0; i<lines.size(); i++){
-		words[0]="nothing"; //Default!
-		words[1]="1"; //Default!
-		tokenize(lines[i]);
-		for (size_t ii = 0; ii < words[0].length(); ii++)
-		{
-			words[0][ii] = SDL_tolower(words[0][ii]);
-		}
-		if(words[0] == "music"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			if(words[1]=="0"){
-				tstring="stopmusic()";
-			}else{
-				if(words[1]=="11"){ tstring="play(14)";
-				}else if(words[1]=="10"){ tstring="play(13)";
-				}else if(words[1]=="9"){ tstring="play(12)";
-				}else if(words[1]=="8"){ tstring="play(11)";
-				}else if(words[1]=="7"){ tstring="play(10)";
-				}else if(words[1]=="6"){ tstring="play(8)";
-				}else if(words[1]=="5"){ tstring="play(6)";
-				}else { tstring="play("+words[1]+")"; }
-			}
-			add(tstring);
-		}else if(words[0] == "playremix"){
-			add("play(15)");
-		}else if(words[0] == "flash"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add("flash(5)");
-			add("shake(20)");
-			add("playef(9)");
-		}else if(words[0] == "sad" || words[0] == "cry"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			if(words[1]=="player"){
-				add("changemood(player,1)");
-			}else if(words[1]=="cyan" || words[1]=="viridian" || words[1]=="1"){
-				add("changecustommood(customcyan,1)");
-			}else if(words[1]=="purple" || words[1]=="violet" || words[1]=="pink" || words[1]=="2"){
-				add("changecustommood(purple,1)");
-			}else if(words[1]=="yellow" || words[1]=="vitellary" || words[1]=="3"){
-				add("changecustommood(yellow,1)");
-			}else if(words[1]=="red" || words[1]=="vermilion" || words[1]=="4"){
-				add("changecustommood(red,1)");
-			}else if(words[1]=="green" || words[1]=="verdigris" || words[1]=="5"){
-				add("changecustommood(green,1)");
-			}else if(words[1]=="blue" || words[1]=="victoria" || words[1]=="6"){
-				add("changecustommood(blue,1)");
-			}else if(words[1]=="all" || words[1]=="everybody" || words[1]=="everyone"){
-				add("changemood(player,1)");
-				add("changecustommood(customcyan,1)");
-				add("changecustommood(purple,1)");
-				add("changecustommood(yellow,1)");
-				add("changecustommood(red,1)");
-				add("changecustommood(green,1)");
-				add("changecustommood(blue,1)");
-			}else{
-				add("changemood(player,1)");
-			}
-			if(squeakmode==0) add("squeak(cry)");
-		}else if(words[0] == "happy"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			if(words[1]=="player"){
-				add("changemood(player,0)");
-				if(squeakmode==0) add("squeak(player)");
-			}else if(words[1]=="cyan" || words[1]=="viridian" || words[1]=="1"){
-				add("changecustommood(customcyan,0)");
-				if(squeakmode==0) add("squeak(player)");
-			}else if(words[1]=="purple" || words[1]=="violet" || words[1]=="pink" || words[1]=="2"){
-				add("changecustommood(purple,0)");
-				if(squeakmode==0) add("squeak(purple)");
-			}else if(words[1]=="yellow" || words[1]=="vitellary" || words[1]=="3"){
-				add("changecustommood(yellow,0)");
-				if(squeakmode==0) add("squeak(yellow)");
-			}else if(words[1]=="red" || words[1]=="vermilion" || words[1]=="4"){
-				add("changecustommood(red,0)");
-				if(squeakmode==0) add("squeak(red)");
-			}else if(words[1]=="green" || words[1]=="verdigris" || words[1]=="5"){
-				add("changecustommood(green,0)");
-				if(squeakmode==0) add("squeak(green)");
-			}else if(words[1]=="blue" || words[1]=="victoria" || words[1]=="6"){
-				add("changecustommood(blue,0)");
-				if(squeakmode==0) add("squeak(blue)");
-			}else if(words[1]=="all" || words[1]=="everybody" || words[1]=="everyone"){
-				add("changemood(player,0)");
-				add("changecustommood(customcyan,0)");
-				add("changecustommood(purple,0)");
-				add("changecustommood(yellow,0)");
-				add("changecustommood(red,0)");
-				add("changecustommood(green,0)");
-				add("changecustommood(blue,0)");
-			}else{
-				add("changemood(player,0)");
-				if(squeakmode==0) add("squeak(player)");
-			}
-		}else if(words[0] == "squeak"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			if(words[1]=="player"){
-				add("squeak(player)");
-			}else if(words[1]=="cyan" || words[1]=="viridian" || words[1]=="1"){
-				add("squeak(player)");
-			}else if(words[1]=="purple" || words[1]=="violet" || words[1]=="pink" || words[1]=="2"){
-				add("squeak(purple)");
-			}else if(words[1]=="yellow" || words[1]=="vitellary" || words[1]=="3"){
-				add("squeak(yellow)");
-			}else if(words[1]=="red" || words[1]=="vermilion" || words[1]=="4"){
-				add("squeak(red)");
-			}else if(words[1]=="green" || words[1]=="verdigris" || words[1]=="5"){
-				add("squeak(green)");
-			}else if(words[1]=="blue" || words[1]=="victoria" || words[1]=="6"){
-				add("squeak(blue)");
-			}else if(words[1]=="cry" || words[1]=="sad"){
-				add("squeak(cry)");
-			}else if(words[1]=="on"){
-				squeakmode=0;
-			}else if(words[1]=="off"){
-				squeakmode=1;
-			}
-		}else if(words[0] == "delay"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add(lines[i]);
-		}else if(words[0] == "flag"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add(lines[i]);
-		}else if(words[0] == "map"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add("custom"+lines[i]);
-		}else if(words[0] == "warpdir"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add(lines[i]);
-		}else if(words[0] == "ifwarp"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add(lines[i]);
-		}else if(words[0] == "iftrinkets"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add("custom"+lines[i]);
-		}else if(words[0] == "ifflag"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add("custom"+lines[i]);
-		}else if(words[0] == "iftrinketsless"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			add("custom"+lines[i]);
-		}else if(words[0] == "destroy"){
-			if(customtextmode==1){ add("endtext"); customtextmode=0;}
-			if(words[1]=="gravitylines"){
-				add("destroy(gravitylines)");
-			}else if(words[1]=="warptokens"){
-				add("destroy(warptokens)");
-			}else if(words[1]=="platforms"){
-				add("destroy(platforms)");
-			}
-		}else if(words[0] == "speaker"){
-			speakermode=0;
-			if(words[1]=="gray" || words[1]=="grey" || words[1]=="terminal" || words[1]=="0") speakermode=0;
-			if(words[1]=="cyan" || words[1]=="viridian" || words[1]=="player" || words[1]=="1") speakermode=1;
-			if(words[1]=="purple" || words[1]=="violet" || words[1]=="pink" || words[1]=="2") speakermode=2;
-			if(words[1]=="yellow" || words[1]=="vitellary" || words[1]=="3") speakermode=3;
-			if(words[1]=="red" || words[1]=="vermilion" || words[1]=="4") speakermode=4;
-			if(words[1]=="green" || words[1]=="verdigris" || words[1]=="5") speakermode=5;
-			if(words[1]=="blue" || words[1]=="victoria" || words[1]=="6") speakermode=6;
-		}else if(words[0] == "say"){
-			//Speakers!
-			if(words[2]=="terminal" || words[2]=="gray" || words[2]=="grey" || words[2]=="0") speakermode=0;
-			if(words[2]=="cyan" || words[2]=="viridian" || words[2]=="player" || words[2]=="1") speakermode=1;
-			if(words[2]=="purple" || words[2]=="violet" || words[2]=="pink" || words[2]=="2") speakermode=2;
-			if(words[2]=="yellow" || words[2]=="vitellary" || words[2]=="3") speakermode=3;
-			if(words[2]=="red" || words[2]=="vermilion" || words[2]=="4") speakermode=4;
-			if(words[2]=="green" || words[2]=="verdigris" || words[2]=="5") speakermode=5;
-			if(words[2]=="blue" || words[2]=="victoria" || words[2]=="6") speakermode=6;
-			switch(speakermode){
-				case 0:
-					if(squeakmode==0) add("squeak(terminal)");
-					add("text(gray,0,114,"+words[1]+")");
-				break;
-				case 1: //NOT THE PLAYER
-					if(squeakmode==0) add("squeak(cyan)");
-					add("text(cyan,0,0,"+words[1]+")");
-				break;
-				case 2:
-					if(squeakmode==0) add("squeak(purple)");
-					add("text(purple,0,0,"+words[1]+")");
-				break;
-				case 3:
-					if(squeakmode==0) add("squeak(yellow)");
-					add("text(yellow,0,0,"+words[1]+")");
-				break;
-				case 4:
-					if(squeakmode==0) add("squeak(red)");
-					add("text(red,0,0,"+words[1]+")");
-				break;
-				case 5:
-					if(squeakmode==0) add("squeak(green)");
-					add("text(green,0,0,"+words[1]+")");
-				break;
-				case 6:
-					if(squeakmode==0) add("squeak(blue)");
-					add("text(blue,0,0,"+words[1]+")");
-				break;
-			}
-			int ti=help.Int(words[1].c_str());
-			int nti = ti>=0 && ti<=50 ? ti : 1;
-			for(int ti2=0; ti2<nti; ti2++){
-				i++;
-				if(INBOUNDS_VEC(i, lines)){
-					add(lines[i]);
-				}
-			}
-
-			switch(speakermode){
-				case 0: add("customposition(center)"); break;
-				case 1: add("customposition(cyan,above)"); break;
-				case 2: add("customposition(purple,above)"); break;
-				case 3: add("customposition(yellow,above)"); break;
-				case 4: add("customposition(red,above)"); break;
-				case 5: add("customposition(green,above)"); break;
-				case 6: add("customposition(blue,above)"); break;
-			}
-			add("speak_active");
-			customtextmode=1;
-		}else if(words[0] == "reply"){
-			//For this version, terminal only
-			if(squeakmode==0) add("squeak(player)");
-			add("text(cyan,0,0,"+words[1]+")");
-
-			int ti=help.Int(words[1].c_str());
-			int nti = ti>=0 && ti<=50 ? ti : 1;
-			for(int ti2=0; ti2<nti; ti2++){
-				i++;
-				if(INBOUNDS_VEC(i, lines)){
-					add(lines[i]);
-				}
-			}
-			add("position(player,above)");
-			add("speak_active");
-			customtextmode=1;
-		}
-	}
-
-	if(customtextmode==1){ add("endtext"); customtextmode=0;}
-	if(customcutscenemode==1){
-		add("endcutscene()");
-		add("untilbars()");
-	}
 }

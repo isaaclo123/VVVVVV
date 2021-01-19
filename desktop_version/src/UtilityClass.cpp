@@ -1,13 +1,12 @@
-#define HELP_DEFINITION
 #include "UtilityClass.h"
 
-#include <cctype>
-#include <SDL.h>
+#include "SDL.h"
+
 #include <sstream>
 
 /* Used by UtilityClass::GCString to generate a button list */
-static const char *GCChar(SDL_GameControllerButton button)
-{
+const char *GCChar(SDL_GameControllerButton button)
+{  
 	if (button == SDL_CONTROLLER_BUTTON_A)
 	{
 		return "A";
@@ -85,12 +84,15 @@ UtilityClass::UtilityClass() :
 glow(0),
 	glowdir(0)
 {
-	for (size_t i = 0; i < SDL_arraysize(splitseconds); i++)
+	for (int i = 0; i < 30; i++)
 	{
-		splitseconds[i] = (i * 100) / 30;
+		splitseconds.push_back(int((i * 100) / 30));
 	}
 
 	slowsine = 0;
+	globaltemp = 0;
+	temp = 0;
+	temp2 = 0;
 }
 
 std::string UtilityClass::String( int _v )
@@ -98,16 +100,6 @@ std::string UtilityClass::String( int _v )
 	std::ostringstream os;
 	os << _v;
 	return(os.str());
-}
-
-int UtilityClass::Int(const char* str, int fallback /*= 0*/)
-{
-	if (!is_number(str))
-	{
-		return fallback;
-	}
-
-	return (int) SDL_strtol(str, NULL, 0);
 }
 
 std::string UtilityClass::GCString(std::vector<SDL_GameControllerButton> buttons)
@@ -141,7 +133,7 @@ std::string UtilityClass::timestring( int t )
 {
 	//given a time t in frames, return a time in seconds
 	std::string tempstring = "";
-	int temp = (t - (t % 30)) / 30;
+	temp = (t - (t % 30)) / 30;
 	if (temp < 60)   //less than one minute
 	{
 		t = t % 30;
@@ -149,7 +141,7 @@ std::string UtilityClass::timestring( int t )
 	}
 	else
 	{
-		int temp2 = (temp - (temp % 60)) / 60;
+		temp2 = (temp - (temp % 60)) / 60;
 		temp = temp % 60;
 		t = t % 30;
 		tempstring = String(temp2) + ":" + twodigits(temp) + ":" + twodigits(splitseconds[t]);
@@ -159,9 +151,9 @@ std::string UtilityClass::timestring( int t )
 
 std::string UtilityClass::number( int _t )
 {
-	static const std::string ones_place[] = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
-	static const std::string tens_place[] = {"Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
-	static const std::string teens[] = {"Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+	const std::string ones_place[] = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+	const std::string tens_place[] = {"Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+	const std::string teens[] = {"Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
 
 	if (_t < 0)
 	{
@@ -204,6 +196,9 @@ bool UtilityClass::intersects( SDL_Rect A, SDL_Rect B )
 
 void UtilityClass::updateglow()
 {
+  // GUSARBA: Uncomment this to remove glow
+  //return;
+
 	slowsine++;
 	if (slowsine >= 64) slowsine = 0;
 
@@ -214,51 +209,4 @@ void UtilityClass::updateglow()
 		glow-=2;
 		if (glow < 2) glowdir = 0;
 	}
-}
-
-bool is_number(const char* str)
-{
-	for (int i = 0; str[i] != '\0'; i++)
-	{
-		if (!SDL_isdigit(static_cast<unsigned char>(str[i])) && (i != 0 || str[0] != '-'))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-bool is_positive_num(const std::string& str, bool hex)
-{
-	for (size_t i = 0; i < str.length(); i++)
-	{
-		if (hex)
-		{
-			if (!isxdigit(static_cast<unsigned char>(str[i])))
-			{
-				return false;
-			}
-		}
-		else
-		{
-			if (!SDL_isdigit(static_cast<unsigned char>(str[i])))
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-bool endsWith(const std::string& str, const std::string& suffix)
-{
-	if (str.size() < suffix.size())
-	{
-		return false;
-	}
-	return str.compare(
-		str.size() - suffix.size(),
-		suffix.size(),
-		suffix
-	) == 0;
 }

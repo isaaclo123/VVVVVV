@@ -1,7 +1,3 @@
-#include "MakeAndPlay.h"
-
-#ifndef MAKEANDPLAY
-
 #include <stdio.h>
 #include <stdint.h>
 #include <SDL.h>
@@ -17,8 +13,10 @@
 #define STEAM_LIBRARY "steam_api.dll"
 #elif defined(__APPLE__)
 #define STEAM_LIBRARY "libsteam_api.dylib"
-#elif defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) || defined(__DragonFly__)
+#elif defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
 #define STEAM_LIBRARY "libsteam_api.so"
+#elif defined(DREAMCAST)
+#define STEAM_LIBRARY ""
 #else
 #error STEAM_LIBRARY: Unrecognized platform!
 #endif
@@ -99,7 +97,7 @@ static void ClearPointers()
 
 int32_t STEAM_init()
 {
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__) || defined(__DragonFly__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
 	return 0;
 #endif
 	intptr_t steamClient;
@@ -222,5 +220,3 @@ void STEAM_setAchievementProgress(const char *name, int32_t stat)
 		SteamAPI_ISteamUserStats_StoreStats(steamUserStats);
 	}
 }
-
-#endif /* MAKEANDPLAY */

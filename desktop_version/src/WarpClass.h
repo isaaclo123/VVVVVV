@@ -1,14 +1,18 @@
 #ifndef WARPCLASS_H
 #define WARPCLASS_H
 
+#include "Game.h"
+#include "Entity.h"
+
 #include <string>
+#include <vector>
 
 class warpclass
 {
 public:
-	const short* loadlevel(int rx, int ry);
+	std::vector<std::string> loadlevel(int rx, int ry);
 	std::string roomname;
-	int rcol;
+	int coin, rcol;
 	bool warpx, warpy;
 };
 

@@ -1,22 +1,29 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <algorithm>
-#include <map>
-#include <string>
-#include <vector>
-
 #include "GraphicsResources.h"
-#include "GraphicsUtil.h"
+#include <vector>
+#include <map>
+
+
+
 #include "Maths.h"
-#include "Screen.h"
 #include "Textbox.h"
-#include "TowerBG.h"
+#include "UtilityClass.h"
+#include "Game.h"
+
+
+#include <string>
+#include <algorithm>
+
+#include "GraphicsUtil.h"
+#include "Screen.h"
 
 class Graphics
 {
 public:
 	void init();
+	~Graphics();
 
 	GraphicsResources grphx;
 
@@ -25,9 +32,7 @@ public:
 
 	void Makebfont();
 
-	void drawhuetile(int x, int y, int t);
-	void huetilesetcol(int t);
-	Uint32 bigchunkygetcol(int t);
+	void drawhuetile(int x, int y, int t, int c);
 
 	void drawgravityline(int t);
 
@@ -39,7 +44,8 @@ public:
 
 	void drawcoloredtile(int x, int y, int t, int r, int g, int b);
 
-	void drawmenu(int cr, int cg, int cb, bool levelmenu = false);
+	void drawmenu(int cr, int cg, int cb, int division = 30);
+	void drawlevelmenu(int cr, int cg, int cb, int division = 30);
 
 	void processfade();
 
@@ -49,9 +55,15 @@ public:
 
 	void createtextbox(std::string t, int xp, int yp, int r= 255, int g= 255, int b = 255);
 
+	void textboxcleanup();
+
+	void textboxcenter();
+
 	void textboxcenterx();
 
 	int textboxwidth();
+
+	void textboxmove(int xo, int yo);
 
 	void textboxmoveto(int xo);
 
@@ -79,7 +91,6 @@ public:
 	int crewcolour(const int t);
 
 	void cutscenebars();
-	void cutscenebarstimer();
 
 	void drawpartimage(int t, int xp, int yp, int wp, int hp);
 
@@ -87,11 +98,9 @@ public:
 
 	void drawimagecol(int t, int xp, int yp, int r, int g, int b, bool cent= false);
 
-	void updatetextboxes();
 	void drawgui();
 
 	void drawsprite(int x, int y, int t, int r, int g, int b);
-	void drawsprite(int x, int y, int t, Uint32 c);
 
 	void printcrewname(int x, int y, int t);
 
@@ -99,13 +108,13 @@ public:
 
 	void printcrewnamedark(int x, int y, int t);
 
-	void map_tab(int opt, const std::string& text, bool selected = false);
-
-	void map_option(int opt, int num_opts, const std::string& text, bool selected = false);
-
 	void Print(int _x, int _y, std::string _s, int r, int g, int b, bool cen = false);
 
 	void PrintAlpha(int _x, int _y, std::string _s, int r, int g, int b, int a, bool cen = false);
+
+	void RPrint(int _x, int _y, std::string _s, int r, int g, int b, bool cen = false);
+
+	void PrintOff(int _x, int _y, std::string _s, int r, int g, int b, bool cen = false);
 
 	void PrintOffAlpha(int _x, int _y, std::string _s, int r, int g, int b, int a, bool cen = false);
 
@@ -120,26 +129,19 @@ public:
 
 	void flashlight();
 	void screenshake();
-	void updatescreenshake();
-
-	int screenshake_x;
-	int screenshake_y;
 
 	void render();
-	void renderwithscreeneffects();
 
 	bool Hitest(SDL_Surface* surface1, point p1, SDL_Surface* surface2, point p2);
 
 	void drawentities();
-
-	void drawentity(const int i, const int yoff);
 
 	void drawtrophytext();
 
 	void bigrprint(int x, int y, std::string& t, int r, int g, int b, bool cen = false, float sc = 2);
 
 
-	void drawtele(int x, int y, int t, Uint32 c);
+	void drawtele(int x, int y, int t, int c);
 
 	Uint32 getRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
@@ -157,12 +159,12 @@ public:
 	void setcolreal(Uint32 t);
 
 	void drawbackground(int t);
-	void updatebackground(int t);
-	void drawtile3( int x, int y, int t, int off, int height_subtract = 0 );
+	void drawtile3( int x, int y, int t, int off );
+	void drawentcolours( int x, int y, int t);
 	void drawtile2( int x, int y, int t );
 	void drawtile( int x, int y, int t );
 	void drawtowertile( int x, int y, int t );
-	void drawtowertile3( int x, int y, int t, TowerBG& bg_obj );
+	void drawtowertile3( int x, int y, int t, int off );
 
 	void drawmap();
 
@@ -176,30 +178,33 @@ public:
 
 	void drawtowermap();
 
+	void drawtowermap_nobackground();
+
 	void drawtowerspikes();
+
+	void drawtowerentities();
 
 	bool onscreen(int t);
 
-	void reloadresources();
-	std::string assetdir;
+	void drawtowerbackgroundsolo();
 
 
 	void menuoffrender();
 
-	void drawtowerbackground(const TowerBG& bg_obj);
-	void updatetowerbackground(TowerBG& bg_obj);
+	void drawtowerbackground();
 
 	void setcol(int t);
 	void drawfinalmap();
 
 	colourTransform ct;
 
-	int rcol;
+	int bcol, bcol2, rcol;
 
 
 
-	int m;
+	int j, k, m;
 
+	std::vector <SDL_Surface*> backgrounds;
 	std::vector <SDL_Surface*> images;
 
 	std::vector <SDL_Surface*> tele;
@@ -210,31 +215,30 @@ public:
 	std::vector <SDL_Surface*> sprites;
 	std::vector <SDL_Surface*> flipsprites;
 	std::vector <SDL_Surface*> bfont;
+	std::vector <SDL_Surface*> bfontmask;
 	std::vector <SDL_Surface*> flipbfont;
+	std::vector <SDL_Surface*> flipbfontmask;
 
 	bool flipmode;
 	bool setflipmode;
 	bool notextoutline;
+	point tl;
 	//buffer objects. //TODO refactor buffer objects
 	SDL_Surface* backBuffer;
 	Screen* screenbuffer;
 	SDL_Surface* menubuffer;
+	SDL_Surface* towerbuffer;
 	SDL_Surface* foregroundBuffer;
 	SDL_Surface* tempBuffer;
-	SDL_Surface* warpbuffer;
-	SDL_Surface* warpbuffer_lerp;
-
-	TowerBG towerbg;
-	TowerBG titlebg;
 
 	SDL_Rect bfont_rect;
 	SDL_Rect tiles_rect;
 	SDL_Rect sprites_rect;
+	SDL_Rect bfontmask_rect;
 	SDL_Rect images_rect;
 	SDL_Rect bg_rect;
 	SDL_Rect line_rect;
 	SDL_Rect tele_rect;
-	SDL_Rect towerbuffer_rect;
 
 	SDL_Rect foot_rect;
 	SDL_Rect prect;
@@ -246,7 +250,6 @@ public:
 	bool backgrounddrawn, foregrounddrawn;
 
 	int menuoffset;
-	int oldmenuoffset;
 	bool resumegamemode;
 
 	SDL_Rect warprect;
@@ -256,8 +259,7 @@ public:
 
 	int fademode;
 	int fadeamount;
-	int oldfadeamount;
-	int fadebars[15];
+	std::vector <int> fadebars;
 
 	bool trinketcolset;
 	int trinketr, trinketg, trinketb;
@@ -266,18 +268,16 @@ public:
 
 	bool showcutscenebars;
 	int cutscenebarspos;
-	int oldcutscenebarspos;
 
-	static const int numstars = 50;
-	SDL_Rect stars[numstars];
-	int starsspeed[numstars];
+	std::vector<SDL_Rect> stars;
+	std::vector<int> starsspeed;
 
-	static const int numbackboxes = 18;
 	int spcol, spcoldel;
-	SDL_Rect backboxes[numbackboxes];
-	int backboxvx[numbackboxes];
-	int backboxvy[numbackboxes];
-	float backboxint[numbackboxes];
+	std::vector<SDL_Rect> backboxes;
+	std::vector<int> backboxvx;
+	std::vector<int> backboxvy;
+	std::vector<float> backboxint;
+	SDL_Rect backboxrect;
 
 	int warpskip, warpfcol, warpbcol;
 
@@ -286,36 +286,8 @@ public:
 	bool showmousecursor;
 
 	std::map<int, int> font_positions;
-
-	SDL_Surface* ghostbuffer;
-
-	float inline lerp(const float v0, const float v1)
-	{
-		return v0 + alpha * (v1 - v0);
-	}
-	float alpha;
-
-	Uint32 col_crewred;
-	Uint32 col_crewyellow;
-	Uint32 col_crewgreen;
-	Uint32 col_crewcyan;
-	Uint32 col_crewblue;
-	Uint32 col_crewpurple; //actually pink
-	Uint32 col_crewinactive;
-	Uint32 col_clock;
-	Uint32 col_trinket;
-	int col_tr;
-	int col_tg;
-	int col_tb;
-	void updatetitlecolours();
-
-	bool kludgeswnlinewidth;
-
-	Uint32 crewcolourreal(int t);
 };
 
-#ifndef GRAPHICS_DEFINITION
 extern Graphics graphics;
-#endif
 
 #endif /* GRAPHICS_H */

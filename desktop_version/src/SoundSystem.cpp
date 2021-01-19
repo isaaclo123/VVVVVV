@@ -1,7 +1,6 @@
-#include "SoundSystem.h"
-
 #include <SDL.h>
-
+#include <SDL_mixer.h>
+#include "SoundSystem.h"
 #include "FileSystemUtils.h"
 
 MusicTrack::MusicTrack(const char* fileName)
@@ -10,7 +9,7 @@ MusicTrack::MusicTrack(const char* fileName)
 	m_isValid = true;
 	if(m_music == NULL)
 	{
-		fprintf(stderr, "Unable to load Ogg Music file: %s\n", Mix_GetError());
+		fprintf(stderr, "Unable to load Ogg Music file: %s\n", Mix_GetError());;
 		m_isValid = false;
 	}
 }
@@ -57,5 +56,17 @@ SoundSystem::SoundSystem()
 	{
 		fprintf(stderr, "Unable to initialize audio: %s\n", Mix_GetError());
 		SDL_assert(0 && "Unable to initialize audio!");
+	}
+}
+
+void SoundSystem::playMusic(MusicTrack* music)
+{
+	if(!music->m_isValid)
+	{
+		fprintf(stderr, "Invalid mix specified: %s\n", Mix_GetError());
+	}
+	if(Mix_PlayMusic(music->m_music, 0) == -1)
+	{
+		fprintf(stderr, "Unable to play Ogg file: %s\n", Mix_GetError());
 	}
 }

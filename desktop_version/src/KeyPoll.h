@@ -1,10 +1,15 @@
 #ifndef KEYPOLL_H
 #define KEYPOLL_H
 
-#include <map> // FIXME: I should feel very bad for using C++ -flibit
-#include <SDL.h>
 #include <string>
 #include <vector>
+#include <map> // FIXME: I should feel very bad for using C++ -flibit
+
+#include "SDL.h"
+
+#ifdef PSP
+#include "SDL2_stub.h"
+#endif
 
 enum Kybrd
 {
@@ -20,7 +25,6 @@ enum Kybrd
 	KEYBOARD_a = SDLK_a,
 	KEYBOARD_d = SDLK_d,
 	KEYBOARD_m = SDLK_m,
-	KEYBOARD_n = SDLK_n,
 
 	KEYBOARD_v = SDLK_v,
 	KEYBOARD_z = SDLK_z,
@@ -37,12 +41,13 @@ public:
 
 	bool resetWindow;
 
+	bool escapeWasPressedPreviously;
 	bool quitProgram;
 	bool toggleFullscreen;
 
 	int sensitivity;
 
-	int inline getThreshold();
+	void setSensitivity(int _value);
 
 	KeyPoll();
 
@@ -54,6 +59,8 @@ public:
 
 	bool isDown(SDL_Keycode key);
 
+	bool isUp(SDL_Keycode key);
+
 	bool isDown(std::vector<SDL_GameControllerButton> buttons);
 	bool isDown(SDL_GameControllerButton button);
 	bool controllerButtonDown();
@@ -63,13 +70,12 @@ public:
 	int leftbutton, rightbutton, middlebutton;
 	int mx, my;
 
-	bool textentry();
+	bool textentrymode;
+	int keyentered, keybufferlen;
 	bool pressedbackspace;
 	std::string keybuffer;
 
 	bool linealreadyemptykludge;
-
-	Uint64 pauseStart;
 
 private:
 	std::map<SDL_JoystickID, SDL_GameController*> controllers;
@@ -79,8 +85,6 @@ private:
 	Uint32 wasFullscreen;
 };
 
-#ifndef KEY_DEFINITION
 extern KeyPoll key;
-#endif
 
 #endif /* KEYPOLL_H */
