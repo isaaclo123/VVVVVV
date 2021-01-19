@@ -122,28 +122,21 @@ SET(VVV_SRC
         src/Finalclass.cpp
         src/Game.cpp
         src/Graphics.cpp
-        # src/GraphicsResources.cpp
         src/GraphicsResources_psp.cpp
-        # src/GraphicsUtil.cpp
         src/GraphicsUtil_psp.cpp
         src/Input.cpp
-        # src/KeyPoll.cpp
         src/KeyPoll_psp.cpp
         src/Labclass.cpp
         src/Logic.cpp
         src/main.cpp
         src/Map.cpp
-        # src/Music.cpp
         src/Music_psp.cpp
         src/Otherlevel.cpp
         src/preloader.cpp
         src/Render.cpp
-        # src/Screen.cpp
         src/Screen_psp.cpp
         src/Script.cpp
         src/Scripts.cpp
-        # src/snprintf.cpp
-        # src/SoundSystem.cpp
         src/SoundSystem_psp.cpp
         src/Spacestation2.cpp
         src/TerminalScripts.cpp
@@ -151,10 +144,6 @@ SET(VVV_SRC
         src/Tower.cpp
         src/UtilityClass.cpp
         src/WarpClass.cpp
-
-        # src/SteamNetwork.c
-        # src/GOGNetwork.c
-        # src/Network.c
 )
 IF(NOT CUSTOM_LEVEL_SUPPORT STREQUAL "DISABLED")
         LIST(APPEND VVV_SRC src/editor.cpp)

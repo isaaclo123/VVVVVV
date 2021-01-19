@@ -3251,7 +3251,7 @@ void Game::updatestate()
                 // NETWORK_unlockAchievement("vvvvvvcomplete100");
             }
             if (bestgamedeaths <= 50) {
-                NETWORK_unlockAchievement("vvvvvvcomplete50");
+                // NETWORK_unlockAchievement("vvvvvvcomplete50");
             }
         }
 

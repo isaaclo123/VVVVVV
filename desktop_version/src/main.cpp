@@ -45,7 +45,7 @@ KeyPoll key;
 mapclass map;
 entityclass obj;
 
-int SDL_main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     // char* baseDir = NULL;
     char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
