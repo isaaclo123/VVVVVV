@@ -25,7 +25,7 @@
 #include "preloader.h"
 
 #include "FileSystemUtils.h"
-#include "Network.h"
+// #include "Network.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -45,7 +45,7 @@ KeyPoll key;
 mapclass map;
 entityclass obj;
 
-int main(int argc, char *argv[])
+int SDL_main(int argc, char *argv[])
 {
     // char* baseDir = NULL;
     char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
         // | SDL_INIT_GAMECONTROLLER
     );
 
-    NETWORK_init();
+    // NETWORK_init();
 
     Screen gameScreen;
 
@@ -195,6 +195,7 @@ int main(int argc, char *argv[])
         default: game.gameframerate=34; break;
     }
 
+    /*
     //Check to see if you've already unlocked some achievements here from before the update
     if (game.swnbestrank > 0){
         if(game.swnbestrank >= 1) NETWORK_unlockAchievement("vvvvvvsupgrav5");
@@ -230,6 +231,7 @@ int main(int argc, char *argv[])
     if(game.bestrank[3]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_station2_fixed");
     if(game.bestrank[4]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_warp_fixed");
     if(game.bestrank[5]>=3) NETWORK_unlockAchievement("vvvvvvtimetrial_final_fixed");
+    */
 
     obj.init();
 
@@ -242,7 +244,7 @@ int main(int argc, char *argv[])
         time = SDL_GetTicks();
 
         // Update network per frame.
-        NETWORK_update();
+        // NETWORK_update();
 
         //framerate limit to 30
         Uint32 timetaken = time - timePrev;
@@ -469,7 +471,7 @@ int main(int argc, char *argv[])
     }
 
     game.savestats();
-    NETWORK_shutdown();
+    // NETWORK_shutdown();
     SDL_Quit();
     FILESYSTEM_deinit();
 

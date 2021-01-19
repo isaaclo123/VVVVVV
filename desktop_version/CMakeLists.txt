@@ -151,6 +151,10 @@ SET(VVV_SRC
         src/Tower.cpp
         src/UtilityClass.cpp
         src/WarpClass.cpp
+
+        # src/SteamNetwork.c
+        # src/GOGNetwork.c
+        # src/Network.c
 )
 IF(NOT CUSTOM_LEVEL_SUPPORT STREQUAL "DISABLED")
         LIST(APPEND VVV_SRC src/editor.cpp)

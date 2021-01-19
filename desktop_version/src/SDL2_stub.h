@@ -28,20 +28,20 @@
 // #define SDL_vasprintf rpl_vasprintf
 // #define SDL_asprintf rpl_asprintf
 
-static inline size_t SDL_strlcpy(char *dst, const char *src, size_t maxlen) {
-    // FIXME unsafe
-    strncpy(dst, src, maxlen);
-    return maxlen;
-}
-
-#define SDL_strncpy strncpy
-#define SDL_strcpy strcpy
-
-#define SDL_strcmp strcmp
-#define SDL_strncmp strncmp
-
-#define SDL_fabsf fabsf
-
+// static inline size_t SDL_strlcpy(char *dst, const char *src, size_t maxlen) {
+//     // FIXME unsafe
+//     strncpy(dst, src, maxlen);
+//     return maxlen;
+// }
+//
+// #define SDL_strncpy strncpy
+// #define SDL_strcpy strcpy
+//
+// #define SDL_strcmp strcmp
+// #define SDL_strncmp strncmp
+//
+// #define SDL_fabsf fabsf
+//
 
 // assert
 
