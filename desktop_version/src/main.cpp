@@ -2,6 +2,13 @@
 #include <SDL_mixer.h>
 #include "SoundSystem.h"
 
+#include <pspkernel.h>
+#include <pspdebug.h>
+#include <pspsdk.h>
+#include <pspthreadman.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "UtilityClass.h"
 #include "Game.h"
 #include "Graphics.h"
@@ -45,8 +52,44 @@ KeyPoll key;
 mapclass map;
 entityclass obj;
 
+PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
+
+int sdl_psp_exit_callback(int arg1, int arg2, void *common)
+{
+	exit(0);
+	return 0;
+}
+
+int sdl_psp_callback_thread(SceSize args, void *argp)
+{
+	int cbid;
+	cbid = sceKernelCreateCallback("Exit Callback",
+				       sdl_psp_exit_callback, NULL);
+	sceKernelRegisterExitCallback(cbid);
+	sceKernelSleepThreadCB();
+	return 0;
+}
+
+int sdl_psp_setup_callbacks(void)
+{
+	int thid = 0;
+	thid = sceKernelCreateThread("update_thread",
+				     sdl_psp_callback_thread, 0x11, 0xFA0, 0, 0);
+	if(thid >= 0)
+		sceKernelStartThread(thid, 0, 0);
+	return thid;
+}
+
+PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
+PSP_HEAP_SIZE_MAX();
+
 int main(int argc, char *argv[])
 {
+    // SDL main
+    pspDebugScreenInit();
+    sdl_psp_setup_callbacks();
+    atexit(sceKernelExitGame);
+
     // char* baseDir = NULL;
     char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
     char* assetsPath = NULL;

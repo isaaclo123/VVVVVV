@@ -9,48 +9,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-// #if !HAVE_VSNPRINTF
-// int rpl_vsnprintf(char *, size_t, const char *, va_list);
-// #endif	/* !HAVE_VSNPRINTF */
-// #if !HAVE_SNPRINTF
-// int rpl_snprintf(char *, size_t, const char *, ...);
-// #endif	/* !HAVE_SNPRINTF */
-// #if !HAVE_VASPRINTF
-// int rpl_vasprintf(char **, const char *, va_list);
-// #endif	/* !HAVE_VASPRINTF */
-// #if !HAVE_ASPRINTF
-// int rpl_asprintf(char **, const char *, ...);
-// #endif	/* !HAVE_ASPRINTF */
-
-// #define SDL_vsnprintf rpl_vsnprintf
-// #define SDL_snprintf rpl_snprintf
-// #define SDL_sprintf sprintf
-// #define SDL_vasprintf rpl_vasprintf
-// #define SDL_asprintf rpl_asprintf
-
-// static inline size_t SDL_strlcpy(char *dst, const char *src, size_t maxlen) {
-//     // FIXME unsafe
-//     strncpy(dst, src, maxlen);
-//     return maxlen;
-// }
-//
-// #define SDL_strncpy strncpy
-// #define SDL_strcpy strcpy
-//
-// #define SDL_strcmp strcmp
-// #define SDL_strncmp strncmp
-//
-// #define SDL_fabsf fabsf
-//
-
-// assert
-
-
 #define SDL_assert(X) assert(X)
 
 
 // Keyboard
-typedef Sint32 SDL_Keycode;
+// typedef Sint32 SDL_Keycode;
+typedef int SDL_Keycode;
 
 
 // Joystick

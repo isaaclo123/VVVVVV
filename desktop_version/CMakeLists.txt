@@ -74,6 +74,11 @@ PROJECT(VVVVVV)
 # -g for debug
 ADD_COMPILE_OPTIONS(-g)
 
+ADD_COMPILE_OPTIONS("-D__POSIX_C_VISIBLE=200809")
+
+ADD_DEFINITIONS(-D_GNU_SOURCE=1)
+# ADD_DEFINITIONS(-Dmain=SDL_main)
+
 IF(APPLE)
         MESSAGE(STATUS "Using macOS SDK at ${CMAKE_OSX_SYSROOT}")
 ENDIF()
@@ -124,7 +129,7 @@ SET(VVV_SRC
         src/Graphics.cpp
         src/GraphicsResources_psp.cpp
         src/GraphicsUtil_psp.cpp
-        src/Input.cpp
+        src/Input_psp.cpp
         src/KeyPoll_psp.cpp
         src/Labclass.cpp
         src/Logic.cpp

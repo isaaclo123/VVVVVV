@@ -1,5 +1,7 @@
 How to Build
 ------------
+**For psp, be sure to compile sdl without pspirkeyb support**
+
 VVVVVV's official desktop versions are built with the following environments:
 
 - Windows: Visual Studio 2010
