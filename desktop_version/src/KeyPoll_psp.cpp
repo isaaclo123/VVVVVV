@@ -105,11 +105,11 @@ void KeyPoll::Poll()
         for (int i=0; i < PSP_BUTTONS_LENGTH; i++) {
             int button = PSP_BUTTONS[i];
             if (pspKeyIsDown(button)) {
-                printf("button %i down\n", button);
+                // printf("button %i down\n", button);
                 keymap[button] = true;
             }
             if (pspKeyIsUp(button)) {
-                printf("button %i up\n", button);
+                // printf("button %i up\n", button);
                 keymap[button] = false;
             }
         }

@@ -37,12 +37,6 @@ int mkdir(char* path, int mode)
 #define VNEEDS_MIGRATION 0
 // #include "FileSystemUtils_dreamcast.h"
 //
-int mkdir(char* path, int mode)
-{
-    int rc;
-    rc = sceIoMkdir(path, mode);
-    return rc > 0;
-}
 #endif
 
 char saveDir[MAX_PATH];
@@ -78,7 +72,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	}
 
 	/* Create base user directory, mount */
-	mkdirResult = mkdir(output, 0777);
+	mkdirResult = PHYSFS_mkdir(output);
 
 	/* Mount our base user directory */
 	PHYSFS_mount(output, NULL, 1);
@@ -89,21 +83,21 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath)
 	strcpy(saveDir, output);
 	strcat(saveDir, "saves");
 	strcat(saveDir, PHYSFS_getDirSeparator());
-	mkdir(saveDir, 0777);
+	mkdirResult |= PHYSFS_mkdir("saves");
 	printf("Save directory: %s\n", saveDir);
 
 	/* Create level directory */
 	strcpy(levelDir, output);
 	strcat(levelDir, "levels");
 	strcat(levelDir, PHYSFS_getDirSeparator());
-	mkdirResult |= mkdir(levelDir, 0777);
+	mkdirResult |= PHYSFS_mkdir("levels");
 	printf("Level directory: %s\n", levelDir);
 
 	/* We didn't exist until now, migrate files! */
-	if (VNEEDS_MIGRATION)
-	{
-		PLATFORM_migrateSaveData(output);
-	}
+	// if (VNEEDS_MIGRATION)
+	// {
+	// 	PLATFORM_migrateSaveData(output);
+	// }
 
 	/* Mount the stock content last */
 	// if (assetsPath) {

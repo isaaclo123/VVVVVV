@@ -57,6 +57,7 @@ Screen::Screen()
 	SDL_SetWindowTitle(m_window, "VVVVVV");
   */
 
+        /*
 	unsigned char *fileIn = NULL;
 	size_t length = 0;
 	unsigned char *data;
@@ -79,6 +80,7 @@ Screen::Screen()
   SDL_WM_SetIcon(icon, NULL);
 	SDL_FreeSurface(icon);
 	free(data);
+        */
 
   // GUSARBA: Uncomment these if you are using Chui's SDL port
   /*
@@ -91,6 +93,7 @@ Screen::Screen()
   // SDL1.2 Migration
   SDL_WM_SetCaption("VVVVVV", "VVVVVV");
   m_window = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  // SDL_DOUBLEBUF
 
 	// FIXME: This surface should be the actual backbuffer! -flibit
 	m_screen = SDL_CreateRGBSurface(
