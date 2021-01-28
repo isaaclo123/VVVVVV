@@ -515,6 +515,7 @@ int main(int argc, char *argv[])
 
     game.savestats();
     // NETWORK_shutdown();
+    // Mix_CloseAudio();
     SDL_Quit();
     FILESYSTEM_deinit();
 

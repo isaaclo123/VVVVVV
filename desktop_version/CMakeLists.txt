@@ -84,6 +84,7 @@ IF(APPLE)
 ENDIF()
 
 # Flags
+ADD_DEFINITIONS(-DPSP=1)
 ADD_DEFINITIONS(-DPHYSFS_SUPPORTS_DEFAULT=0 -DPHYSFS_SUPPORTS_ZIP=1)
 
 # RPATH
@@ -142,7 +143,7 @@ SET(VVV_SRC
         src/Screen_psp.cpp
         src/Script.cpp
         src/Scripts.cpp
-        src/SoundSystem_psp.cpp
+        src/SoundSystem.cpp
         src/Spacestation2.cpp
         src/TerminalScripts.cpp
         src/Textbox.cpp

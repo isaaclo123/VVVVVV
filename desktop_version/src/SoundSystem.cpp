@@ -18,7 +18,7 @@ MusicTrack::MusicTrack(const char* fileName)
 
 MusicTrack::MusicTrack(SDL_RWops *rw)
 {
-	m_music = Mix_LoadMUS_RW(rw, 0);
+	m_music = Mix_LoadMUS_RW(rw);
 	m_isValid = true;
 	if(m_music == NULL)
 	{
@@ -53,6 +53,13 @@ SoundSystem::SoundSystem()
 	Uint16 audio_format = AUDIO_S16SYS;
 	int audio_channels = 2;
 	int audio_buffers = 1024;
+
+        int flags=MIX_INIT_OGG;
+        int initted=Mix_Init(flags);
+        if(initted&flags != flags) {
+            printf("Mix_Init: Failed to init required ogg and mod support!\n");
+            printf("Mix_Init: %s\n", Mix_GetError());
+        }
 
 	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0)
 	{

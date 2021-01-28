@@ -62,7 +62,7 @@ SDL_Surface* GetSubSurface( SDL_Surface* metaSurface, int x, int y, int width, i
     //SDL_FreeSurface(preSurface);
 
     // Lastly, apply the area from the meta _surface onto the whole of the sub _surface.
-    SDL_BlitSurface(metaSurface, &area, preSurface, 0);    
+    SDL_BlitSurface(metaSurface, &area, preSurface, 0);
 
     // Return the new Bitmap _surface
     return preSurface;
@@ -251,7 +251,7 @@ SDL_Surface *  FlipSurfaceVerticle(SDL_Surface* _src)
     return ret;
 }
 
-void BlitSurfaceStandard( SDL_Surface* _src, SDL_Rect* _srcRect, SDL_Surface* _dest, SDL_Rect* _destRect, 
+void BlitSurfaceStandard( SDL_Surface* _src, SDL_Rect* _srcRect, SDL_Surface* _dest, SDL_Rect* _destRect,
     Uint8 key_r, Uint8 key_g, Uint8 key_b)
 {
     Uint32 tmp = SDL_GetTicks();
@@ -275,7 +275,7 @@ void BlitSurfaceStandard( SDL_Surface* _src, SDL_Rect* _srcRect, SDL_Surface* _d
     //	SDL_FreeSurface(tempScaled);
     //}
     //else
-    //{    
+    //{
     SDL_BlitSurface( _src, _srcRect, _dest, _destRect );
     //}
 
@@ -290,12 +290,12 @@ void BlitSurfaceColoured(
     SDL_Rect* _destRect,
     colourTransform& ct,
     Uint32 key
-) {    
+) {
     Uint32 tmp = SDL_GetTicks();
 
     SDL_Rect *tempRect = _destRect;
 
-    const SDL_PixelFormat& fmt = *(_src->format);    
+    const SDL_PixelFormat& fmt = *(_src->format);
     // const SDL_PixelFormat& destfmt = *(_dest->format);
 
     SDL_Surface* tempsurface =  SDL_CreateRGBSurface(
@@ -307,7 +307,7 @@ void BlitSurfaceColoured(
         fmt.Gmask,
         fmt.Bmask,
         fmt.Amask
-    );    
+    );
 
     // Cache colour
     Uint16 r = (ct.colour & 0xF800) >> 11;
@@ -320,7 +320,7 @@ void BlitSurfaceColoured(
     {
         for(int y = 0; y < tempsurface->h; y++)
         {
-          if (fmt.BitsPerPixel == 16)        
+          if (fmt.BitsPerPixel == 16)
           {
             // RGB565 with color keys
             Uint16 pixel = ReadPixel(_src, x, y);
@@ -330,17 +330,17 @@ void BlitSurfaceColoured(
             if ((pixel == 0x0000) || (pixel == 0x2210) || (pixel == key)) {
               // Color key
               result = 0x0000;
-            } else {              
+            } else {
               result = col16;
             }
             Uint16 Alpha = 0x00;
-            
+
             DrawPixel(tempsurface, x, y, result | Alpha);
           }
           else
           {
             Uint32 pixel = ReadPixel(_src, x, y);
-            Uint32 Alpha = pixel & fmt.Amask;       
+            Uint32 Alpha = pixel & fmt.Amask;
             Uint32 result = ct.colour & 0x00FFFFFF;
             Uint32 CTAlpha = ct.colour & fmt.Amask;
             float div1 = ((Alpha >> 24) / 255.0f);
@@ -351,7 +351,7 @@ void BlitSurfaceColoured(
         }
     }
 
-    // GUSARBA    
+    // GUSARBA
     SDL_SetColorKey(tempsurface, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(tempsurface->format, 0, 0, 0));
     SDL_SetColorKey(_dest, SDL_RLEACCEL, SDL_MapRGB(_dest->format, 0, 0, 0));
 
