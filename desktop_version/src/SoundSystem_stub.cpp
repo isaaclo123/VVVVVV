@@ -41,7 +41,7 @@ struct WAVE_Data {
 
 MusicTrack::MusicTrack(const char* fileName)
 {
-  m_music = s_num_tracks;
+  m_music = NULL;
   ++s_num_tracks;
   m_isValid = true;
 }

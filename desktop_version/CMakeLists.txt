@@ -135,14 +135,15 @@ SET(VVV_SRC
         src/Logic.cpp
         src/main.cpp
         src/Map.cpp
-        src/Music_psp.cpp
+        src/Music.cpp
+        # src/Music.cpp
         src/Otherlevel.cpp
         src/preloader.cpp
         src/Render.cpp
         src/Screen_psp.cpp
         src/Script.cpp
         src/Scripts.cpp
-        src/SoundSystem_psp.cpp
+        src/SoundSystem.cpp
         src/Spacestation2.cpp
         src/TerminalScripts.cpp
         src/Textbox.cpp

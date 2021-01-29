@@ -71,7 +71,6 @@ int LoadWavFile(const char* filename,
   WAVE_Format wave_format;
   RIFF_Header riff_header;
   WAVE_Data wave_data;
-
   soundFile = fs_open(filename, O_RDONLY);
   if (soundFile < 0) {
     printf("LoadWavFile: Could not open %s\n", filename);
@@ -79,9 +78,7 @@ int LoadWavFile(const char* filename,
   } else {
     printf("LoadWavFile: Opened %s\n", filename);
   }
-
   fs_read(soundFile, &riff_header, sizeof(RIFF_Header));
-
   if ((riff_header.chunkID[0] != 'R' ||
       riff_header.chunkID[1] != 'I' ||
       riff_header.chunkID[2] != 'F' ||
@@ -93,7 +90,6 @@ int LoadWavFile(const char* filename,
     fs_close(soundFile);
     return 0;
   }
-
   fs_read(soundFile, &wave_format, sizeof(WAVE_Format));
   if (wave_format.subChunkID[0] != 'f' ||
       wave_format.subChunkID[1] != 'm' ||
@@ -102,10 +98,8 @@ int LoadWavFile(const char* filename,
     fs_close(soundFile);
     return 0;
   }
-
   if (wave_format.subChunkSize > 16)
     fs_seek(soundFile, sizeof(short), SEEK_CUR);
-
   fs_read(soundFile, &wave_data, sizeof(WAVE_Data));
   if (wave_data.subChunkID[0] != 'd' ||
       wave_data.subChunkID[1] != 'a' ||
@@ -115,10 +109,8 @@ int LoadWavFile(const char* filename,
     printf("LoadWavFile: Error reading data %s\n", filename);
     return 0;
   }
-
   *size = wave_data.subChunk2Size;
   *frequency = wave_format.sampleRate;
-
   return 1;
   */
 }
@@ -129,12 +121,10 @@ void *wav_callback(snd_stream_hnd_t hnd, int len, int * actual) {
   SoundTrack* t = SFX[hnd].t;
   int off = sizeof(RIFF_Header) + sizeof(WAVE_Format) + sizeof(WAVE_Data);
   int rest = t->size - off - SFX[hnd].pos;
-
   if (rest <= 0) {
     // We have reached the end of the buffer
     return NULL;
   }
-
   // pcm is the amount of data read by this call(back)
   int pcm = len;
   // If there is less data left in the buffer than len...
@@ -143,9 +133,7 @@ void *wav_callback(snd_stream_hnd_t hnd, int len, int * actual) {
   uint8_t* pcm_ptr = t->sound + off + SFX[hnd].pos;
   // Increment pos and set actual correctly
   SFX[hnd].pos += pcm;
-
   *actual = pcm;
-
   return pcm_ptr;
   */
 }
@@ -158,15 +146,11 @@ int stream_setup(SoundTrack* t) {
     printf("stream_thread: SND_STREAM_INVALID %p\n", t);
     return -1;
   }
-
   RIFF_Header riff_header;
   WAVE_Format wave_format;
-
   memcpy(&riff_header, t->sound, sizeof(RIFF_Header));
   memcpy(&wave_format, t->sound + sizeof(RIFF_Header), sizeof(WAVE_Format));
-
   printf("WAV frequency %d channels %d\n", wave_format.sampleRate, wave_format.numChannels);
-
   SFX[shnd].t = t;
   SFX[shnd].thread = thd_get_current();
   SFX[shnd].pos = sizeof(RIFF_Header) + sizeof(WAVE_Format) + sizeof(WAVE_Data);
@@ -183,14 +167,12 @@ int stream_loop() {
         printf("stream_loop: Stream ended %d\n", shnd);
         snd_stream_stop(shnd);
         snd_stream_destroy(shnd);
-
         SFX[shnd].t = NULL;
         SFX[shnd].thread = NULL;
         SFX[shnd].pos = 0;
       }
     }
   }
-
   return 0;
   */
 }
@@ -290,7 +272,6 @@ void musicclass::play(int t)
     /*
   printf("#####\nmusicclass::play %d\n#####\n", t);
 	t = (t % 16);
-
 	if(mmmmmm)
 	{
 		if(!usingmmmmmm)
@@ -318,7 +299,6 @@ void musicclass::play(int t)
 // 	      		{
 // 	      			printf("Mix_PlayMusic: %s\n", Mix_GetError());
 // 	      		}
-
         mix_playing_music = 1;
         printf("Playing CD track %d\n", mix_next+1);
         if (cdrom_cdda_play(mix_next+1, mix_next+1, 15, CDDA_TRACKS) != ERR_OK)
@@ -417,10 +397,8 @@ void musicclass::processmusicfadein()
     /*
 	musicVolume += FadeVolAmountPerFrame;
 	//Mix_VolumeMusic(musicVolume);
-
   //mix_volume = musicVolume;
   //spu_cdda_volume(mix_volume, mix_volume);
-
 	//if (musicVolume >= MIX_MAX_VOLUME)
 	if (musicVolume >= 15)
 	{
@@ -436,25 +414,21 @@ void musicclass::processmusic()
 	{
 		return;
 	}
-
 	//if (fadeoutqueuesong != -1 && Mix_PlayingMusic() == 0) {
 	if (fadeoutqueuesong != -1 && mix_playing_music == 0) {
 		play(fadeoutqueuesong);
 		fadeoutqueuesong = -1;
 	}
-
 	//if (nicefade == 1 && Mix_PlayingMusic() == 0)
 	if (nicefade == 1 && mix_playing_music == 0)
 	{
 		play(nicechange);
 		nicechange = -1; nicefade = 0;
 	}
-
 	if(m_doFadeInVol)
 	{
 		processmusicfadein();
 	}
-
   // Actual processing of mix variables
   if (mix_fading_out == 1) {  // FadingOut
     // int fade_amount =  mix_volume / (mix_fading_ms / 33);
@@ -466,7 +440,6 @@ void musicclass::processmusic()
     //    mix_fading_ms = 0;
     //    mix_fading_out = 0;
     // }
-
     mix_playing_music = 0;
     cdrom_cdda_pause();
     mix_fading_out = 0;
@@ -479,7 +452,6 @@ void musicclass::processmusic()
       printf("Playing CD track %d\n", mix_next+1);
     }
   } else if (mix_fading_out == -1) {  // FadingIn
-
 //	  int fade_amount =  mix_volume / (mix_fading_ms / 33);
 //    mix_volume += fade_amount;
 //    if (mix_volume > 15) mix_volume = 15;
@@ -493,7 +465,6 @@ void musicclass::processmusic()
     spu_cdda_volume(mix_volume, mix_volume);
     mix_fading_out = 0;
   }
-
   stream_loop();
   */
 }
@@ -525,17 +496,14 @@ void musicclass::changemusicarea(int x, int y)
 	case musicroom(11, 4):
 		niceplay(2);
 		break;
-
 	case musicroom(2, 4):
 	case musicroom(7, 15):
 		niceplay(3);
 		break;
-
 	case musicroom(18, 1):
 	case musicroom(15, 0):
 		niceplay(12);
 		break;
-
 	case musicroom(0, 0):
 	case musicroom(0, 16):
 	case musicroom(2, 11):
@@ -547,7 +515,6 @@ void musicclass::changemusicarea(int x, int y)
 	case musicroom(17, 17):
 		niceplay(4);
 		break;
-
 	default:
 		niceplay(1);
 		break;

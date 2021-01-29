@@ -8,6 +8,15 @@ VVVVVV's official desktop versions are built with the following environments:
 - macOS: Xcode CLT, currently targeting 10.9 SDK
 - GNU/Linux: CentOS 7
 
+```bash
+# SDL_mixer.sh
+test_deps_install SDL # libmikmod
+get_pspport SDL_mixer SDL_mixer-psp
+run_autogen_build --with-sdl-prefix=$(psp-config --psp-prefix) \
+  --disable-music-cmd --disable-music-mp3 --disable-music-mod --disable-music-midi --disable-music-flac
+
+```
+
 The engine depends solely on [SDL2](https://libsdl.org/) and
 [SDL2_mixer](https://www.libsdl.org/projects/SDL_mixer/). All other dependencies
 are statically linked into the engine. The development libraries for Windows can
