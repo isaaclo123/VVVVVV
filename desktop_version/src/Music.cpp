@@ -19,7 +19,7 @@ int mix_next = -1;
 void stream_setup(SoundTrack* t) {
     printf("####Playing soundtrack in stream_setup\n");
 
-    if(Mix_PlayChannel(-1, (Mix_Chunk *)(t->sound), -1) == -1) {
+    if(Mix_PlayChannel(-1, (Mix_Chunk *)(t->sound), 0) == -1) {
         printf("Mix_PlayChannel: %s\n",Mix_GetError());
     }
 }
@@ -149,7 +149,7 @@ void musicclass::play(int t)
                 mix_fading_ms = 0;
 
                 mix_playing_music = 1;
-                if(Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1)
+                if(Mix_FadeInMusic(musicTracks[t].m_music, 0, 0)==-1)
                 {
                     printf("Mix_PlayMusic: %s\n", Mix_GetError());
                     mix_playing_music = 0;
