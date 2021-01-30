@@ -118,7 +118,7 @@ INCLUDE_DIRECTORIES(
 
 # Source Lists
 SET(VVV_SRC
-        src/BinaryBlob.cpp
+    # src/BinaryBlob.cpp
         src/BlockV.cpp
         src/editor.cpp
         src/Ent.cpp

@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
     int audio_rate = 44100;
     uint16_t audio_format = AUDIO_S16LSB;
-    int audio_channels = 1;
+    int audio_channels = 2;
     int audio_buffers = 2048;
 
     int flags=MIX_INIT_OGG|MIX_INIT_MOD;
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
             SDL_assert(0 && "Unable to initialize audio!");
     }
 
-    Mix_AllocateChannels(4);
+    Mix_AllocateChannels(16);
 
     // NETWORK_init();
 

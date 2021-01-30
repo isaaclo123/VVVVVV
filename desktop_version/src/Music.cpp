@@ -3,7 +3,6 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <stdio.h>
-#include "BinaryBlob.h"
 #include "Map.h"
 
 // Variables for streaming music
@@ -17,7 +16,7 @@ int mix_loops = -1;
 int mix_next = -1;
 
 void stream_setup(SoundTrack* t) {
-    printf("####Playing soundtrack in stream_setup\n");
+    // printf("####Playing soundtrack in stream_setup\n");
 
     if(Mix_PlayChannel(-1, (Mix_Chunk *)(t->sound), 0) == -1) {
         printf("Mix_PlayChannel: %s\n",Mix_GetError());
@@ -71,28 +70,25 @@ void musicclass::init()
   // print_ram_stats();
 
 #ifdef VVV_COMPILEMUSIC
-	binaryBlob musicWriteBlob;
-	musicWriteBlob.AddFileToBinaryBlob("data/music/0levelcomplete.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/1pushingonwards.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/2positiveforce.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/3potentialforanything.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/4passionforexploring.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/5intermission.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/6presentingvvvvvv.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/7gamecomplete.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/8predestinedfate.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/9positiveforcereversed.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/10popularpotpourri.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/11pipedream.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/12pressurecooker.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/13pacedenergy.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/14piercingthesky.ogg");
-	musicWriteBlob.AddFileToBinaryBlob("data/music/predestinedfatefinallevel.ogg");
+	musicTracks.push_back(MusicTrack("data/music/0levelcomplete.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/1pushingonwards.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/2positiveforce.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/3potentialforanything.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/4passionforexploring.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/5intermission.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/6presentingvvvvvv.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/7gamecomplete.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/8predestinedfate.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/9positiveforcereversed.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/10popularpotpourri.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/11pipedream.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/12pressurecooker.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/13pacedenergy.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/14piercingthesky.ogg"));
+	musicTracks.push_back(MusicTrack("data/music/predestinedfatefinallevel.ogg"));
 
-	musicWriteBlob.writeBinaryBlob("data/BinaryMusic.vvv");
+	// musicWriteBlob.writeBinaryBlob("data/BinaryMusic.vvv");
 #endif
-
-	binaryBlob musicReadBlob;
 
   // print_ram_stats();
 
@@ -138,7 +134,7 @@ void musicclass::play(int t)
     // spu_cdda_volume(15, 15);
     if (currentsong !=t)
     {
-        if (t != -1)
+        if (t < 0 || t >= musicTracks.size())
         {
             currentsong = t;
             if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
@@ -147,10 +143,9 @@ void musicclass::play(int t)
                 mix_next = t;
                 mix_loops = 0;
                 mix_fading_ms = 0;
-
                 mix_playing_music = 1;
-                if(Mix_FadeInMusic(musicTracks[t].m_music, 0, 0)==-1)
-                {
+
+                if(Mix_PlayMusic(musicTracks[t].m_music, 1)==-1){
                     printf("Mix_PlayMusic: %s\n", Mix_GetError());
                     mix_playing_music = 0;
                 }
