@@ -215,9 +215,9 @@ void musicclass::fadeMusicVolumeIn(int ms)
 
 void musicclass::fadeout()
 {
-    //Mix_FadeOutMusic(2000);
+    Mix_FadeOutMusic(2000);
     mix_playing_music = 0;
-    Mix_PauseMusic();
+    // Mix_PauseMusic();
     mix_fading_out = 1;
     mix_fading_ms = 2000;
     currentsong = -1;
@@ -260,30 +260,6 @@ void musicclass::processmusic()
     {
         processmusicfadein();
     }
-
-    // Actual processing of mix variables
-    if (mix_fading_out == 1) {  // FadingOut
-        int fade_amount =  mix_volume / (mix_fading_ms / 33);
-        mix_volume -= fade_amount;
-        if (mix_volume < 0) mix_volume = 0;
-        Mix_VolumeMusic(mix_volume);
-            mix_fading_ms -= 33;
-        if (mix_fading_ms <= 0) {
-            mix_fading_ms = 0;
-            mix_fading_out = 0;
-        }
-    } else if (mix_fading_out == -1) {  // FadingIn
-        int fade_amount =  mix_volume / (mix_fading_ms / 33);
-        mix_volume += fade_amount;
-        if (mix_volume > 15) mix_volume = 15;
-        Mix_VolumeMusic(mix_volume);
-            mix_fading_ms -= 33;
-        if (mix_fading_ms <= 0) {
-            mix_fading_ms = 0;
-            mix_fading_out = 0;
-        }
-    }
-
     // stream_loop();
 }
 
