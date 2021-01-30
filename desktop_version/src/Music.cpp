@@ -149,7 +149,7 @@ void musicclass::play(int t)
                 mix_fading_ms = 0;
 
                 mix_playing_music = 1;
-                if(Mix_FadeInMusic(musicTracks[t].m_music, 0, 0)==-1)
+                if(Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1)
                 {
                     printf("Mix_PlayMusic: %s\n", Mix_GetError());
                     mix_playing_music = 0;
