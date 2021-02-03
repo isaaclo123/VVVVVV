@@ -42,7 +42,7 @@ class SoundSystem
 {
 public:
 	SoundSystem();
-	void playMusic(MusicTrack* music);
+	int playMusic(MusicTrack* music);
 };
 
 #endif /* SOUNDSYSTEM_H */

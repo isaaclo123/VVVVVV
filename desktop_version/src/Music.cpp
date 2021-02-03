@@ -15,14 +15,6 @@ int mix_volume = 15;
 int mix_loops = -1;
 int mix_next = -1;
 
-void stream_setup(SoundTrack* t) {
-    // printf("####Playing soundtrack in stream_setup\n");
-
-    if(Mix_PlayChannel(-1, (Mix_Chunk *)(t->sound), 0) == -1) {
-        printf("Mix_PlayChannel: %s\n",Mix_GetError());
-    }
-}
-
 void musicclass::init()
 {
     // load support for the OGG and MOD sample/music formats
@@ -129,52 +121,102 @@ void musicclass::play(int t)
         }
     }
     safeToProcessMusic = true;
-    Mix_VolumeMusic(128);
+    musicVolume = MIX_MAX_VOLUME;
+
+    if (currentsong == t && Mix_PlayingMusic() != MIX_FADING_OUT)
+    {
+            return;
+    }
+
+    currentsong = t;
+
+    if (t == -1)
+    {
+            return;
+    }
+
+    if (t < 0 || t >= musicTracks.size()) {
+        currentsong = -1;
+        return;
+    }
+
+    Mix_VolumeMusic(musicVolume);
+
+
+    // if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 0+num_mmmmmm_tracks || currentsong == 7+num_mmmmmm_tracks)))
+    if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
+    {
+        // Level Complete theme, no fade in or repeat
+        if (Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1) {
+            printf("Mix_FadeInMusic: %s\n", Mix_GetError());
+            mix_playing_music = 0;
+        }
+    }
+    else
+    {
+        if (Mix_FadingMusic() == MIX_FADING_OUT)
+        {
+            // We're already fading out
+            fadeoutqueuesong = t;
+            currentsong = -1;
+            if (!dontquickfade) {
+                Mix_FadeOutMusic(500); // fade out quicker
+                mix_fading_out = 1;
+                mix_fading_ms = 500;
+            } else
+                dontquickfade = false;
+        }
+        else if(Mix_FadeInMusic(musicTracks[t].m_music, -1, 3000)==-1)
+        {
+            printf("Mix_FadeInMusic: %s\n", Mix_GetError());
+            mix_fading_out = -1;
+            mix_next = t;
+            mix_loops = -1;
+            mix_fading_ms = 3000;
+            mix_playing_music = 1;
+        }
+    }
+
     // mix_volume = 15;
     // spu_cdda_volume(15, 15);
     if (currentsong !=t)
     {
-        if (t < 0 || t >= musicTracks.size())
+
+        if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
         {
-            currentsong = t;
-            if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
-            {
-                // Level Complete theme, no fade in or repeat
-                mix_next = t;
-                mix_loops = 0;
-                mix_fading_ms = 0;
-                mix_playing_music = 1;
+            // Level Complete theme, no fade in or repeat
+            mix_next = t;
+            mix_loops = 0;
+            mix_fading_ms = 0;
+            mix_playing_music = 1;
 
-                if(Mix_PlayMusic(musicTracks[t].m_music, 1)==-1){
-                    printf("Mix_PlayMusic: %s\n", Mix_GetError());
-                    mix_playing_music = 0;
-                }
-
+            // if(soundSystem.playMusic(&(musicTracks[t]))==-1){
+            if (Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1) {
+                mix_playing_music = 0;
             }
-            else
+
+        }
+        else
+        {
+            if (Mix_FadingMusic() == MIX_FADING_OUT) {
+                // We're already fading out
+                fadeoutqueuesong = t;
+                currentsong = -1;
+                if (!dontquickfade) {
+                    Mix_FadeOutMusic(500); // fade out quicker
+                    mix_fading_out = 1;
+                    mix_fading_ms = 500;
+                } else
+                    dontquickfade = false;
+            }
+            else if(Mix_FadeInMusic(musicTracks[t].m_music, -1, 3000)==-1)
             {
-                if (mix_fading_out == 1) {
-                    if (Mix_FadingMusic() == MIX_FADING_OUT) {
-                        // We're already fading out
-                        fadeoutqueuesong = t;
-                        currentsong = -1;
-                        if (!dontquickfade) {
-                            Mix_FadeOutMusic(500); // fade out quicker
-                            mix_fading_out = 1;
-                            mix_fading_ms = 500;
-                        } else
-                            dontquickfade = false;
-                    }
-                    else if(Mix_FadeInMusic(musicTracks[t].m_music, -1, 3000)==-1)
-                    {
-                        printf("Mix_FadeInMusic: %s\n", Mix_GetError());
-                        mix_fading_out = -1;
-                        mix_next = t;
-                        mix_loops = -1;
-                        mix_fading_ms = 3000;
-                        mix_playing_music = 1;
-                    }
-                }
+                printf("Mix_FadeInMusic: %s\n", Mix_GetError());
+                mix_fading_out = -1;
+                mix_next = t;
+                mix_loops = -1;
+                mix_fading_ms = 3000;
+                mix_playing_music = 1;
             }
         }
     } else {
@@ -313,6 +355,7 @@ void musicclass::changemusicarea(int x, int y)
 
 void musicclass::playef(int t)
 {
-    //thd_create(1, (void*)stream_thread, (void*)&soundTracks[t]);
-    stream_setup(&soundTracks[t]);
+    if(Mix_PlayChannel(-1, soundTracks[t].sound, 0) == -1) {
+        printf("Mix_PlayChannel: %s\n",Mix_GetError());
+    }
 }
