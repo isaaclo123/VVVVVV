@@ -17,78 +17,12 @@ int mix_next = -1;
 
 void musicclass::init()
 {
-    // load support for the OGG and MOD sample/music formats
-    // int flags=MIX_INIT_OGG;
-    // int initted=Mix_Init(flags);
-    // if(initted&flags != flags) {
-    //     printf("Mix_Init: Failed to init required ogg and mod support!\n");
-    //     printf("Mix_Init: %s\n", Mix_GetError());
-    // }
-
-    // if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
-    //     printf("Mix_OpenAudio: %s\n", Mix_GetError());
-    // }
-
-	soundTracks.push_back(SoundTrack( "sounds/jump.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/jump2.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/hurt.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/souleyeminijingle.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/coin.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/save.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crumble.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/vanish.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/blip.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/preteleport.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/teleport.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew1.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew2.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew3.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew4.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew5.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crew6.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/terminal.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/gamesaved.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crashing.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/blip2.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/countdown.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/go.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/crash.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/combine.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/newrecord.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/trophy.wav" ));
-	soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
-
+    for (int i = 0; i < 28; i++) {
+        soundTracks[i] = SoundTrack(SOUND_TRACK_PATHS[i]);
+    }
 
   // print_ram_stats();
-
-#ifdef VVV_COMPILEMUSIC
-	musicTracks.push_back(MusicTrack("data/music/0levelcomplete.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/1pushingonwards.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/2positiveforce.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/3potentialforanything.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/4passionforexploring.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/5intermission.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/6presentingvvvvvv.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/7gamecomplete.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/8predestinedfate.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/9positiveforcereversed.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/10popularpotpourri.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/11pipedream.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/12pressurecooker.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/13pacedenergy.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/14piercingthesky.ogg"));
-	musicTracks.push_back(MusicTrack("data/music/predestinedfatefinallevel.ogg"));
-
-	// musicWriteBlob.writeBinaryBlob("data/BinaryMusic.vvv");
-#endif
-
   // print_ram_stats();
-
-  // for (int i = 0; i < 32; ++i) {
-  //   SFX[i].t = NULL;
-  //   SFX[i].thread = NULL;
-  //   SFX[i].pos = 0;
-  // }
 
 	safeToProcessMusic= false;
 	m_doFadeInVol = false;
@@ -135,7 +69,7 @@ void musicclass::play(int t)
             return;
     }
 
-    if (t < 0 || t >= musicTracks.size()) {
+    if (t < 0 || t >= 16) {
         currentsong = -1;
         return;
     }
@@ -147,7 +81,7 @@ void musicclass::play(int t)
     if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
     {
         // Level Complete theme, no fade in or repeat
-        if (Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1) {
+        if (playMusic(t, 1, 0)==-1) {
             printf("Mix_FadeInMusic: %s\n", Mix_GetError());
             mix_playing_music = 0;
         }
@@ -166,7 +100,7 @@ void musicclass::play(int t)
             } else
                 dontquickfade = false;
         }
-        else if(Mix_FadeInMusic(musicTracks[t].m_music, -1, 3000)==-1)
+        else if(playMusic(t, -1, 3000)==-1)
         {
             printf("Mix_FadeInMusic: %s\n", Mix_GetError());
             mix_fading_out = -1;
@@ -359,3 +293,41 @@ void musicclass::playef(int t)
         printf("Mix_PlayChannel: %s\n",Mix_GetError());
     }
 }
+
+#ifdef VVV_COMPILEMUSIC
+
+int musicclass::playMusic(int t, int loops, int ms) {
+    // load music file if not in yet
+    if (musicTracks[t].m_isValid) {
+        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
+    }
+
+    musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
+
+    if (!musicTracks[t].m_isValid) {
+        freeMusic();
+    }
+
+    musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
+
+    if (musicTracks[t].m_isValid) {
+        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
+    }
+
+    return -1;
+}
+
+void musicclass::freeMusic() {
+    for (int i = 0; i < 16; i++) {
+        if (i == currentsong) {
+            // dont free currently playing song
+            continue;
+        }
+        Mix_FreeMusic(musicTracks[i].m_music);
+        musicTracks[i].m_isValid = false;
+    }
+}
+#else
+int musicclass::playMusic(int t, int loop, int ms) { return -1; }
+void musicclass::freeMusic() {}
+#endif

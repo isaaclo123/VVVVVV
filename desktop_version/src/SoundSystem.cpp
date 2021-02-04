@@ -55,6 +55,11 @@ MusicTrack::MusicTrack(SDL_RWops *rw)
 	}
 }
 
+MusicTrack::MusicTrack() {
+    m_isValid = false;
+    m_music = NULL;
+}
+
 SoundTrack::SoundTrack(const char* fileName)
 {
 	sound = NULL;
@@ -73,6 +78,10 @@ SoundTrack::SoundTrack(const char* fileName)
 	{
 		printf("Unable to load WAV file: %s\n", Mix_GetError());
 	}
+}
+
+SoundTrack::SoundTrack() {
+    sound = NULL;
 }
 
 SoundSystem::SoundSystem() {

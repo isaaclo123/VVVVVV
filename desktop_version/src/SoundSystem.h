@@ -9,14 +9,15 @@
 class MusicTrack
 {
 public:
-	MusicTrack(const char* fileName);
+    MusicTrack();
+    MusicTrack(const char* fileName);
 // #ifndef PSP
-        MusicTrack(SDL_RWops *rw);
-        Mix_Music *m_music;
+    MusicTrack(SDL_RWops *rw);
+    Mix_Music *m_music;
 // #else
 	// int m_music;
 // #endif
-	bool m_isValid;
+        bool m_isValid;
   static int s_num_tracks;
 };
 
@@ -26,7 +27,8 @@ public:
 class SoundTrack
 {
 public:
-	SoundTrack(const char* fileName);
+    SoundTrack();
+    SoundTrack(const char* fileName);
 // #ifndef PSP
     Mix_Chunk *sound;
 //   int size;
