@@ -5,6 +5,7 @@
 #include <string>
 #include "SDL.h"
 #include "Maths.h"
+#include "Music.h"
 #include "UtilityClass.h"
 #include "GraphicsUtil.h"
 
@@ -15,9 +16,8 @@
 class Game
 {
 public:
-    void init(void);
+    void init();
     ~Game(void);
-
 
     void setGlobalSoundVol(const float _vol)
     {
@@ -27,7 +27,6 @@ public:
     {
         return m_globalVol;
     }
-
 
     int crewrescued();
 
@@ -312,9 +311,9 @@ public:
     bool customlevelstatsloaded;
 
 
-    std::vector<SDL_GameControllerButton> controllerButton_map;    
+    std::vector<SDL_GameControllerButton> controllerButton_map;
     std::vector<SDL_GameControllerButton> controllerButton_flip;
-    std::vector<SDL_GameControllerButton> controllerButton_esc;    
+    std::vector<SDL_GameControllerButton> controllerButton_esc;
 
     bool skipfakeload;
 };

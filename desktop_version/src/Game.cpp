@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "Entity.h"
 #include "Map.h"
+#include "Music.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,7 +114,7 @@ bool GetButtonFromString(const char *pText, SDL_GameControllerButton *button)
 }
 
 
-void Game::init(void)
+void Game::init()
 {
     mutebutton = 0;
     infocus = true;
@@ -661,6 +662,14 @@ void Game::savecustomlevelstats()
     msg = new TiXmlElement( "customlevelstats" );
     msg->LinkEndChild( new TiXmlText( customlevelstatsstr.c_str() ));
     msgs->LinkEndChild( msg );
+
+    if(FILESYSTEM_saveTiXmlDocument("saves/levelstats.vvv", &doc))
+    {
+        printf("Level stats saved\n");
+        return;
+    }
+
+    music.freeMusic();
 
     if(FILESYSTEM_saveTiXmlDocument("saves/levelstats.vvv", &doc))
     {
@@ -4708,6 +4717,12 @@ void Game::savestats()
     msg->LinkEndChild( new TiXmlText( tu.String(controllerSensitivity).c_str()));
     dataNode->LinkEndChild( msg );
 
+    if(FILESYSTEM_saveTiXmlDocument("saves/unlock.vvv", &doc)) {
+        return;
+    }
+
+    music.freeMusic();
+
     FILESYSTEM_saveTiXmlDocument("saves/unlock.vvv", &doc);
 }
 
@@ -5997,6 +6012,14 @@ void Game::savequick()
     if(FILESYSTEM_saveTiXmlDocument("saves/qsave.vvv", &doc))
     {
         printf("Game saved\n");
+        return;
+    }
+
+    music.freeMusic();
+
+    if(FILESYSTEM_saveTiXmlDocument("saves/qsave.vvv", &doc))
+    {
+        printf("Game saved\n");
     }
     else
     {
@@ -6204,6 +6227,14 @@ void Game::customsavequick(std::string savfile)
     customquicksummary = summary;
 
     std::string levelfile = savfile.substr(7);
+    if(FILESYSTEM_saveTiXmlDocument(("saves/"+levelfile+".vvv").c_str(), &doc))
+    {
+        printf("Game saved\n");
+        return;
+    }
+
+    music.freeMusic();
+
     if(FILESYSTEM_saveTiXmlDocument(("saves/"+levelfile+".vvv").c_str(), &doc))
     {
         printf("Game saved\n");

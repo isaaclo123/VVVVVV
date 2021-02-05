@@ -79,7 +79,8 @@ public:
 
 	void changemusicarea(int x, int y);
 
-	int currentsong, musicfade, musicfadein;
+        int currentsong;
+	int musicfade, musicfadein;
 	int resumesong;
 
 	void playef(int t);
@@ -88,6 +89,7 @@ public:
 	SoundTrack soundTracks[28];
 	// std::vector<MusicTrack> musicTracks;
 	MusicTrack musicTracks[16];
+
 	SoundSystem soundSystem;
 	bool safeToProcessMusic;
 

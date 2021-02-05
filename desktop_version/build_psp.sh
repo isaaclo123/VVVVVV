@@ -2,22 +2,22 @@
 
 # PSPDEV=$(psp-config -d)
 
-# jrm -rf build/*
-# jrm Makefile
-# j
-# jmkdir -p build
-# j
-# jcd build
-# j
-# j# -DCMAKE_VERBOSE_MAKEFILE=1 \
-# jcmake .. \
-# j    -DSDL_INCLUDE_DIRS="$PSPDEV/psp/include/SDL" \
-# j    -DSDL_LIBRARIES="$PSPDEV/psp/lib/libSDL.a;$PSPDEV/psp/lib/libSDLmain.a;$PSPDEV/psp/lib/libSDL_mixer.a" \
-# j    || exit 1
-# j
-# jcd ../
-# j
-# jcmake --build build
+rm -rf build/*
+rm Makefile
+
+mkdir -p build
+
+cd build
+
+# -DCMAKE_VERBOSE_MAKEFILE=1 \
+cmake .. \
+    -DSDL_INCLUDE_DIRS="$PSPDEV/psp/include/SDL" \
+    -DSDL_LIBRARIES="$PSPDEV/psp/lib/libSDL.a;$PSPDEV/psp/lib/libSDLmain.a;$PSPDEV/psp/lib/libSDL_mixer.a" \
+    || exit 1
+
+cd ../
+
+cmake --build build
 
 
 echo
