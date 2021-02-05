@@ -44,7 +44,7 @@ void musicclass::init()
 
 void musicclass::play(int t)
 {
-    printf("#####\nmusicclass::play %d\n#####\n", t);
+    printf("#####\nmusicclass::play %d\n#####currentsong %d\n", t, currentsong);
     t = (t % 16);
 
     if(mmmmmm)
@@ -70,6 +70,7 @@ void musicclass::play(int t)
     }
 
     if (t < 0 || t >= 16) {
+        // invalid t
         currentsong = -1;
         return;
     }
@@ -153,9 +154,6 @@ void musicclass::play(int t)
                 mix_playing_music = 1;
             }
         }
-    } else {
-        // TODO unsure
-        currentsong = -1;
     }
 }
 
@@ -299,6 +297,7 @@ void musicclass::playef(int t)
 int musicclass::playMusic(int t, int loops, int ms) {
     // load music file if not in yet
     if (musicTracks[t].m_isValid) {
+        currentsong = t;
         return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
     }
 
@@ -311,6 +310,7 @@ int musicclass::playMusic(int t, int loops, int ms) {
     musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
 
     if (musicTracks[t].m_isValid) {
+        currentsong = t;
         return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
     }
 
