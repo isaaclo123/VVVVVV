@@ -257,7 +257,7 @@ SDL_Surface *  FlipSurfaceVerticle(SDL_Surface* _src)
 void BlitSurfaceStandard( SDL_Surface* _src, SDL_Rect* _srcRect, SDL_Surface* _dest, SDL_Rect* _destRect,
     Uint8 key_r, Uint8 key_g, Uint8 key_b)
 {
-    Uint32 tmp = SDL_GetTicks();
+    // TODO Uint32 tmp = SDL_GetTicks();
 
     SDL_SetColorKey(_src, SDL_RLEACCEL, SDL_MapRGB(_src->format, key_r, key_g, key_b));
     SDL_SetColorKey(_dest, SDL_RLEACCEL, SDL_MapRGB(_src->format, key_r, key_g, key_b));
@@ -282,7 +282,7 @@ void BlitSurfaceStandard( SDL_Surface* _src, SDL_Rect* _srcRect, SDL_Surface* _d
     SDL_BlitSurface( _src, _srcRect, _dest, _destRect );
     //}
 
-    GraphicsStats::BSS_time += (SDL_GetTicks() - tmp);
+    // TODO GraphicsStats::BSS_time += (SDL_GetTicks() - tmp);
     ++GraphicsStats::BSS_numcalls;
 }
 
@@ -294,7 +294,7 @@ void BlitSurfaceColoured(
     colourTransform& ct,
     Uint32 key
 ) {
-    Uint32 tmp = SDL_GetTicks();
+    // TODO Uint32 tmp = SDL_GetTicks();
 
     SDL_Rect *tempRect = _destRect;
 
@@ -361,7 +361,7 @@ void BlitSurfaceColoured(
     SDL_BlitSurface(tempsurface, _srcRect, _dest, tempRect);
     SDL_FreeSurface(tempsurface);
 
-    GraphicsStats::BSC_time += (SDL_GetTicks() - tmp);
+    // TODO GraphicsStats::BSC_time += (SDL_GetTicks() - tmp);
     ++GraphicsStats::BSC_numcalls;
 }
 
@@ -511,6 +511,9 @@ void OverlaySurfaceKeyed( SDL_Surface* _src, SDL_Surface* _dest, Uint32 _key )
 
 void ScrollSurface( SDL_Surface* _src, int _pX, int _pY )
 {
+    // TODO
+    return;
+
     SDL_Surface* part1 = NULL;
 
     SDL_Rect rect1;

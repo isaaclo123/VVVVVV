@@ -64,7 +64,7 @@ class musicclass
 {
 public:
         int playMusic(int t, int loop, int ms);
-        void freeMusic();
+        // void freeMusic();
 
 	void init();
 
@@ -88,7 +88,9 @@ public:
 	// std::vector<SoundTrack> soundTracks;
 	SoundTrack soundTracks[28];
 	// std::vector<MusicTrack> musicTracks;
-	MusicTrack musicTracks[16];
+	// MusicTrack musicTracks[16];
+	MusicTrack musicTrack;
+	MusicTrack prevMusicTrack;
 
 	SoundSystem soundSystem;
 	bool safeToProcessMusic;

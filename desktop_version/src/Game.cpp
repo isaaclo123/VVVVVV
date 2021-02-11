@@ -669,7 +669,7 @@ void Game::savecustomlevelstats()
         return;
     }
 
-    music.freeMusic();
+    // music.freeMusic();
 
     if(FILESYSTEM_saveTiXmlDocument("saves/levelstats.vvv", &doc))
     {
@@ -4721,7 +4721,7 @@ void Game::savestats()
         return;
     }
 
-    music.freeMusic();
+    // music.freeMusic();
 
     FILESYSTEM_saveTiXmlDocument("saves/unlock.vvv", &doc);
 }
@@ -6015,7 +6015,7 @@ void Game::savequick()
         return;
     }
 
-    music.freeMusic();
+    // music.freeMusic();
 
     if(FILESYSTEM_saveTiXmlDocument("saves/qsave.vvv", &doc))
     {
@@ -6233,7 +6233,7 @@ void Game::customsavequick(std::string savfile)
         return;
     }
 
-    music.freeMusic();
+    // music.freeMusic();
 
     if(FILESYSTEM_saveTiXmlDocument(("saves/"+levelfile+".vvv").c_str(), &doc))
     {

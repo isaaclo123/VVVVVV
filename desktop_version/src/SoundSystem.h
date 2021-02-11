@@ -10,6 +10,7 @@ class MusicTrack
 {
 public:
     MusicTrack();
+    void free();
     MusicTrack(const char* fileName);
 // #ifndef PSP
     MusicTrack(SDL_RWops *rw);

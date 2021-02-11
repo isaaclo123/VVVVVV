@@ -1432,7 +1432,7 @@ void gamerender()
         }
 
         time = SDL_GetTicks() - time;
-        time_entities = SDL_GetTicks();
+        // time_entities = SDL_GetTicks();
 
         if(!game.completestop)
         {
@@ -1465,8 +1465,8 @@ void gamerender()
         graphics.drawentities();
     }
 
-    time_entities = SDL_GetTicks() - time_entities;
-    time_backbuffer = SDL_GetTicks();
+    // time_entities = SDL_GetTicks() - time_entities;
+    // time_backbuffer = SDL_GetTicks();
 
     if(map.extrarow==0 || (map.custommode && map.roomname!=""))
     {
@@ -1513,12 +1513,12 @@ void gamerender()
     graphics.drawfade();
     BlitSurfaceStandard(graphics.backBuffer, NULL, graphics.tempBuffer, NULL);
 
-    time_backbuffer = SDL_GetTicks() - time_backbuffer;
-    time_ui = SDL_GetTicks();
+    // time_backbuffer = SDL_GetTicks() - time_backbuffer;
+    // time_ui = SDL_GetTicks();
 
     graphics.drawgui();
-    time_ui = SDL_GetTicks() - time_ui;
-    time_extra = SDL_GetTicks();
+    // time_ui = SDL_GetTicks() - time_ui;
+    // time_extra = SDL_GetTicks();
 
     if (graphics.flipmode)
     {
@@ -1756,8 +1756,8 @@ void gamerender()
         graphics.flashlight();
     }
 
-    time_extra = SDL_GetTicks() - time_extra;
-    time_render = SDL_GetTicks();
+    // time_extra = SDL_GetTicks() - time_extra;
+    // time_render = SDL_GetTicks();
 
     if (game.screenshake > 0 && !game.noflashingmode)
     {
@@ -1769,7 +1769,7 @@ void gamerender()
         graphics.render();
     }
 
-    time_render = SDL_GetTicks() - time_render;
+    // time_render = SDL_GetTicks() - time_render;
 
     // GUSARBA: Uncomment these to get performance debug stats
 

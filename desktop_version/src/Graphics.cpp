@@ -557,6 +557,7 @@ void Graphics::drawtile2( int x, int y, int t )
 void Graphics::drawtile3( int x, int y, int t, int off )
 {
     SDL_Rect rect = { Sint16(x), Sint16(y), tiles_rect.w, tiles_rect.h };
+
     BlitSurfaceStandard(tiles3[t+(off*30)], NULL, backBuffer, &rect);
 }
 
@@ -2275,34 +2276,40 @@ void Graphics::drawbackground( int t )
         break;
     case 7:
         //Static, unscrolling section of the tower
-        for (int j = 0; j < 30; j++)
-        {
-            for (int i = 0; i < 40; i++)
-            {
-                drawtile3(i * 8, j * 8, map.tower.backat(i, j, 200), 15);
-            }
-        }
+        FillRect(backBuffer,0x00000);
         break;
+        // for (int j = 0; j < 30; j++)
+        // {
+        //     for (int i = 0; i < 40; i++)
+        //     {
+        //         drawtile3(i * 8, j * 8, map.tower.backat(i, j, 200), 15);
+        //     }
+        // }
+        // break;
     case 8:
-        //Static, unscrolling section of the tower
-        for (int j = 0; j < 30; j++)
-        {
-            for (int i = 0; i < 40; i++)
-            {
-                drawtile3(i * 8, j * 8, map.tower.backat(i, j, 200), 10);
-            }
-        }
+        FillRect(backBuffer,0x00000);
         break;
+        //Static, unscrolling section of the tower
+        // for (int j = 0; j < 30; j++)
+        // {
+        //     for (int i = 0; i < 40; i++)
+        //     {
+        //         drawtile3(i * 8, j * 8, map.tower.backat(i, j, 200), 10);
+        //     }
+        // }
+        // break;
     case 9:
-        //Static, unscrolling section of the tower
-        for (int j = 0; j < 30; j++)
-        {
-            for (int i = 0; i < 40; i++)
-            {
-                drawtile3(i * 8, j * 8, map.tower.backat(i, j, 600), 0);
-            }
-        }
+        FillRect(backBuffer,0x00000);
         break;
+        //Static, unscrolling section of the tower
+        // for (int j = 0; j < 30; j++)
+        // {
+        //     for (int i = 0; i < 40; i++)
+        //     {
+        //         drawtile3(i * 8, j * 8, map.tower.backat(i, j, 600), 0);
+        //     }
+        // }
+        // break;
     default:
         FillRect(backBuffer, 0x000000 );
         BlitSurfaceStandard(backgrounds[t], NULL, backBuffer, &bg_rect);
@@ -2395,6 +2402,11 @@ void Graphics::drawfinalmap()
 
 void Graphics::drawtowermap()
 {
+    // if (foregrounddrawn) {
+    //     foregrounddrawn = false;
+    //     return;
+    // }
+
     int temp;
     for (int j = 0; j < 30; j++)
     {
@@ -2404,6 +2416,7 @@ void Graphics::drawtowermap()
             if (temp > 0) drawtile3(i * 8, (j * 8) - ((int)map.ypos % 8), temp, map.colstate);
         }
     }
+    // foregrounddrawn = true;
 }
 
 void Graphics::drawtowermap_nobackground()
@@ -2542,6 +2555,8 @@ void Graphics::drawtowerspikes()
 
 void Graphics::drawtowerbackgroundsolo()
 {
+    // TODO
+    return;
     if (map.bypos < 0)
     {
         map.bypos += 120 * 8;
@@ -2566,6 +2581,7 @@ void Graphics::drawtowerbackgroundsolo()
     else
     {
         //just update the bottom
+        // TODO
         ScrollSurface(towerbuffer,0, -map.bscroll);
         for (int i = 0; i < 40; i++)
         {
@@ -2579,6 +2595,8 @@ void Graphics::drawtowerbackgroundsolo()
 
 void Graphics::drawtowerbackground()
 {
+    // TODO
+    return;
     int temp;
 
     if (map.bypos < 0) map.bypos += 120 * 8;
@@ -2981,7 +2999,7 @@ void Graphics::screenshake()
 void Graphics::render()
 {
 
-  Uint32 time = SDL_GetTicks();
+  // Uint32 time = SDL_GetTicks();
 
 	if(screenbuffer == NULL)
 	{

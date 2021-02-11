@@ -62,7 +62,7 @@ void musicclass::play(int t)
             return;
     }
 
-    currentsong = t;
+    // currentsong = t;
 
     if (t == -1)
     {
@@ -71,7 +71,7 @@ void musicclass::play(int t)
 
     if (t < 0 || t >= 16) {
         // invalid t
-        currentsong = -1;
+        // currentsong = -1;
         return;
     }
 
@@ -126,7 +126,7 @@ void musicclass::play(int t)
             mix_playing_music = 1;
 
             // if(soundSystem.playMusic(&(musicTracks[t]))==-1){
-            if (Mix_FadeInMusic(musicTracks[t].m_music, 1, 0)==-1) {
+            if (playMusic(t, 1, 0)==-1) {
                 mix_playing_music = 0;
             }
 
@@ -144,7 +144,7 @@ void musicclass::play(int t)
                 } else
                     dontquickfade = false;
             }
-            else if(Mix_FadeInMusic(musicTracks[t].m_music, -1, 3000)==-1)
+            else if(playMusic(t, -1, 3000)==-1)
             {
                 printf("Mix_FadeInMusic: %s\n", Mix_GetError());
                 mix_fading_out = -1;
@@ -295,39 +295,38 @@ void musicclass::playef(int t)
 #ifdef VVV_COMPILEMUSIC
 
 int musicclass::playMusic(int t, int loops, int ms) {
-    // load music file if not in yet
-    if (musicTracks[t].m_isValid) {
+    // free track TODO
+    // prevMusicTrack.free();
+
+    // printf("Before setPrevMusicTrack:\n");
+    prevMusicTrack = musicTrack;
+    // printf("After setPrevMusicTrack:\n");
+    // printf("Set new musictrack:\n");
+    musicTrack = MusicTrack(MUSIC_TRACK_PATHS[t]);
+    // printf("After Set new musictrack:\n");
+
+    if (musicTrack.m_isValid) {
         currentsong = t;
-        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
-    }
-
-    musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
-
-    if (!musicTracks[t].m_isValid) {
-        freeMusic();
-    }
-
-    musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
-
-    if (musicTracks[t].m_isValid) {
-        currentsong = t;
-        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
+        // printf("before fadein %d\n", musicTrack.m_music);
+        int result = Mix_FadeInMusic(musicTrack.m_music, loops, ms);
+        // printf("after fadein %d result\n", result);
+        return result;
     }
 
     return -1;
 }
 
-void musicclass::freeMusic() {
-    for (int i = 0; i < 16; i++) {
-        if (i == currentsong) {
-            // dont free currently playing song
-            continue;
-        }
-        Mix_FreeMusic(musicTracks[i].m_music);
-        musicTracks[i].m_isValid = false;
-    }
-}
+// void musicclass::freeMusic() {
+//     for (int i = 0; i < 16; i++) {
+//         if (i == currentsong) {
+//             // dont free currently playing song
+//             continue;
+//         }
+//         Mix_FreeMusic(musicTracks[i].m_music);
+//         musicTracks[i].m_isValid = false;
+//     }
+// }
 #else
 int musicclass::playMusic(int t, int loop, int ms) { return -1; }
-void musicclass::freeMusic() {}
+// void musicclass::freeMusic() {}
 #endif

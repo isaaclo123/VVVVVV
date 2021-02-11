@@ -208,7 +208,7 @@ void Screen::GetWindowSize(int* x, int* y)
 
 void Screen::UpdateScreen(SDL_Surface* buffer, SDL_Rect* rect )
 {
-  Uint32 func_time = SDL_GetTicks();
+  // Uint32 func_time = SDL_GetTicks();
 
 	if((buffer == NULL) && (m_screen == NULL) )
 	{
@@ -229,7 +229,7 @@ void Screen::UpdateScreen(SDL_Surface* buffer, SDL_Rect* rect )
 		SDL_FreeSurface(buffer);
 	}
 
-  update_time += (SDL_GetTicks() - func_time);
+  // update_time += (SDL_GetTicks() - func_time);
 }
 
 const SDL_PixelFormat* Screen::GetFormat()
@@ -276,32 +276,32 @@ void Screen::FlipScreen()
   inprint(m_window, tmpstats, 10, 10);
   */
 
-  flip_time = SDL_GetTicks();
+  // flip_time = SDL_GetTicks();
 
   //SDL_UpdateRect(m_window, 0, 0, 0, 0);
   SDL_Flip(m_window);
 
-  flip_time = SDL_GetTicks() - flip_time;
+  // flip_time = SDL_GetTicks() - flip_time;
 
-  rect_time = SDL_GetTicks();
+  // rect_time = SDL_GetTicks();
 
   //SDL_FillRect(m_screen, NULL, 0x00000000);
   //SDL_FillRect(m_window, NULL, 0x00000000);
 
-  rect_time = SDL_GetTicks() - rect_time;
+  // rect_time = SDL_GetTicks() - rect_time;
 
-  static Uint32 frame_time = SDL_GetTicks();
-  static Uint32 prev_time = SDL_GetTicks();
+  // static Uint32 frame_time = SDL_GetTicks();
+  // static Uint32 prev_time = SDL_GetTicks();
 
-  frame_time = SDL_GetTicks() - prev_time;
-  prev_time = SDL_GetTicks();
+  // frame_time = SDL_GetTicks() - prev_time;
+  // prev_time = SDL_GetTicks();
 
   static Uint32 t = 0;
-  ++t;
-  if (t == 30) {
-    t = 0;
-    sprintf(tmpstats, "ft u bS bC bSn bNn %d %d %d %d %d %d\0", frame_time, update_time, GraphicsStats::BSS_time, GraphicsStats::BSC_time, GraphicsStats::BSS_numcalls, GraphicsStats::BSC_numcalls);
-  }
+  // ++t;
+  // if (t == 30) {
+  //   t = 0;
+  //   sprintf(tmpstats, "ft u bS bC bSn bNn %d %d %d %d %d %d\0", frame_time, update_time, GraphicsStats::BSS_time, GraphicsStats::BSC_time, GraphicsStats::BSS_numcalls, GraphicsStats::BSC_numcalls);
+  // }
   GraphicsStats::BSS_time = 0;
   GraphicsStats::BSC_time = 0;
   GraphicsStats::BSS_numcalls = 0;

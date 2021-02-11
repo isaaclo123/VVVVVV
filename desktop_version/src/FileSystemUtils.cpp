@@ -39,6 +39,10 @@ int mkdir(char* path, int mode)
 //
 #endif
 
+// create FILE_BUF for reading data, no malloc needed
+// 8.38M 10popularpotpourri.off seems to be largest file
+unsigned char FILE_BUF[8800000];
+
 char saveDir[MAX_PATH];
 char levelDir[MAX_PATH];
 
@@ -158,6 +162,7 @@ char *FILESYSTEM_getUserLevelDirectory()
 void FILESYSTEM_loadFileToMemory(const char *name, unsigned char **mem,
                                  size_t *len, bool addnull)
 {
+    // load into buf
 	PHYSFS_File *handle = PHYSFS_openRead(name);
 	if (handle == NULL)
 	{
@@ -171,12 +176,15 @@ void FILESYSTEM_loadFileToMemory(const char *name, unsigned char **mem,
 	}
 	if (addnull)
 	{
-		*mem = (unsigned char *) malloc(length + 1);
+		// *mem = (unsigned char *) malloc(length + 1);
+		// (*mem)[length] = 0;
+		*mem = FILE_BUF;
 		(*mem)[length] = 0;
 	}
 	else
 	{
-		*mem = (unsigned char*) malloc(length);
+		*mem = FILE_BUF;
+		// *mem = (unsigned char*) malloc(length);
 	}
 	PHYSFS_readBytes(handle, *mem, length);
 	PHYSFS_close(handle);
@@ -184,8 +192,9 @@ void FILESYSTEM_loadFileToMemory(const char *name, unsigned char **mem,
 
 void FILESYSTEM_freeMemory(unsigned char **mem)
 {
-	free(*mem);
-	*mem = NULL;
+    return;
+	// free(*mem);
+	// *mem = NULL;
 }
 
 bool FILESYSTEM_saveTiXmlDocument(const char *name, TiXmlDocument *doc)
