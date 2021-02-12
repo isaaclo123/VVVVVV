@@ -24,7 +24,7 @@ extern "C"
 	);
 }
 
-SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha = false, 
+SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha = false,
     Uint8 key_r = 0x00, Uint8 key_g = 0x00, Uint8 key_b = 0x00)
 //SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha = false)
 {
@@ -64,50 +64,40 @@ SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha =
       }
     }
   }
-  
+
 	loadedImage = SDL_CreateRGBSurfaceFrom(
 		data,
 		width,
 		height,
-		noAlpha ? 24 : 32,    
+		noAlpha ? 24 : 32,
 		width * (noAlpha ? 3 : 4),
 		0x000000FF,
 		0x0000FF00,
 		0x00FF0000,
 		noAlpha ? 0x00000000 : 0xFF000000
 	);
-	
+
   if (loadedImage != NULL)
-	{ 
+	{
     // GUSARBA: Helper Surface
     SDL_Surface* optSurface = SDL_CreateRGBSurface(
       0,
       0,
       0,
-#ifndef PSP
-      16,
-      0xF800,
-      0x07E0,
-      0x001F,
-      0
+      32,
+      0x000000FF,
+      0x0000FF00,
+      0x00FF0000,
+      0xFF000000
     );
-#else
-      16,
-      0xF800,
-      0x07E0,
-      0x001F,
-      0
-    );
-#endif      
-    
-		//optimizedImage = SDL_ConvertSurfaceFormat(    
+
     optimizedImage = SDL_ConvertSurface(
       loadedImage,
       //SDL_PIXELFORMAT_ABGR8888, // FIXME: Format? -flibit
       optSurface->format,
 			0
 		);
-    
+
 
     //SDL_SetAlpha(loadedImage, SDL_SRCALPHA, 255);
     //optimizedImage = SDL_DisplayFormatAlpha(loadedImage);
@@ -115,16 +105,16 @@ SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha =
 
     SDL_FreeSurface(optSurface);
 		SDL_FreeSurface( loadedImage );
-		free(data);    
-    SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_NONE);    
+		free(data);
+    SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_NONE);
 		if (noBlend)
-		{      
-			SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_BLEND);            
+		{
+			SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_BLEND);
 		}
     printf("LoadImage: %s loaded (%dx%d)\n", filename, width, height);
     //SDL_SetAlpha(optimizedImage, SDL_RLEACCEL, 255);
     SDL_SetColorKey(optimizedImage, SDL_RLEACCEL, SDL_MapRGB(optimizedImage->format, 0, 0, 0));
-		return optimizedImage;    
+		return optimizedImage;
 	}
 	else
 	{

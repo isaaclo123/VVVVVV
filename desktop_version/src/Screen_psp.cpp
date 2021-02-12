@@ -4,7 +4,6 @@
 #include "GraphicsUtil.h"
 
 #include <stdlib.h>
-#include <SDL_opengl.h>
 
 #include "SDL2_stub.h"
 
@@ -94,25 +93,6 @@ Screen::Screen()
   // SDL1.2 Migration
   SDL_WM_SetCaption("VVVVVV", "VVVVVV");
 
-
-    // SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
-    // SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
-    // SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
-
-    // SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 0);
-    // SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0);
-    // SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 0);
-
-    // SDL_GL_SetAttribute( SDL_GL_ACCUM_RED_SIZE, 0);
-    // SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 0);
-    // SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 0);
-    // SDL_GL_SetAttribute( SDL_GL_ACCUM_ALPHA_SIZE, 0);
-
-    // SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1);
-
-    // SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-  // m_window = SDL_SetVideoMode(320, 240, 16, SDL_SWSURFACE);
   m_window = SDL_SetVideoMode(480, 272, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
     if (!m_window) {
@@ -120,25 +100,7 @@ Screen::Screen()
         SDL_ClearError();
         SDL_assert(false);
     }
-  // SDL_DOUBLEBUF
 
-	// FIXME: This surface should be the actual backbuffer! -flibit
-	m_screen = SDL_CreateRGBSurface(
-		0,
-		320,
-		240,
-    16,
-    // 0x00000F00,
-    // 0x000000F0,
-    // 0x0000000F,
-    // 0x0000F000
-        0x00FF0000,
-        0x0000FF00,
-        0x000000FF,
-        0xFF000000
-	);
-
-  SDL_SetAlpha(m_screen, 0, 255);
 
   m_screen = m_window;
 

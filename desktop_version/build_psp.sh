@@ -6,12 +6,11 @@ BUILD=true
 LINK=true
 
 if [ "$BUILD" = true ]; then
-    rm -rf build/*
     rm Makefile
-
     mkdir -p build
-
     cd build
+
+    find . -mindepth 1 ! -regex '^./vvvvvv\(/.*\)?' -delete
 
     # -DCMAKE_VERBOSE_MAKEFILE=1 \
     cmake .. \

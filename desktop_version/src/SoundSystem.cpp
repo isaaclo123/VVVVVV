@@ -6,6 +6,8 @@
 
 #include "SDL2_stub.h"
 
+extern char baseDir[256];
+
 MusicTrack::MusicTrack(const char* fileName)
 {
 	// unsigned char *mem;
@@ -28,9 +30,9 @@ MusicTrack::MusicTrack(const char* fileName)
 	// 	printf("Unable to load Ogg Music file: %s\n", Mix_GetError());;
 	// 	m_isValid = false;
 	// }
-        char* basename = "ms0:/PSP/GAME/VVVVVV/";
-        char path[100];
-        strcpy(path, basename);
+        // char* basename = "ms0:/PSP/GAME/VVVVVV/";
+        char path[256];
+        strcpy(path, baseDir);
         strcat(path, fileName);
 
         printf("LoadOgg: %s\n", path);

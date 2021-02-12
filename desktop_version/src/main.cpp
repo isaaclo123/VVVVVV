@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include <SDL_opengl.h>
 #include <SDL_mixer.h>
 #include "SoundSystem.h"
 
@@ -10,6 +9,8 @@
 #include <pspthreadman.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <sys/unistd.h>
 
 #include "UtilityClass.h"
 #include "Game.h"
@@ -54,6 +55,8 @@ KeyPoll key;
 mapclass map;
 entityclass obj;
 
+#define printf pspDebugScreenPrintf
+
 PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
 
 int sdl_psp_exit_callback(int arg1, int arg2, void *common)
@@ -82,33 +85,38 @@ int sdl_psp_setup_callbacks(void)
 	return thid;
 }
 
+char baseDir[256];
+
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
 PSP_HEAP_SIZE_MAX();
 
 int main(int argc, char *argv[])
 {
     // SDL main
+    // sceDisplaySetMode(PSP_DISPLAY_PIXEL_FORMAT_8888, 480, 272);
     scePowerSetClockFrequency(333,333,166);
     pspDebugScreenInit();
     sdl_psp_setup_callbacks();
     atexit(sceKernelExitGame);
 
-    // char* baseDir = NULL;
-    char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
+    // char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
+    getcwd(baseDir, 256);
+    strcat(baseDir, "/vvvvvv/");
+
     char* assetsPath = NULL;
 
-    for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "-renderer") == 0) {
-            ++i;
-            SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, argv[i], SDL_HINT_OVERRIDE);
-        } else if (strcmp(argv[i], "-basedir") == 0) {
-            ++i;
-            baseDir = argv[i];
-        } else if (strcmp(argv[i], "-assets") == 0) {
-            ++i;
-            assetsPath = argv[i];
-        }
-    }
+    // for (int i = 1; i < argc; ++i) {
+    //     if (strcmp(argv[i], "-renderer") == 0) {
+    //         ++i;
+    //         SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, argv[i], SDL_HINT_OVERRIDE);
+    //     } else if (strcmp(argv[i], "-basedir") == 0) {
+    //         ++i;
+    //         baseDir = argv[i];
+    //     } else if (strcmp(argv[i], "-assets") == 0) {
+    //         ++i;
+    //         assetsPath = argv[i];
+    //     }
+    // }
 
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath))
     {
@@ -187,8 +195,6 @@ int main(int argc, char *argv[])
     printf("\t\t\n");
 
     //Set up screen
-
-
 
 
     // Load Ini
@@ -327,10 +333,11 @@ int main(int argc, char *argv[])
         Uint32 timetaken = time - timePrev;
         if(game.gamestate==EDITORMODE)
         {
-            if (timetaken < 24)
+            if (timetaken < 34)
             {
-                volatile Uint32 delay = 24 - timetaken;
-                SDL_Delay( delay );
+                volatile Uint32 delay = 1000 * (34 - timetaken);
+                // SDL_Delay( delay );
+                sceKernelDelayThread(delay);
                 time = SDL_GetTicks();
             }
             timePrev = time;
@@ -338,12 +345,12 @@ int main(int argc, char *argv[])
         }else{
             if (timetaken < game.gameframerate)
             {
-                volatile Uint32 delay = game.gameframerate - timetaken;
-                SDL_Delay( delay );
+                volatile Uint32 delay = 1000 * (game.gameframerate - timetaken);
+                // SDL_Delay( delay );
+                sceKernelDelayThread(delay);
                 time = SDL_GetTicks();
             }
             timePrev = time;
-
         }
 
 
