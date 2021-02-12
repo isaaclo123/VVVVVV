@@ -1,8 +1,10 @@
 #include <SDL.h>
+#include <SDL_opengl.h>
 #include <SDL_mixer.h>
 #include "SoundSystem.h"
 
 #include <pspkernel.h>
+#include <psppower.h>
 #include <pspdebug.h>
 #include <pspsdk.h>
 #include <pspthreadman.h>
@@ -86,6 +88,7 @@ PSP_HEAP_SIZE_MAX();
 int main(int argc, char *argv[])
 {
     // SDL main
+    scePowerSetClockFrequency(333,333,166);
     pspDebugScreenInit();
     sdl_psp_setup_callbacks();
     atexit(sceKernelExitGame);
@@ -113,6 +116,7 @@ int main(int argc, char *argv[])
     }
 
     SDL_Init(
+        // SDL_VIDEO_OPENGL |
         SDL_INIT_VIDEO |
         SDL_INIT_AUDIO
         // | SDL_INIT_JOYSTICK

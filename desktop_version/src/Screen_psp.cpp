@@ -4,6 +4,7 @@
 #include "GraphicsUtil.h"
 
 #include <stdlib.h>
+#include <SDL_opengl.h>
 
 #include "SDL2_stub.h"
 
@@ -92,7 +93,33 @@ Screen::Screen()
 
   // SDL1.2 Migration
   SDL_WM_SetCaption("VVVVVV", "VVVVVV");
-  m_window = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+
+
+    // SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
+    // SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
+    // SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
+
+    // SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 0);
+    // SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0);
+    // SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 0);
+
+    // SDL_GL_SetAttribute( SDL_GL_ACCUM_RED_SIZE, 0);
+    // SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 0);
+    // SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 0);
+    // SDL_GL_SetAttribute( SDL_GL_ACCUM_ALPHA_SIZE, 0);
+
+    // SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1);
+
+    // SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+  // m_window = SDL_SetVideoMode(320, 240, 16, SDL_SWSURFACE);
+  m_window = SDL_SetVideoMode(480, 272, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+
+    if (!m_window) {
+        printf("SDL_SetVideoMode Error: %s\n", SDL_GetError());
+        SDL_ClearError();
+        SDL_assert(false);
+    }
   // SDL_DOUBLEBUF
 
 	// FIXME: This surface should be the actual backbuffer! -flibit
@@ -239,6 +266,9 @@ const SDL_PixelFormat* Screen::GetFormat()
 
 void Screen::FlipScreen()
 {
+  SDL_Flip(m_window);
+    // SDL_UpdateRect(m_window, 0, 0, 0, 0);
+    // SDL_GL_SwapBuffers();
   /*
 	SDL_UpdateTexture(
 		m_screenTexture,
@@ -256,9 +286,9 @@ void Screen::FlipScreen()
 	SDL_RenderClear(m_renderer);
   */
 
-  Uint32 flip_time = 0;
-  Uint32 rect_time = 0;
-  static char tmpstats[256] = {0};
+  // Uint32 flip_time = 0;
+  // Uint32 rect_time = 0;
+  // static char tmpstats[256] = {0};
 
   // GUSARBA: Disabled at the moment
   /*
@@ -279,7 +309,7 @@ void Screen::FlipScreen()
   // flip_time = SDL_GetTicks();
 
   //SDL_UpdateRect(m_window, 0, 0, 0, 0);
-  SDL_Flip(m_window);
+  // SDL_Flip(m_window);
 
   // flip_time = SDL_GetTicks() - flip_time;
 
@@ -296,17 +326,17 @@ void Screen::FlipScreen()
   // frame_time = SDL_GetTicks() - prev_time;
   // prev_time = SDL_GetTicks();
 
-  static Uint32 t = 0;
+  // static Uint32 t = 0;
   // ++t;
   // if (t == 30) {
   //   t = 0;
   //   sprintf(tmpstats, "ft u bS bC bSn bNn %d %d %d %d %d %d\0", frame_time, update_time, GraphicsStats::BSS_time, GraphicsStats::BSC_time, GraphicsStats::BSS_numcalls, GraphicsStats::BSC_numcalls);
   // }
-  GraphicsStats::BSS_time = 0;
-  GraphicsStats::BSC_time = 0;
-  GraphicsStats::BSS_numcalls = 0;
-  GraphicsStats::BSC_numcalls = 0;
-  update_time = 0;
+  // GraphicsStats::BSS_time = 0;
+  // GraphicsStats::BSC_time = 0;
+  // GraphicsStats::BSS_numcalls = 0;
+  // GraphicsStats::BSC_numcalls = 0;
+  // update_time = 0;
 }
 
 void Screen::toggleFullScreen()
