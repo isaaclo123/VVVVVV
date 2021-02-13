@@ -2124,19 +2124,20 @@ void Graphics::drawbackground( int t )
         backoffset+=3;
         if (backoffset >= 16) backoffset -= 16;
 
-        if (backgrounddrawn)
-        {
-            ScrollSurface(towerbuffer, -3, 0 );
-            for (int j = 0; j < 15; j++)
-            {
-                temp = 680 + (rcol * 3);
-                drawtowertile(317 - backoffset, (j * 16), temp+40);  //20*16 = 320
-                drawtowertile(317 - backoffset + 8, (j * 16), temp + 41);
-                drawtowertile(317 - backoffset, (j * 16) + 8, temp + 80);
-                drawtowertile(317 - backoffset + 8, (j * 16) + 8, temp + 81);
-            }
-        }
-        else
+        // if (backgrounddrawn)
+        // {
+        //     // ScrollSurface(towerbuffer, -3, 0 );
+        //     // for (int j = 0; j < 15; j++)
+        //     // {
+        //     //     temp = 680 + (rcol * 3);
+        //     //     drawtowertile(317 - backoffset, (j * 16), temp+40);  //20*16 = 320
+        //     //     drawtowertile(317 - backoffset + 8, (j * 16), temp + 41);
+        //     //     drawtowertile(317 - backoffset, (j * 16) + 8, temp + 80);
+        //     //     drawtowertile(317 - backoffset + 8, (j * 16) + 8, temp + 81);
+        //     // }
+        // }
+        // else
+        if (!backgrounddrawn)
         {
             //draw the whole thing for the first time!
             backoffset = 0;
@@ -2160,19 +2161,20 @@ void Graphics::drawbackground( int t )
         backoffset+=3;
         if (backoffset >= 16) backoffset -= 16;
 
-        if (backgrounddrawn)
-        {
-            ScrollSurface(towerbuffer,0,-3);
-            for (int i = 0; i < 21; i++)
-            {
-                temp = 760 + (rcol * 3);
-                drawtowertile((i * 16), 237 - backoffset, temp + 40); //14*17=240 - 3
-                drawtowertile((i * 16) + 8, 237 - backoffset, temp + 41);
-                drawtowertile((i * 16), 237 - backoffset + 8, temp + 80);
-                drawtowertile((i * 16) + 8, 237 - backoffset + 8, temp + 81);
-            }
-        }
-        else
+        // if (backgrounddrawn)
+        // {
+        //     // ScrollSurface(towerbuffer,0,-3);
+        //     // for (int i = 0; i < 21; i++)
+        //     // {
+        //     //     temp = 760 + (rcol * 3);
+        //     //     drawtowertile((i * 16), 237 - backoffset, temp + 40); //14*17=240 - 3
+        //     //     drawtowertile((i * 16) + 8, 237 - backoffset, temp + 41);
+        //     //     drawtowertile((i * 16), 237 - backoffset + 8, temp + 80);
+        //     //     drawtowertile((i * 16) + 8, 237 - backoffset + 8, temp + 81);
+        //     // }
+        // }
+        // else
+        if (!backgrounddrawn)
         {
             //draw the whole thing for the first time!
             backoffset = 0;
@@ -2574,22 +2576,23 @@ void Graphics::drawtowerbackgroundsolo()
                 drawtowertile3(i * 8, (j * 8) - (map.bypos % 8), temp, map.colstate);
             }
         }
-        SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
+        // SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
         map.tdrawback = false;
     }
-    else
-    {
-        //just update the bottom
-        // TODO
-        ScrollSurface(towerbuffer,0, -map.bscroll);
-        for (int i = 0; i < 40; i++)
-        {
-            temp = map.tower.backat(i, 0, map.bypos);
-            drawtowertile3(i * 8, -(map.bypos % 8), temp, map.colstate);
-        }
+    // else
+    // {
+    //     //just update the bottom
+    //     // TODO
+    //     ScrollSurface(towerbuffer,0, -map.bscroll);
+    //     for (int i = 0; i < 40; i++)
+    //     {
+    //         temp = map.tower.backat(i, 0, map.bypos);
+    //         drawtowertile3(i * 8, -(map.bypos % 8), temp, map.colstate);
+    //     }
 
-        SDL_BlitSurface(towerbuffer, NULL, backBuffer,NULL);
-    }
+    //     SDL_BlitSurface(towerbuffer, NULL, backBuffer,NULL);
+    // }
+    SDL_BlitSurface(towerbuffer, NULL, backBuffer,NULL);
 }
 
 void Graphics::drawtowerbackground()
@@ -2614,22 +2617,22 @@ void Graphics::drawtowerbackground()
             }
         }
 
-        SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
-
         map.tdrawback = false;
     }
-    else
-    {
-        //just update the bottom
-        ScrollSurface(towerbuffer, 0, -map.bscroll);
-        for (int i = 0; i < 40; i++)
-        {
-            temp = map.tower.backat(i, 0, map.bypos);
-            drawtowertile3(i * 8, -(map.bypos % 8), temp, map.colstate);
-        }
 
-        SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
-    }
+    SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
+    // else
+    // {
+    //     //just update the bottom
+    //     ScrollSurface(towerbuffer, 0, -map.bscroll);
+    //     for (int i = 0; i < 40; i++)
+    //     {
+    //         temp = map.tower.backat(i, 0, map.bypos);
+    //         drawtowertile3(i * 8, -(map.bypos % 8), temp, map.colstate);
+    //     }
+
+    //     SDL_BlitSurface(towerbuffer,NULL, backBuffer,NULL);
+    // }
 }
 
 void Graphics::setcol( int t )
