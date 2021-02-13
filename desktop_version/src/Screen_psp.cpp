@@ -93,7 +93,7 @@ Screen::Screen()
   // SDL1.2 Migration
   SDL_WM_SetCaption("VVVVVV", "VVVVVV");
 
-  m_window = SDL_SetVideoMode(480, 272, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  m_window = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
     if (!m_window) {
         printf("SDL_SetVideoMode Error: %s\n", SDL_GetError());

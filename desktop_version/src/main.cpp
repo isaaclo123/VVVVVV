@@ -55,8 +55,6 @@ KeyPoll key;
 mapclass map;
 entityclass obj;
 
-#define printf pspDebugScreenPrintf
-
 PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
 
 int sdl_psp_exit_callback(int arg1, int arg2, void *common)

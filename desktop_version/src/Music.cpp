@@ -79,7 +79,7 @@ void musicclass::play(int t)
 
 
     // if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 0+num_mmmmmm_tracks || currentsong == 7+num_mmmmmm_tracks)))
-    if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
+    if (t == 0 || t == 7 || (!map.custommode && (t == 16 || t == 23)))
     {
         // Level Complete theme, no fade in or repeat
         if (playMusic(t, 1, 0)==-1) {
