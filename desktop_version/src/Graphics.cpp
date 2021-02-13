@@ -2275,7 +2275,8 @@ void Graphics::drawbackground( int t )
         }
         break;
     case 7:
-        //Static, unscrolling section of the tower
+        // Static, unscrolling section of the tower
+        // TODO This one very slow so removed
         FillRect(backBuffer,0x00000);
         break;
         // for (int j = 0; j < 30; j++)

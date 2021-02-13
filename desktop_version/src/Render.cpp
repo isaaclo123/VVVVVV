@@ -2630,18 +2630,20 @@ void maprender()
 
 void towerrender()
 {
-
     FillRect(graphics.backBuffer, 0x000000);
 
-    if (!game.colourblindmode)
-    {
-        graphics.drawtowerbackground();
-        graphics.drawtowermap();
-    }
-    else
-    {
-        graphics.drawtowermap_nobackground();
-    }
+    // TODO dont draw background for now
+    graphics.drawtowermap_nobackground();
+
+    // if (!game.colourblindmode)
+    // {
+    //     graphics.drawtowerbackground();
+    //     graphics.drawtowermap();
+    // }
+    // else
+    // {
+    //     graphics.drawtowermap_nobackground();
+    // }
 
     if(!game.completestop)
     {
