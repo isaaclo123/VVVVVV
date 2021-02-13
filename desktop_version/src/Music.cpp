@@ -111,50 +111,6 @@ void musicclass::play(int t)
             mix_playing_music = 1;
         }
     }
-
-    // mix_volume = 15;
-    // spu_cdda_volume(15, 15);
-    if (currentsong !=t)
-    {
-
-        if (currentsong == 0 || currentsong == 7 || (!map.custommode && (currentsong == 16 || currentsong == 23)))
-        {
-            // Level Complete theme, no fade in or repeat
-            mix_next = t;
-            mix_loops = 0;
-            mix_fading_ms = 0;
-            mix_playing_music = 1;
-
-            // if(soundSystem.playMusic(&(musicTracks[t]))==-1){
-            if (playMusic(t, 1, 0)==-1) {
-                mix_playing_music = 0;
-            }
-
-        }
-        else
-        {
-            if (Mix_FadingMusic() == MIX_FADING_OUT) {
-                // We're already fading out
-                fadeoutqueuesong = t;
-                currentsong = -1;
-                if (!dontquickfade) {
-                    Mix_FadeOutMusic(500); // fade out quicker
-                    mix_fading_out = 1;
-                    mix_fading_ms = 500;
-                } else
-                    dontquickfade = false;
-            }
-            else if(playMusic(t, -1, 3000)==-1)
-            {
-                printf("Mix_FadeInMusic: %s\n", Mix_GetError());
-                mix_fading_out = -1;
-                mix_next = t;
-                mix_loops = -1;
-                mix_fading_ms = 3000;
-                mix_playing_music = 1;
-            }
-        }
-    }
 }
 
 void musicclass::haltdasmusik()
@@ -295,11 +251,8 @@ void musicclass::playef(int t)
 #ifdef VVV_COMPILEMUSIC
 
 int musicclass::playMusic(int t, int loops, int ms) {
-    // free track TODO
-    // prevMusicTrack.free();
-
     // printf("Before setPrevMusicTrack:\n");
-    prevMusicTrack = musicTrack;
+    MusicTrack tmpMusicTrack = musicTrack;
     // printf("After setPrevMusicTrack:\n");
     // printf("Set new musictrack:\n");
     musicTrack = MusicTrack(MUSIC_TRACK_PATHS[t]);
@@ -310,8 +263,12 @@ int musicclass::playMusic(int t, int loops, int ms) {
         // printf("before fadein %d\n", musicTrack.m_music);
         int result = Mix_FadeInMusic(musicTrack.m_music, loops, ms);
         // printf("after fadein %d result\n", result);
+        // tmpMusicTrack.free();
         return result;
     }
+
+    // free track TODO
+    // musicTrack = tmpMusicTrack;
 
     return -1;
 }
