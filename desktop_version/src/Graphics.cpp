@@ -2556,8 +2556,6 @@ void Graphics::drawtowerspikes()
 
 void Graphics::drawtowerbackgroundsolo()
 {
-    // TODO
-    return;
     if (map.bypos < 0)
     {
         map.bypos += 120 * 8;
