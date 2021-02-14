@@ -37,4 +37,6 @@ if [ "$LINK" = true ]; then
 
     psp-fixup-imports VVVVVV
     psp-prxgen VVVVVV VVVVVV.prx
+    mksfo VVVVVV PARAM.SFO
+    pack-pbp EBOOT.PBP PARAM.SFO ../VVVVVV.png NULL NULL NULL NULL VVVVVV.prx NULL
 fi
