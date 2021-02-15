@@ -1,55 +1,32 @@
 How to Build
 ------------
-**For psp, be sure to compile sdl without pspirkeyb support**
 
-VVVVVV's official desktop versions are built with the following environments:
+* Install psptoolchain as usual
+* install my psplibraries fork with small compiler flag changes
+    * 
+      [https://github.com/isaaclo123/psplibraries](https://github.com/isaaclo123/psplibraries)
 
-- Windows: Visual Studio 2010
-- macOS: Xcode CLT, currently targeting 10.9 SDK
-- GNU/Linux: CentOS 7
+To generate the projects on Linux:
 
 ```bash
-# SDL_mixer.sh
-test_deps_install SDL # libmikmod
-get_pspport SDL_mixer SDL_mixer-psp
-run_autogen_build --with-sdl-prefix=$(psp-config --psp-prefix) \
-  --disable-music-cmd --disable-music-mp3 --disable-music-mod --disable-music-midi --disable-music-flac
+# in the VVVVVV/desktop_version/ directory
 
+./build_psp.sh
 ```
 
-The engine depends solely on [SDL2](https://libsdl.org/) and
-[SDL2_mixer](https://www.libsdl.org/projects/SDL_mixer/). All other dependencies
-are statically linked into the engine. The development libraries for Windows can
-be downloaded from their respective websites, Linux developers can find the dev
-libraries from their respective repositories, and macOS developers should
-compile and install from source (including libogg/libvorbis/libvorbisfile).
+This will generate a EBOOT.PBP inside the build folder
 
-Steamworks support is included and the DLL is loaded dynamically, you do not
-need the SDK headers and there is no special Steam or non-Steam version. The
-current implementation has been tested with Steamworks SDK v1.46.
+## How to Install on PSP
 
-To generate the projects on Windows:
-```
-# Put your SDL2/SDL2_mixer folders somewhere nice!
-mkdir flibitBuild
-cd flibitBuild
-cmake -G "Visual Studio 10 2010" .. -DSDL2_INCLUDE_DIRS="C:\SDL2-2.0.10\include;C:\SDL2_mixer-2.0.4\include" -DSDL2_LIBRARIES="C:\SDL2-2.0.10\lib\x86\SDL2;C:\SDL2-2.0.10\lib\x86\SDL2main;C:\SDL2_mixer-2.0.4\lib\x86\SDL2_mixer"
-```
-
-Note that on some systems, the `SDL2_LIBRARIES` list on Windows may need
-SDL2/SDL2main/SDL2_mixer to have `.lib` at the end of them. The reason for this
-inconsistency is unknown.
-
-To generate everywhere else:
-```
-mkdir flibitBuild
-cd flibitBuild
-cmake ..
-```
-
-macOS may be fussy about the SDK version. How to fix this is up to the whims of
-however Apple wants to make CMAKE_OSX_SYSROOT annoying to configure and retain
-each time Xcode updates.
+1. Create a folder VVVVVV
+2. Extract the contents of data,zip into the VVVVVV folder
+3. Find a VVVVVV music unpacker (like vvvvvv_music_unpacker) on github to unpack the 
+   vvvvvvmusic.vvv binary.
+   * This should create a folder called data/music inside the VVVVVV folder
+   * Afterward, feel free to delete the vvvvvvmusic.vvv binary if you wish
+4. Place the EBOOT.PBP inside the VVVVVV folder
+5. Place the VVVVVV folder into /PSP/GAME
+6. Enjoy!
 
 Including data.zip
 ------------

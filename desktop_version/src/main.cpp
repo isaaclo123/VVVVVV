@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     // char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
     getcwd(baseDir, 256);
-    strcat(baseDir, "/vvvvvv/");
+    strcat(baseDir, "/");
 
     char* assetsPath = NULL;
 
