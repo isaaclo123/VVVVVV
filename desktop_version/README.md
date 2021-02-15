@@ -31,6 +31,7 @@ This will generate a EBOOT.PBP inside the build folder
 
 This port is based off of the code from 
 [https://github.com/gusarba/VVVVVVDC](https://github.com/gusarba/VVVVVVDC). The port is a bit messy 
-and has a known memory leak regarding music loading. Certain backgrounds are removed in the Tower 
-stage for slightly better performance, and background scrolling has been disabled for performance 
-too. Certain levels like the Tower are still slower than normal, but playable.
+and has a known memory leak regarding music loading. The port also only compiles for PSP, no other 
+working target. Certain backgrounds are removed in the Tower stage for slightly better performance, 
+and background scrolling has been disabled for performance too. Certain levels like the Tower are 
+still slower than normal, but playable.
