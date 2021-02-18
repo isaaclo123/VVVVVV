@@ -20,6 +20,8 @@
 
 #include "MakeAndPlay.h"
 
+inline int printf(const char *format, ...) {}
+
 // lol, Win32 -flibit
 #ifdef _WIN32
 #define strcasecmp stricmp

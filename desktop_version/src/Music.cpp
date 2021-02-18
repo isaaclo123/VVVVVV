@@ -15,6 +15,8 @@ int mix_volume = 15;
 int mix_loops = -1;
 int mix_next = -1;
 
+inline int printf(const char *format, ...) {}
+
 void musicclass::init()
 {
     for (int i = 0; i < 28; i++) {

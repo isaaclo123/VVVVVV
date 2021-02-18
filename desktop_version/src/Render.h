@@ -16,6 +16,8 @@ void gamerender();
 
 void maprender();
 
+void entityrender();
+
 void teleporterrender();
 
 void gamecompleterender();

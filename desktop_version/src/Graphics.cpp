@@ -2405,11 +2405,6 @@ void Graphics::drawfinalmap()
 
 void Graphics::drawtowermap()
 {
-    // if (foregrounddrawn) {
-    //     foregrounddrawn = false;
-    //     return;
-    // }
-
     int temp;
     for (int j = 0; j < 30; j++)
     {
@@ -2419,7 +2414,6 @@ void Graphics::drawtowermap()
             if (temp > 0) drawtile3(i * 8, (j * 8) - ((int)map.ypos % 8), temp, map.colstate);
         }
     }
-    // foregrounddrawn = true;
 }
 
 void Graphics::drawtowermap_nobackground()

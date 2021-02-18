@@ -41,6 +41,7 @@ int mkdir(char* path, int mode)
 
 
 // #define printf pspDebugScreenPrintf
+inline int printf(const char *format, ...) {}
 
 // create FILE_BUF for reading data, no malloc needed
 // 8.38M 10popularpotpourri.off seems to be largest file

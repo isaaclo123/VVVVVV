@@ -1,5 +1,7 @@
 #include "Render.h"
 
+// #include <melib.h>
+
 #include "Graphics.h"
 #include "UtilityClass.h"
 #include "Maths.h"
@@ -2628,23 +2630,7 @@ void maprender()
     }
 }
 
-void towerrender()
-{
-    FillRect(graphics.backBuffer, 0x000000);
-
-    // TODO dont draw background for now
-    graphics.drawtowermap_nobackground();
-
-    // if (!game.colourblindmode)
-    // {
-    //     graphics.drawtowerbackground();
-    //     graphics.drawtowermap();
-    // }
-    // else
-    // {
-    //     graphics.drawtowermap_nobackground();
-    // }
-
+void entityrender() {
     if(!game.completestop)
     {
         for (size_t i = 0; i < obj.entities.size(); i++)
@@ -2672,16 +2658,71 @@ void towerrender()
             obj.animateentities(i);
         }
     }
+}
 
-    graphics.drawtowerentities();
+void towerrender()
+{
+    // FillRect(graphics.backBuffer, 0x000000);
 
-    graphics.drawtowerspikes();
+
+    // struct Job* j1 = (struct Job*)malloc(sizeof(struct Job));
+    // j1->jobInfo.id = 1;
+    // j1->jobInfo.execMode = MELIB_EXEC_ME;
+    // j1->function = mapwrapper;
+    // j1->data = 0;
+
+    // J_AddJob(j1);
+    // J_Update(0.0f); //No dynamic rebalancing so this doesn't matter.
+
+    // TODO dont draw background for now
+    // graphics.drawtowermap_nobackground();
+
+    // if (!game.colourblindmode)
+    // {
+    //     graphics.drawtowerbackground();
+    //     graphics.drawtowermap();
+    // }
+    // else
+    // {
+    //     graphics.drawtowermap_nobackground();
+    // }
+
+    // if(!game.completestop)
+    // {
+    //     for (size_t i = 0; i < obj.entities.size(); i++)
+    //     {
+    //         //Is this entity on the ground? (needed for jumping)
+    //         if (obj.entitycollidefloor(i))
+    //         {
+    //             obj.entities[i].onground = 2;
+    //         }
+    //         else
+    //         {
+    //             obj.entities[i].onground--;
+    //         }
+
+    //         if (obj.entitycollideroof(i))
+    //         {
+    //             obj.entities[i].onroof = 2;
+    //         }
+    //         else
+    //         {
+    //             obj.entities[i].onroof--;
+    //         }
+
+    //         //Animate the entities
+    //         obj.animateentities(i);
+    //     }
+    // }
+
+    // graphics.drawtowerentities();
+
+    // graphics.drawtowerspikes();
 
 
-    graphics.cutscenebars();
-    BlitSurfaceStandard(graphics.backBuffer, NULL, graphics.tempBuffer, NULL);
+    // graphics.cutscenebars();
+    // BlitSurfaceStandard(graphics.backBuffer, NULL, graphics.tempBuffer, NULL);
 
-    graphics.drawgui();
     if (graphics.flipmode)
     {
         if (game.advancetext) graphics.bprint(5, 228, "- Press ACTION to advance text -", 220 - (help.glow), 220 - (help.glow), 255 - (help.glow / 2), true);

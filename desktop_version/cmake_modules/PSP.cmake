@@ -53,6 +53,7 @@ add_definitions("-G0")
 add_definitions("-D__PSP__")
 add_definitions("-DHAVE_OPENGL")
 add_definitions("-DPSP_FW_VERSION=500")
+add_definitions("-DPSP_LARGE_MEMORY=1")
 
 # Modify compile flags to change optimization level from O3 to O2
 string(REGEX REPLACE "([\\/\\-]O)3" "\\12"

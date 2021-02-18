@@ -1,3 +1,5 @@
+#include <melib.h>
+
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "SoundSystem.h"
@@ -5,8 +7,9 @@
 #include <pspkernel.h>
 #include <psppower.h>
 #include <pspdebug.h>
+#include <pspdisplay.h>
 #include <pspsdk.h>
-#include <pspthreadman.h>
+// #include <pspthreadman.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -37,6 +40,7 @@
 #include "FileSystemUtils.h"
 // #include "Network.h"
 
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -54,8 +58,6 @@ Game game;
 KeyPoll key;
 mapclass map;
 entityclass obj;
-
-PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
 
 int sdl_psp_exit_callback(int arg1, int arg2, void *common)
 {
@@ -85,21 +87,148 @@ int sdl_psp_setup_callbacks(void)
 
 char baseDir[256];
 
-PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_MAX();
+int mapwrapper(JobData d) {
+    (void) d;
+    graphics.drawtowermap_nobackground();
+    // graphics.drawtowermap();
+    return 0;
+}
+
+int inputwrapper(JobData d) {
+    (void) d;
+    gameinput();
+    return 0;
+}
+
+int entitywrapper(JobData d) {
+    (void) d;
+    entityrender();
+    return 0;
+}
+
+int clearwrapper(JobData d) {
+    (void) d;
+    FillRect(graphics.backBuffer, 0x000000);
+    return 0;
+}
+
+int renderwrapper(JobData d) {
+    (void) d;
+    towerrender();
+    return 0;
+}
+//
+int backgroundwrapper(JobData d) {
+    (void) d;
+    graphics.drawtowerbackground();
+}
+
+int barwrapper(JobData d) {
+    (void) d;
+    graphics.cutscenebars();
+    return 0;
+}
+
+int spikewrapper(JobData d) {
+    (void) d;
+    graphics.drawtowerspikes();
+    return 0;
+}
+int entitydrawwrapper(JobData d) {
+    (void) d;
+    graphics.drawtowerentities();
+return 0;
+}
+
+int guiwrapper(JobData d) {
+    (void) d;
+    graphics.drawgui();
+return 0;
+}
+
+int blitwrapper(JobData d) {
+(void) d;
+    BlitSurfaceStandard(graphics.backBuffer, NULL, graphics.tempBuffer, NULL);
+return 0;
+}
+
+int logicwrapper(JobData d) {
+    (void) d;
+    towerlogic();
+    return 0;
+}
+
+inline struct Job* job(JobFunction jobfunc, int execMode) {
+
+    struct Job* j1 = (struct Job*)malloc(sizeof(struct Job));
+    j1->jobInfo.id = 1;
+    j1->jobInfo.execMode = execMode;
+    j1->function = jobfunc;
+    j1->data = 0;
+    return j1;
+}
+
+PSP_MODULE_INFO("VVVVVV", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_VFPU | PSP_THREAD_ATTR_USER);
+PSP_HEAP_SIZE_KB(-1024);
+
+
+int myInt = 77;
+int addFunc(JobData data) {
+	myInt++;
+
+	return 0; //Result doesn't matter
+}
+
+int test(int argc, char* argv[])
+{
+	pspDebugScreenInit();
+        printf("new main\n");
+
+	J_Init(true);
+
+
+	while (1)
+	{
+		pspDebugScreenSetXY(0, 0);
+		pspDebugScreenPrintf("MY COUNTER: %x\n", myInt);
+
+		struct Job* j = (struct Job*)malloc(sizeof(struct Job));
+		j->jobInfo.id = 1;
+		j->jobInfo.execMode = MELIB_EXEC_ME;
+
+		j->function = &addFunc;
+		j->data = (int)&myInt;
+
+		J_AddJob(j);
+
+		J_DispatchJobs(0.0f); //No dynamic rebalancing so this doesn't matter.
+		sceDisplayWaitVblankStart();
+	}
+
+	J_Cleanup();
+
+	return 0;
+}
 
 int main(int argc, char *argv[])
 {
     // SDL main
     // sceDisplaySetMode(PSP_DISPLAY_PIXEL_FORMAT_8888, 480, 272);
     scePowerSetClockFrequency(333,333,166);
+
     pspDebugScreenInit();
+    J_Init(false);
+
+    printf("After J_Init\n");
+
     sdl_psp_setup_callbacks();
     atexit(sceKernelExitGame);
 
     // char* baseDir = "ms0:/PSP/GAME/VVVVVV/";
     getcwd(baseDir, 256);
     strcat(baseDir, "/");
+
 
     char* assetsPath = NULL;
 
@@ -227,7 +356,7 @@ int main(int argc, char *argv[])
     graphics.images.push_back(graphics.grphx.im_image12);
 
     const SDL_PixelFormat* fmt = gameScreen.GetFormat();
-    graphics.backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+    graphics.backBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_ASYNCBLIT, 320, 240, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
     SDL_SetSurfaceBlendMode(graphics.backBuffer, SDL_BLENDMODE_NONE);
     graphics.footerbuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 10, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
     SDL_SetSurfaceBlendMode(graphics.footerbuffer, SDL_BLENDMODE_BLEND);
@@ -429,6 +558,36 @@ int main(int argc, char *argv[])
                 if (map.towermode)
                 {
                     gameinput();
+                    // entityrender();
+
+                    // FillRect(graphics.backBuffer, 0x000000);
+                    // graphics.drawtowermap_nobackground();
+
+                    // J_AddJob(job(inputwrapper, MELIB_EXEC_DEFAULT));
+
+                    J_AddJob(job(entitywrapper, MELIB_EXEC_DEFAULT));
+                    J_AddJob(job(clearwrapper, MELIB_EXEC_DEFAULT));
+
+
+                    // Custom towerrender
+
+                    J_AddJob(job(mapwrapper, MELIB_EXEC_DEFAULT));
+                    // J_AddJob(job(backgroundwrapper, MELIB_EXEC_CPU));
+
+                    J_AddJob(job(barwrapper, MELIB_EXEC_DEFAULT));
+                    J_AddJob(job(spikewrapper, MELIB_EXEC_DEFAULT));
+                    J_AddJob(job(entitydrawwrapper, MELIB_EXEC_DEFAULT));
+
+                    // towerrender();
+
+                    J_AddJob(job(blitwrapper, MELIB_EXEC_DEFAULT));
+                    J_AddJob(job(guiwrapper, MELIB_EXEC_DEFAULT));
+
+                    // J_AddJob(job(renderwrapper, MELIB_EXEC_DEFAULT));
+                    // J_AddJob(job(logicwrapper, MELIB_EXEC_DEFAULT));
+
+                    J_Update(0.2f); //No dynamic rebalancing so this doesn't matter.
+
                     towerrender();
                     towerlogic();
 
@@ -442,6 +601,7 @@ int main(int argc, char *argv[])
                     }
 
                     gameinput();
+
                     gamerender();
                     gamelogic();
 
@@ -553,6 +713,7 @@ int main(int argc, char *argv[])
     }
 
     game.savestats();
+    J_Cleanup();
     // NETWORK_shutdown();
     SDL_Quit();
     FILESYSTEM_deinit();

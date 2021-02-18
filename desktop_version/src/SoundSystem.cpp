@@ -8,6 +8,8 @@
 
 extern char baseDir[256];
 
+inline int printf(const char *format, ...) {}
+
 MusicTrack::MusicTrack(const char* fileName)
 {
 	// unsigned char *mem;

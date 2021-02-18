@@ -4,7 +4,7 @@
 #include "GraphicsResources.h"
 #include <vector>
 #include <map>
-
+#include <me.h>
 
 
 #include "Maths.h"
@@ -25,6 +25,7 @@ public:
 	void init();
 	~Graphics();
 
+        me_struct me;
 	GraphicsResources grphx;
 
 	int bfontlen(uint32_t ch);

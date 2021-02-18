@@ -109,17 +109,30 @@ ENDIF()
 INCLUDE_DIRECTORIES(
         src
         # ../third_party/snprintf
-        ../third_party/tinyxml2
+        ../third_party/MElib/include
+        ../third_party/MElib/include/driver # ../third_party/MElib
+        # ../third_party/MElib/src/driver
         ../third_party/tinyxml
         ../third_party/physfs
-        ../third_party/psp-physfs
         ../third_party/lodepng
         ../third_party/utfcpp/source
 )
 
 # Source Lists
+# SET(MELIB_SRC
+#     ../third_party/MElib/src/MediaEngine.S
+#     ../third_party/MElib/src/me.c
+#     ../third_party/MElib/src/melib.c
+#     ../third_party/MElib/src/driver/MediaEngine.S
+#     ../third_party/MElib/src/driver/me.c
+#     ../third_party/MElib/src/driver/me_stub.S
+#     )
+
 SET(VVV_SRC
-    # src/BinaryBlob.cpp
+    # ../third_party/MElib/src/me.c
+    # ../third_party/MElib/src/melib.c
+    # ../third_party/MElib/src/MediaEngine.S
+
         src/BlockV.cpp
         src/editor.cpp
         src/Ent.cpp
@@ -172,23 +185,7 @@ SET(XML_SRC
         ../third_party/tinyxml/snprintf.cpp
 )
 
-SET(XML2_SRC
-        ../third_party/tinyxml2/snprintf.cpp
-        ../third_party/tinyxml2/tinyxml2.cpp
-)
-
 SET(PFS_SRC
-    # ../third_party/psp-physfs/physfs.c
-    # ../third_party/psp-physfs/physfs_byteorder.c
-    # ../third_party/psp-physfs/physfs_unicode.c
-    # ../third_party/psp-physfs/archivers/zip.c
-    # ../third_party/psp-physfs/archivers/dir.c
-    # # ../third_party/psp-physfs/archivers/unpacked.c
-    # ../third_party/psp-physfs/platform/vita.c
-    # ../third_party/physfs/physfs_archiver_dir.c
-    # ../third_party/physfs/physfs_archiver_unpacked.c
-    # ../third_party/physfs/physfs_archiver_zip.c
-    # ../third_party/physfs/physfs.c
     ../third_party/physfs/physfs.c
     ../third_party/physfs/physfs_archiver_dir.c
     ../third_party/physfs/physfs_archiver_unpacked.c
@@ -213,6 +210,8 @@ IF(WIN32)
 ELSE()
         ADD_EXECUTABLE(VVVVVV ${VVV_SRC})
 ENDIF()
+
+# ADD_EXECUTABLE(MediaEngine ${MEDIAENGINE_SRC})
 
 IF(NOT OFFICIAL_BUILD)
         # Add interim commit hash and its date to the build
@@ -283,14 +282,6 @@ ENDIF()
 SET_PROPERTY(TARGET VVVVVV PROPERTY CXX_STANDARD 98)
 SET_PROPERTY(TARGET VVVVVV PROPERTY CXX_EXTENSIONS FALSE)
 
-# Library information
-ADD_LIBRARY(tinyxml2-static STATIC ${XML2_SRC})
-target_precompile_headers(tinyxml2-static
-    PRIVATE ../third_party/tinyxml2/config.h
-    PRIVATE ../third_party/tinyxml2/tinyxml2.h
-)
-# target_include_directories(VVVVVV PUBLIC ../third_party/tinyxml2)
-
 ADD_LIBRARY(tinyxml-static STATIC ${XML_SRC})
 target_precompile_headers(tinyxml-static
     PRIVATE ../third_party/tinyxml/config.h
@@ -300,14 +291,12 @@ target_precompile_headers(tinyxml-static
 ADD_LIBRARY(physfs-static STATIC ${PFS_SRC})
 ADD_LIBRARY(lodepng-static STATIC ${PNG_SRC})
 
-# TARGET_LINK_LIBRARIES(tinyxml2-static snprintf-static )
-
 # Static Dependencies
 TARGET_LINK_LIBRARIES(
     VVVVVV
+    ../third_party/MElib/lib/libME.a
     physfs-static
     tinyxml-static
-    tinyxml2-static
     lodepng-static
     )
 
