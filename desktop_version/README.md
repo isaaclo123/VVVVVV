@@ -24,6 +24,7 @@ This will generate a EBOOT.PBP inside the build folder
    * This should create a folder called data/music inside the VVVVVV folder
    * Afterward, feel free to delete the vvvvvvmusic.vvv binary if you wish
 4. Place the EBOOT.PBP inside the VVVVVV folder
+4. Place the mediaengine.prx file inside the VVVVVV folder
 5. Place the VVVVVV folder into /PSP/GAME
 6. Enjoy!
 
