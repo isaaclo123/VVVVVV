@@ -87,7 +87,7 @@ int sdl_psp_setup_callbacks(void)
 
 char baseDir[256];
 
-int mapwrapper(JobData d) {
+int towermapwrapper(JobData d) {
     (void) d;
     graphics.drawtowermap_nobackground();
     // graphics.drawtowermap();
@@ -117,11 +117,6 @@ int renderwrapper(JobData d) {
     towerrender();
     return 0;
 }
-//
-int backgroundwrapper(JobData d) {
-    (void) d;
-    graphics.drawtowerbackground();
-}
 
 int barwrapper(JobData d) {
     (void) d;
@@ -134,7 +129,8 @@ int spikewrapper(JobData d) {
     graphics.drawtowerspikes();
     return 0;
 }
-int entitydrawwrapper(JobData d) {
+
+int towerentitydrawwrapper(JobData d) {
     (void) d;
     graphics.drawtowerentities();
 return 0;
@@ -155,6 +151,41 @@ return 0;
 int logicwrapper(JobData d) {
     (void) d;
     towerlogic();
+    return 0;
+}
+
+
+
+
+int backgroundwrapper(JobData d) {
+    (void) d;
+    if(!game.colourblindmode)
+    {
+        graphics.drawbackground(map.background);
+    }
+    else
+    {
+        FillRect(graphics.backBuffer,0x00000);
+    }
+    return 0;
+}
+
+int mapwrapper(JobData d) {
+    (void) d;
+    if (map.final_colormode)
+    {
+        graphics.drawfinalmap();
+    }
+    else
+    {
+        graphics.drawmap();
+    }
+    return 0;
+}
+
+int entitydrawwrapper(JobData d) {
+    (void) d;
+    graphics.drawentities();
     return 0;
 }
 
@@ -367,7 +398,7 @@ int main(int argc, char *argv[])
     graphics.Makebfont();
 
 
-    graphics.foregroundBuffer =  SDL_CreateRGBSurface(SDL_SWSURFACE ,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask  );
+    graphics.foregroundBuffer =  SDL_CreateRGBSurface(SDL_SWSURFACE,320 ,240 ,fmt->BitsPerPixel,fmt->Rmask,fmt->Gmask,fmt->Bmask,fmt->Amask  );
     SDL_SetSurfaceBlendMode(graphics.foregroundBuffer, SDL_BLENDMODE_NONE);
 
     graphics.screenbuffer = &gameScreen;
@@ -558,35 +589,17 @@ int main(int argc, char *argv[])
                 if (map.towermode)
                 {
                     gameinput();
-                    // entityrender();
-
-                    // FillRect(graphics.backBuffer, 0x000000);
-                    // graphics.drawtowermap_nobackground();
-
-                    // J_AddJob(job(inputwrapper, MELIB_EXEC_DEFAULT));
 
                     J_AddJob(job(entitywrapper, MELIB_EXEC_DEFAULT));
                     J_AddJob(job(clearwrapper, MELIB_EXEC_DEFAULT));
-
-
-                    // Custom towerrender
-
-                    J_AddJob(job(mapwrapper, MELIB_EXEC_DEFAULT));
-                    // J_AddJob(job(backgroundwrapper, MELIB_EXEC_CPU));
-
+                    J_AddJob(job(towermapwrapper, MELIB_EXEC_DEFAULT));
                     J_AddJob(job(barwrapper, MELIB_EXEC_DEFAULT));
                     J_AddJob(job(spikewrapper, MELIB_EXEC_DEFAULT));
-                    J_AddJob(job(entitydrawwrapper, MELIB_EXEC_DEFAULT));
-
-                    // towerrender();
-
+                    J_AddJob(job(towerentitydrawwrapper, MELIB_EXEC_DEFAULT));
                     J_AddJob(job(blitwrapper, MELIB_EXEC_DEFAULT));
                     J_AddJob(job(guiwrapper, MELIB_EXEC_DEFAULT));
 
-                    // J_AddJob(job(renderwrapper, MELIB_EXEC_DEFAULT));
-                    // J_AddJob(job(logicwrapper, MELIB_EXEC_DEFAULT));
-
-                    J_Update(0.2f); //No dynamic rebalancing so this doesn't matter.
+                    J_Update(0.1f); //No dynamic rebalancing so this doesn't matter.
 
                     towerrender();
                     towerlogic();
@@ -601,6 +614,20 @@ int main(int argc, char *argv[])
                     }
 
                     gameinput();
+
+                    if(!game.completestop) {
+                        // entityrender();
+                        J_AddJob(job(entitywrapper, MELIB_EXEC_DEFAULT));
+                        J_AddJob(job(backgroundwrapper, MELIB_EXEC_DEFAULT));
+                        J_AddJob(job(mapwrapper, MELIB_EXEC_DEFAULT));
+                        // graphics.drawentities();
+                        // J_AddJob(job(entitydrawwrapper, MELIB_EXEC_DEFAULT));
+
+                        J_Update(0.1f); //No dynamic rebalancing so this doesn't matter.
+                    }
+                    //
+                    // J_AddJob(job(entitydrawwrapper, MELIB_EXEC_DEFAULT));
+                    graphics.drawentities();
 
                     gamerender();
                     gamelogic();

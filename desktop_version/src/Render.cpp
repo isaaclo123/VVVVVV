@@ -1416,6 +1416,7 @@ void gamerender()
     if(!game.blackout)
     {
 
+        /*
         if(!game.colourblindmode)
         {
             graphics.drawbackground(map.background);
@@ -1432,10 +1433,12 @@ void gamerender()
         {
             graphics.drawmap();
         }
+        */
 
         time = SDL_GetTicks() - time;
         // time_entities = SDL_GetTicks();
 
+        /*
         if(!game.completestop)
         {
             for (size_t i = 0; i < obj.entities.size(); i++)
@@ -1465,6 +1468,7 @@ void gamerender()
         }
 
         graphics.drawentities();
+        */
     }
 
     // time_entities = SDL_GetTicks() - time_entities;
