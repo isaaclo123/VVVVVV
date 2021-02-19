@@ -88,8 +88,7 @@ public:
 	// std::vector<SoundTrack> soundTracks;
 	SoundTrack soundTracks[28];
 	// std::vector<MusicTrack> musicTracks;
-	// MusicTrack musicTracks[16];
-	MusicTrack musicTrack;
+	MusicTrack musicTracks[16];
 
 	SoundSystem soundSystem;
 	bool safeToProcessMusic;

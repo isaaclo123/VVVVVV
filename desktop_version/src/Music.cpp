@@ -252,6 +252,7 @@ void musicclass::playef(int t)
 
 #ifdef VVV_COMPILEMUSIC
 
+/*
 int musicclass::playMusic(int t, int loops, int ms) {
     // printf("Before setPrevMusicTrack:\n");
     MusicTrack tmpMusicTrack = musicTrack;
@@ -271,6 +272,24 @@ int musicclass::playMusic(int t, int loops, int ms) {
 
     // free track TODO
     // musicTrack = tmpMusicTrack;
+
+    return -1;
+}
+*/
+
+int musicclass::playMusic(int t, int loops, int ms) {
+    // load music file if not in yet
+    if (musicTracks[t].m_isValid) {
+        currentsong = t;
+        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
+    }
+
+    musicTracks[t] = MusicTrack(MUSIC_TRACK_PATHS[t]);
+
+    if (musicTracks[t].m_isValid) {
+        currentsong = t;
+        return Mix_FadeInMusic(musicTracks[t].m_music, loops, ms);
+    }
 
     return -1;
 }
